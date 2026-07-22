@@ -9,9 +9,9 @@ CREATE TABLE IF NOT EXISTS pengaturan (
 );
 
 INSERT OR IGNORE INTO pengaturan (key, value) VALUES
-  ('kontak_alamat',  'Kantor Desa Loji, Kecamatan Simpenan, Kabupaten Sukabumi, Jawa Barat'),
+  ('kontak_alamat',  'Kantor Desa Citarik, Kecamatan Simpenan, Kabupaten Sukabumi, Jawa Barat'),
   ('kontak_telepon', '(0266) 000-0000'),
-  ('kontak_email',   'desalojimaju@gmail.com'),
+  ('kontak_email',   'desacitarik@gmail.com'),
   ('kontak_jam',     'Senin-Jumat, pukul 08.00-15.00 WIB'),
   ('sosial_whatsapp', ''),
   ('sosial_facebook', ''),

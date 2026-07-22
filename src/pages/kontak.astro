@@ -17,13 +17,13 @@ const kanal = [
 ---
 
 <Layout
-  title="Kontak & Info | Desa Loji"
-  description="Alamat, telepon, email, dan kanal resmi Pemerintah Desa Loji, Kecamatan Simpenan, Kabupaten Sukabumi."
+  title="Kontak & Info | Desa Citarik"
+  description="Alamat, telepon, email, dan kanal resmi Pemerintah Desa Citarik, Kecamatan Simpenan, Kabupaten Sukabumi."
 >
 
 <main id="main" class="mx-auto max-w-[1152px] px-4 sm:px-6 py-10">
   <h1 class="text-3xl sm:text-4xl font-heading font-extrabold text-primary">Kontak & Info Desa</h1>
-  <p class="text-muted mt-2 max-w-xl">Hubungi Pemerintah Desa Loji melalui kanal resmi berikut.</p>
+  <p class="text-muted mt-2 max-w-xl">Hubungi Pemerintah Desa Citarik melalui kanal resmi berikut.</p>
 
   <div class="grid lg:grid-cols-2 gap-6 mt-8">
     <!-- Info cards -->
@@ -81,7 +81,7 @@ const kanal = [
   document.addEventListener('DOMContentLoaded', function() {
     var map = L.map('kontak-map', { scrollWheelZoom: false }).setView([-7.0589, 106.5778], 14);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
-    L.marker([-7.0589, 106.5778]).addTo(map).bindPopup('<b>Kantor Desa Loji</b><br>Kec. Simpenan, Sukabumi');
+    L.marker([-7.0589, 106.5778]).addTo(map).bindPopup('<b>Kantor Desa Citarik</b><br>Kec. Simpenan, Sukabumi');
     if (typeof lucide !== 'undefined') lucide.createIcons();
   });
   setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 300);

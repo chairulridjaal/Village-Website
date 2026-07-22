@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /api
 
-Sitemap: https://loji.web.id/sitemap.xml
+Sitemap: https://citarik.web.id/sitemap.xml

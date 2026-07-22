@@ -1,6 +1,6 @@
-# Panduan Admin — Web Desa Loji
+# Panduan Admin — Web Desa Citarik
 
-Panduan ini untuk **pengelola konten** situs https://loji.web.id (perangkat desa / Karang Taruna).
+Panduan ini untuk **pengelola konten** situs https://citarik.web.id (perangkat desa / Karang Taruna).
 Anda **tidak perlu keahlian teknis** — semua dilakukan lewat browser (HP atau komputer).
 
 > **Prinsip penting:** Semua perubahan lewat Panel Admin **langsung tayang** di situs
@@ -10,7 +10,7 @@ Anda **tidak perlu keahlian teknis** — semua dilakukan lewat browser (HP atau 
 
 ## 1. Masuk ke Panel Admin
 
-1. Buka **https://loji.web.id/admin** di browser.
+1. Buka **https://citarik.web.id/admin** di browser.
 2. Masukkan **nama pengguna** dan **kata sandi** admin desa.
 3. Klik **Masuk**.
 
@@ -50,7 +50,7 @@ Ini fitur yang paling sering dipakai. Targetnya: **minimal 1 berita per bulan** 
 
 **Menulis berita baru:**
 1. Menu **Berita** → **Tulis Berita Baru** (atau lewat Aksi Cepat di Dasbor).
-2. Isi **Judul** (singkat dan jelas, misal: "Kerja Bakti Bersih Pantai Loji").
+2. Isi **Judul** (singkat dan jelas, misal: "Kerja Bakti Bersih Pantai Citarik").
 3. Tulis **Isi Berita**. Toolbar menyediakan tebal/miring, subjudul, daftar, dan **sisip gambar** langsung di dalam tulisan. Draf tersimpan otomatis selama mengetik.
 4. Pilih salah satu:
    - **Simpan Draf** — tersimpan tapi *belum* tampil di situs. Bisa dilanjutkan nanti.
@@ -63,7 +63,7 @@ Ini fitur yang paling sering dipakai. Targetnya: **minimal 1 berita per bulan** 
 
 ## 5. Wisata
 
-Menu **Wisata** mengelola destinasi (Pantai Loji, Vihara, Geopark Ciletuh, dst).
+Menu **Wisata** mengelola destinasi (Pantai Citarik, Vihara, Geopark Ciletuh, dst).
 
 1. **Tambah Wisata** → isi **Nama** dan **Deskripsi**, pilih Status **Draf** dulu.
 2. Simpan, lalu buka kembali dari daftar untuk menambah **foto sampul + galeri**.
@@ -89,7 +89,7 @@ Menu **UMKM** mengelola direktori usaha warga.
 
 Menu **Peta** mengelola titik-titik di peta interaktif desa.
 
-1. Isi **Label** (nama titik), **Jenis** (wisata/UMKM/fasilitas), dan **Slug Entitas** (nama-pendek halaman wisata/UMKM yang ditautkan, terlihat di alamat halamannya, contoh: `pantai-loji`).
+1. Isi **Label** (nama titik), **Jenis** (wisata/UMKM/fasilitas), dan **Slug Entitas** (nama-pendek halaman wisata/UMKM yang ditautkan, terlihat di alamat halamannya, contoh: `pantai-Citarik`).
 2. Isi **Lintang** dan **Bujur** (koordinat). Cara mudah: buka Google Maps → tekan-lama lokasi → salin dua angka yang muncul (contoh: `-7.0512, 106.5233`) → angka pertama = Lintang, kedua = Bujur.
 3. Simpan — titik langsung muncul di halaman Peta situs.
 
@@ -133,4 +133,4 @@ Menu **Statistik**:
 
 ---
 
-*Dokumen serah terima Program DIGDAYA DESA — KKNT Inovasi IPB 2026, Desa Loji, Kec. Simpenan, Kab. Sukabumi.*
+*Dokumen serah terima Program DIGDAYA DESA — KKNT Inovasi IPB 2026, Desa Citarik, Kec. Simpenan, Kab. Sukabumi.*

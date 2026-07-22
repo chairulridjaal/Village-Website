@@ -29,8 +29,8 @@ const totalKK = wilayahData.reduce((sum, d) => sum + d.kk, 0);
 ---
 
 <Layout
-  title="Pemerintahan Desa | Desa Loji"
-  description="Pemerintahan Desa Loji: perangkat desa, struktur organisasi, visi & misi, ruang lingkup, tugas & fungsi."
+  title="Pemerintahan Desa | Desa Citarik"
+  description="Pemerintahan Desa Citarik: perangkat desa, struktur organisasi, visi & misi, ruang lingkup, tugas & fungsi."
 >
 
 <!-- Hero -->
@@ -38,7 +38,7 @@ const totalKK = wilayahData.reduce((sum, d) => sum + d.kk, 0);
   <div class="h-48 sm:h-60 overflow-hidden">
     <img
       src="/images/kantor_desa.png"
-      alt="Kantor Desa Loji"
+      alt="Kantor Desa Citarik"
       class="w-full h-full object-cover"
     />
   </div>
@@ -52,7 +52,7 @@ const totalKK = wilayahData.reduce((sum, d) => sum + d.kk, 0);
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
         <span class="font-medium">Pemerintahan</span>
       </nav>
-      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1">Pemerintahan Desa Loji</h1>
+      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1">Pemerintahan Desa Citarik</h1>
       <p class="text-white/85 mt-1 max-w-xl">Perangkat, struktur, dan visi-misi penyelenggara pemerintahan desa.</p>
     </div>
   </div>
@@ -83,7 +83,7 @@ const totalKK = wilayahData.reduce((sum, d) => sum + d.kk, 0);
   <!-- Perangkat Desa -->
   <section id="perangkat" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Perangkat Desa</h2>
-    <p class="text-muted mt-2 max-w-2xl">Jajaran perangkat Pemerintah Desa Loji, dari pimpinan hingga pelaksana.</p>
+    <p class="text-muted mt-2 max-w-2xl">Jajaran perangkat Pemerintah Desa Citarik, dari pimpinan hingga pelaksana.</p>
 
     {perangkat.length > 0 ? (
       <div class="mt-8 space-y-6">
@@ -168,9 +168,9 @@ const totalKK = wilayahData.reduce((sum, d) => sum + d.kk, 0);
   <!-- Struktur Organisasi -->
   <section id="struktur" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Struktur Organisasi</h2>
-    <p class="text-muted mt-2 max-w-2xl">Bagan struktur organisasi Pemerintah Desa Loji beserta jajaran perangkatnya.</p>
+    <p class="text-muted mt-2 max-w-2xl">Bagan struktur organisasi Pemerintah Desa Citarik beserta jajaran perangkatnya.</p>
     <div class="mt-4 rounded-2xl overflow-hidden border border-line shadow-[0_4px_10px_rgba(15,36,51,.08)]">
-      <img src="/images/struktur_organisasi.png" alt="Bagan Struktur Organisasi Desa Loji" class="w-full h-auto object-cover" />
+      <img src="/images/struktur_organisasi.png" alt="Bagan Struktur Organisasi Desa Citarik" class="w-full h-auto object-cover" />
     </div>
   </section>
 
@@ -182,7 +182,7 @@ const totalKK = wilayahData.reduce((sum, d) => sum + d.kk, 0);
         <span class="inline-flex items-center gap-2 text-white/80 font-heading font-semibold">
           <i data-lucide="target" class="w-5 h-5"></i> Visi
         </span>
-        <p class="text-xl font-heading font-semibold mt-3 leading-snug" set:html={visiMisi?.content_html ?? '"Mewujudkan Desa Loji yang maju, mandiri, dan sejahtera berbasis potensi bahari dan pariwisata yang berkelanjutan."'} />
+        <p class="text-xl font-heading font-semibold mt-3 leading-snug" set:html={visiMisi?.content_html ?? '"Mewujudkan Desa Citarik yang maju, mandiri, dan sejahtera berbasis potensi bahari dan pariwisata yang berkelanjutan."'} />
       </div>
       <div class="bg-white border border-line rounded-2xl p-7">
         <span class="inline-flex items-center gap-2 text-primary font-heading font-semibold">
@@ -208,7 +208,7 @@ const totalKK = wilayahData.reduce((sum, d) => sum + d.kk, 0);
   <!-- Ruang Lingkup -->
   <section id="ruang-lingkup" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Ruang Lingkup</h2>
-    <p class="text-muted mt-2 max-w-3xl leading-relaxed" set:html={ruangLingkup?.content_html ?? 'Bagian ini menjelaskan cakupan wilayah administratif Desa Loji, jumlah dusun/RW/RT, serta lingkup kewenangan dan layanan yang diselenggarakan pemerintah desa bagi masyarakat.'} />
+    <p class="text-muted mt-2 max-w-3xl leading-relaxed" set:html={ruangLingkup?.content_html ?? 'Bagian ini menjelaskan cakupan wilayah administratif Desa Citarik, jumlah dusun/RW/RT, serta lingkup kewenangan dan layanan yang diselenggarakan pemerintah desa bagi masyarakat.'} />
     <div class="grid sm:grid-cols-4 gap-4 mt-4">
       {[
         { icon: 'layers', label: 'Dusun', value: String(wilayahData.length) },

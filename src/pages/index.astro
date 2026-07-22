@@ -30,27 +30,27 @@ const totalPenduduk = dusunData.reduce((sum, d) => sum + d.l + d.p, 0);
 const petaCountByJenis = Object.fromEntries(petaCounts.results.map(r => [r.jenis, r.n]));
 
 const demoWisata = [
-  { slug: 'pantai-loji', nama: 'Pantai Loji', img: '/images/pantai_loji.png', tag: 'Pantai', desc: 'Garis pantai sepanjang ±4 km di tepi Samudra Hindia, bagian kawasan Geopark Ciletuh-Palabuhanratu.' },
-  { slug: 'danau-talanca', nama: 'Danau Talanca', img: '/images/pantai_loji.png', tag: 'Wisata Air', desc: 'Danau seluas 20 hektar berpotensi untuk wisata air dan perikanan.' },
-  { slug: 'puncak-gelendrung', nama: 'Puncak Gelendrung', img: '/images/pantai_loji.png', tag: 'Alam', desc: 'Puncak di kawasan Gunung Rompang yang cocok untuk wisata alam dan paralayang.' },
+  { slug: 'pantai-Citarik', nama: 'Pantai Citarik', img: '/images/pantai_Citarik.png', tag: 'Pantai', desc: 'Garis pantai sepanjang ±4 km di tepi Samudra Hindia, bagian kawasan Geopark Ciletuh-Palabuhanratu.' },
+  { slug: 'danau-talanca', nama: 'Danau Talanca', img: '/images/pantai_Citarik.png', tag: 'Wisata Air', desc: 'Danau seluas 20 hektar berpotensi untuk wisata air dan perikanan.' },
+  { slug: 'puncak-gelendrung', nama: 'Puncak Gelendrung', img: '/images/pantai_Citarik.png', tag: 'Alam', desc: 'Puncak di kawasan Gunung Rompang yang cocok untuk wisata alam dan paralayang.' },
 ];
 
 const demoUmkm: Array<{slug:string;nama:string;kategori:string;img:string;wa:string|null;desc:string}> = [];
 
 const demoBerita = [
-  { slug: 'gotong-royong-bersih-pantai', judul: 'Gotong Royong Bersih Pantai Loji Menyambut Musim Kunjungan', published_at: '2026-07-12', img: '/images/gotong_royong.png', ringkasan: 'Warga bersama Karang Taruna membersihkan pesisir Pantai Loji dalam rangka menyambut meningkatnya kunjungan wisatawan.' },
+  { slug: 'gotong-royong-bersih-pantai', judul: 'Gotong Royong Bersih Pantai Citarik Menyambut Musim Kunjungan', published_at: '2026-07-12', img: '/images/gotong_royong.png', ringkasan: 'Warga bersama Karang Taruna membersihkan pesisir Pantai Citarik dalam rangka menyambut meningkatnya kunjungan wisatawan.' },
   { slug: 'pelatihan-digital-umkm', judul: 'Pelatihan Digital untuk UMKM Desa', published_at: '2026-07-08', img: '/images/pelatihan_umkm.png', ringkasan: 'Sepuluh pelaku UMKM mengikuti pelatihan foto produk dan WhatsApp Business.' },
-  { slug: 'peluncuran-situs-resmi', judul: 'Peluncuran Situs Resmi Desa Loji', published_at: '2026-07-01', img: '/images/pelatihan_umkm.png', ringkasan: 'Desa Loji kini punya kehadiran digital resmi yang dapat diakses siapa saja.' },
+  { slug: 'peluncuran-situs-resmi', judul: 'Peluncuran Situs Resmi Desa Citarik', published_at: '2026-07-01', img: '/images/pelatihan_umkm.png', ringkasan: 'Desa Citarik kini punya kehadiran digital resmi yang dapat diakses siapa saja.' },
 ];
 
 const getWisataImg = (slug: string) => {
-  if (slug === 'pantai-loji') return '/images/pantai_loji.png';
+  if (slug === 'pantai-Citarik') return '/images/pantai_Citarik.png';
   if (slug === 'pantai-karang-sari') return '/images/karang_sari.png';
-  return '/images/pantai_loji.png';
+  return '/images/pantai_Citarik.png';
 };
 
 const getUmkmImg = (slug: string) => {
-  if (slug === 'kerajinan-bambu-loji') return '/images/kerajinan_bambu.png';
+  if (slug === 'kerajinan-bambu-Citarik') return '/images/kerajinan_bambu.png';
   if (slug === 'warung-ikan-bakar-bu-sari') return '/images/ikan_bakar.png';
   if (slug === 'kebun-sayur-pak-budi') return '/images/kebun_sayur.png';
   return '/images/kerajinan_bambu.png';
@@ -79,8 +79,8 @@ const finalBerita = beritaList.length > 0
 ---
 
 <Layout
-  title="Desa Loji - Website Desa"
-  description="Situs resmi Pemerintah Desa Loji, Kecamatan Simpenan, Kabupaten Sukabumi. Jelajahi wisata bahari, UMKM lokal, dan potensi desa pesisir yang memukau."
+  title="Desa Citarik - Website Desa"
+  description="Situs resmi Pemerintah Desa Citarik, Kecamatan Simpenan, Kabupaten Sukabumi. Jelajahi wisata bahari, UMKM lokal, dan potensi desa pesisir yang memukau."
   transparentNav={true}
 >
 
@@ -93,9 +93,9 @@ const finalBerita = beritaList.length > 0
   <!-- Background photo -->
   <div
     class="absolute inset-0 bg-cover bg-center"
-    style="background-image: url('/images/pantai_loji.png');"
+    style="background-image: url('/images/pantai_Citarik.png');"
     role="img"
-    aria-label="Pantai Loji, pesisir selatan Sukabumi"
+    aria-label="Pantai Citarik, pesisir selatan Sukabumi"
   ></div>
   <!-- Gradient overlay -->
   <div class="absolute inset-0" style="background: linear-gradient(to bottom, rgba(10,54,80,0.55) 0%, rgba(10,54,80,0.35) 45%, rgba(10,54,80,0.75) 100%);"></div>
@@ -107,7 +107,7 @@ const finalBerita = beritaList.length > 0
       Gerbang Geopark Ciletuh
     </span>
     <h1 id="hero-heading" class="font-heading font-extrabold text-white text-4xl sm:text-5xl lg:text-6xl leading-tight max-w-2xl">
-      Jelajahi<br/>Desa Loji
+      Jelajahi<br/>Desa Citarik
     </h1>
     <div
       class="text-white/85 text-lg mt-3 max-w-xl"
@@ -157,13 +157,13 @@ const finalBerita = beritaList.length > 0
 
 <!-- ── Selamat Datang (editorial intro, centered) ──────────────── -->
 <section class="mx-auto max-w-[1152px] px-4 sm:px-6 pt-16 pb-6 text-center" aria-labelledby="welcome-heading">
-  <span class="text-accent font-heading font-semibold">Selamat Datang di Desa Loji</span>
+  <span class="text-accent font-heading font-semibold">Selamat Datang di Desa Citarik</span>
   <h2 id="welcome-heading" class="text-3xl sm:text-4xl font-heading font-extrabold text-primary mt-2 max-w-2xl mx-auto leading-tight">
     {sekilas?.title ?? 'Desa pesisir yang ramah, kaya alam, dan terbuka untuk dunia'}
   </h2>
   <div
     class="text-muted text-lg mt-4 max-w-2xl mx-auto"
-    set:html={sekilas?.content_html ?? `<p>Berdiri sejak 1976 di Kecamatan Simpenan, Kabupaten Sukabumi, Desa Loji dikenal sebagai lumbung padi wilayah Palabuhanratu sekaligus rumah bagi ${fmt(totalPenduduk)} warga di ${dusunCount} dusun. Dengan garis pantai sepanjang 4 km dan posisinya sebagai gerbang Geopark Ciletuh-Palabuhanratu, Loji menyambut siapa pun yang ingin menikmati wisata bahari, mengenal budaya pesisir, dan mendukung UMKM lokal.</p>`}
+    set:html={sekilas?.content_html ?? `<p>Berdiri sejak 1976 di Kecamatan Simpenan, Kabupaten Sukabumi, Desa Citarik dikenal sebagai lumbung padi wilayah Palabuhanratu sekaligus rumah bagi ${fmt(totalPenduduk)} warga di ${dusunCount} dusun. Dengan garis pantai sepanjang 4 km dan posisinya sebagai gerbang Geopark Ciletuh-Palabuhanratu, Citarik menyambut siapa pun yang ingin menikmati wisata bahari, mengenal budaya pesisir, dan mendukung UMKM lokal.</p>`}
   />
 </section>
 
@@ -178,18 +178,18 @@ const finalBerita = beritaList.length > 0
     </div>
     <div class="grid lg:grid-cols-2 gap-6">
       <!-- Big card (left) -->
-      <a href={`/wisata/${finalWisata[0]?.slug ?? 'pantai-loji'}`}
+      <a href={`/wisata/${finalWisata[0]?.slug ?? 'pantai-Citarik'}`}
          class="group relative block rounded-2xl overflow-hidden h-80 lg:h-full min-h-[20rem] shadow-[0_4px_10px_rgba(15,36,51,.08)] hover:shadow-[0_16px_32px_rgba(15,36,51,.16)] transition-shadow">
         <img
-          src={finalWisata[0]?.img || '/images/pantai_loji.png'}
-          alt={finalWisata[0]?.nama ?? 'Pantai Loji'}
+          src={finalWisata[0]?.img || '/images/pantai_Citarik.png'}
+          alt={finalWisata[0]?.nama ?? 'Pantai Citarik'}
           class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
         <div class="absolute inset-0 bg-gradient-to-t from-[#0A3650]/90 to-transparent"></div>
         <div class="absolute bottom-0 p-6 text-white">
           <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-accent/90">{finalWisata[0]?.tag ?? 'Pantai'}</span>
-          <h3 class="font-heading font-bold text-2xl mt-2">{finalWisata[0]?.nama ?? 'Pantai Loji'}</h3>
+          <h3 class="font-heading font-bold text-2xl mt-2">{finalWisata[0]?.nama ?? 'Pantai Citarik'}</h3>
           <p class="text-white/85 mt-1 max-w-md">{finalWisata[0]?.desc ?? 'Pasir, ombak selatan, dan matahari terbenam: titik awal menjelajah Geopark Ciletuh.'}</p>
         </div>
       </a>
@@ -286,7 +286,7 @@ const finalBerita = beritaList.length > 0
   <!-- Background -->
   <div class="absolute inset-0">
     <img
-      src="/images/pantai_loji.png"
+      src="/images/pantai_Citarik.png"
       alt=""
       class="w-full h-full object-cover"
       aria-hidden="true"
@@ -297,9 +297,9 @@ const finalBerita = beritaList.length > 0
   <div class="relative mx-auto max-w-[1152px] px-4 sm:px-6">
     <div class="max-w-xl text-white">
       <span class="text-[13px] font-heading font-semibold text-accent uppercase tracking-widest">Peta Desa</span>
-      <h2 id="peta-heading" class="font-heading font-extrabold text-3xl sm:text-4xl mt-2">Temukan Semua yang Ada di Loji</h2>
+      <h2 id="peta-heading" class="font-heading font-extrabold text-3xl sm:text-4xl mt-2">Temukan Semua yang Ada di Citarik</h2>
       <p class="text-white/80 mt-3 leading-relaxed">
-        Jelajahi peta interaktif Desa Loji: titik wisata, UMKM, dan potensi alam ditandai langsung di peta. Klik penanda untuk detail dan rute.
+        Jelajahi peta interaktif Desa Citarik: titik wisata, UMKM, dan potensi alam ditandai langsung di peta. Klik penanda untuk detail dan rute.
       </p>
       <div class="flex flex-wrap gap-4 mt-6">
         {[

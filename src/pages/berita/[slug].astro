@@ -33,7 +33,7 @@ const articleJsonLd = {
 ---
 
 <Layout
-  title={`${berita.judul} | Berita Desa Loji`}
+  title={`${berita.judul} | Berita Desa Citarik`}
   description={plainDescription}
   ogImage={coverMedia ? `/api/media/${encodeURIComponent(coverMedia.r2_key_display)}` : undefined}
   jsonLd={articleJsonLd}
@@ -59,7 +59,7 @@ const articleJsonLd = {
       </h1>
       <p class="text-text-muted text-sm">
         Diterbitkan: {berita.published_at ? formatTanggal(berita.published_at) : ''}
-        &nbsp;·&nbsp; Pemerintah Desa Loji
+        &nbsp;·&nbsp; Pemerintah Desa Citarik
       </p>
     </header>
 

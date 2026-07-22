@@ -15,8 +15,8 @@ for (const t of titikList) {
 // Titik peta diisi lewat panel admin setelah pengambilan koordinat GPS di lapangan.
 // Koordinat di bawah bersifat perkiraan (fallback) sampai titik asli dimasukkan.
 const demoPoints = [
-  { jenis: 'wisata', label: 'Pantai Loji', lat: -7.0508, lng: 106.5444, linked_slug: 'pantai-loji', desc: 'Garis pantai ±4 km di tepi Samudra Hindia.' },
-  { jenis: 'potensi', label: 'Kantor Desa Loji', lat: -7.059, lng: 106.578, linked_slug: 'profil', desc: 'Pusat pemerintahan Desa Loji, Kp. Bojongkopo.' },
+  { jenis: 'wisata', label: 'Pantai Citarik', lat: -7.0508, lng: 106.5444, linked_slug: 'pantai-Citarik', desc: 'Garis pantai ±4 km di tepi Samudra Hindia.' },
+  { jenis: 'potensi', label: 'Kantor Desa Citarik', lat: -7.059, lng: 106.578, linked_slug: 'profil', desc: 'Pusat pemerintahan Desa Citarik, Kp. Bojongkopo.' },
 ];
 
 const finalPoints = titikList.length > 0 ? titikList : demoPoints;
@@ -27,12 +27,12 @@ const finalCounts = titikList.length > 0
 ---
 
 <Layout
-  title="Peta Desa | Desa Loji"
-  description="Peta interaktif Desa Loji: titik wisata, UMKM, dan potensi desa. Klik penanda untuk detail."
+  title="Peta Desa | Desa Citarik"
+  description="Peta interaktif Desa Citarik: titik wisata, UMKM, dan potensi desa. Klik penanda untuk detail."
 >
 
 <main id="main" class="mx-auto max-w-[1152px] px-4 sm:px-6 py-6">
-  <h1 class="text-2xl sm:text-3xl font-heading font-extrabold text-primary">Peta Desa Loji</h1>
+  <h1 class="text-2xl sm:text-3xl font-heading font-extrabold text-primary">Peta Desa Citarik</h1>
   <p class="text-muted mt-1">Jelajahi titik wisata, UMKM, dan potensi desa. Klik penanda untuk detail.</p>
 
   <div class="grid lg:grid-cols-[280px_1fr] gap-5 mt-5">

@@ -30,7 +30,7 @@ export const GET: APIRoute = async ({ locals }) => {
   };
 
   const date = new Date().toISOString().slice(0, 10);
-  const filename = `web-desa-loji-export-${date}.json`;
+  const filename = `web-desa-citarik-export-${date}.json`;
 
   return new Response(JSON.stringify(exportData, null, 2), {
     status: 200,

@@ -1,7 +1,7 @@
-# Checklist Kredensial & Serah Terima Aset Digital — Web Desa Loji
+# Checklist Kredensial & Serah Terima Aset Digital — Web Desa Citarik
 
-Dokumen ini mendata **semua akun dan aset digital** situs https://loji.web.id yang harus
-diserahterimakan dari tim KKN (Rafif Muhammad Farras, IPB) kepada Pemerintah Desa Loji,
+Dokumen ini mendata **semua akun dan aset digital** situs https://citarik.web.id yang harus
+diserahterimakan dari tim KKN (Rafif Muhammad Farras, IPB) kepada Pemerintah Desa Citarik,
 **paling lambat 14 Agustus 2026** (akhir masa KKN).
 
 > **Cara pakai:** centang `[x]` setiap butir saat serah terima. Simpan semua kata sandi di
@@ -27,12 +27,12 @@ Berisi semua infrastruktur situs:
 
 | Aset | Nama | Fungsi |
 |---|---|---|
-| Worker | `web-desa-loji` | Aplikasi situs |
-| D1 Database | `web-desa-loji-db` | Semua konten (berita, UMKM, wisata, dll) |
-| R2 Storage | `web-desa-loji-media` | File foto |
+| Worker | `web-desa-citarik` | Aplikasi situs |
+| D1 Database | `web-desa-citarik-db` | Semua konten (berita, UMKM, wisata, dll) |
+| R2 Storage | `web-desa-citarik-media` | File foto |
 | KV | `SESSION_KV` | Sesi login admin |
-| Zone/DNS | `loji.web.id` | Pengarahan domain |
-| Web Analytics | loji.web.id | Statistik pengunjung |
+| Zone/DNS | `citarik.web.id` | Pengarahan domain |
+| Web Analytics | citarik.web.id | Statistik pengunjung |
 
 - [ ] Kata sandi Cloudflare diserahkan (login = email Google desa di atas)
 - [ ] **PENTING — Kartu pembayaran:** akun saat ini memakai **kartu pribadi Rafif**
@@ -41,7 +41,7 @@ Berisi semua infrastruktur situs:
       kuota gratis — pemakaian desa saat ini jauh di bawah kuota.
 - [ ] Rafif memastikan kartunya sudah terhapus dari akun
 
-## 3. Domain `loji.web.id` — dewabiz.com (BERBAYAR, tahunan)
+## 3. Domain `citarik.web.id` — dewabiz.com (BERBAYAR, tahunan)
 
 Domain disewa di **https://dewabiz.com** (client area), nameserver diarahkan ke Cloudflare.
 **Satu-satunya biaya rutin situs ini.**
@@ -53,7 +53,7 @@ Domain disewa di **https://dewabiz.com** (client area), nameserver diarahkan ke 
 
 > Jika domain tidak diperpanjang, situs mati total sampai domain diaktifkan kembali.
 
-## 4. Akun Panel Admin — loji.web.id/admin
+## 4. Akun Panel Admin — citarik.web.id/admin
 
 Akun untuk mengelola konten sehari-hari (lihat `panduan-admin.md`).
 
@@ -95,6 +95,6 @@ admin, perubahan program):
 | Pihak | Nama | Tanda tangan |
 |---|---|---|
 | Yang menyerahkan (KKN IPB) | Rafif Muhammad Farras | |
-| Yang menerima (Pemdes Loji) | | |
+| Yang menerima (Pemdes Citarik) | | |
 
-*Dokumen serah terima Program DIGDAYA DESA — KKNT Inovasi IPB 2026, Desa Loji, Kec. Simpenan, Kab. Sukabumi.*
+*Dokumen serah terima Program DIGDAYA DESA — KKNT Inovasi IPB 2026, Desa Citarik, Kec. Simpenan, Kab. Sukabumi.*

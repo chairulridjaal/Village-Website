@@ -15,7 +15,7 @@ const [allUmkm, covers] = await Promise.all([
 const demoUmkm: Array<{slug:string;nama:string;kategori:string;lokasi:string;img:string;wa_number:string|null;desc:string}> = [];
 
 const getUmkmImg = (slug: string) => {
-  if (slug === 'kerajinan-bambu-loji') return '/images/kerajinan_bambu.png';
+  if (slug === 'kerajinan-bambu-Citarik') return '/images/kerajinan_bambu.png';
   if (slug === 'warung-ikan-bakar-bu-sari') return '/images/ikan_bakar.png';
   if (slug === 'kebun-sayur-pak-budi') return '/images/kebun_sayur.png';
   return '/images/kerajinan_bambu.png';
@@ -33,8 +33,8 @@ const totalCount = displayUmkm.length;
 ---
 
 <Layout
-  title="Direktori UMKM | Desa Loji"
-  description="Direktori UMKM Desa Loji: temukan produk kuliner, kriya, jasa, dan hasil tani lokal beserta kontak langsung."
+  title="Direktori UMKM | Desa Citarik"
+  description="Direktori UMKM Desa Citarik: temukan produk kuliner, kriya, jasa, dan hasil tani lokal beserta kontak langsung."
 >
 
 <!-- Sticky header with search/filter -->
@@ -74,7 +74,7 @@ const totalCount = displayUmkm.length;
       <span class="text-ink font-medium">Direktori UMKM</span>
     </nav>
     <h1 class="text-3xl sm:text-4xl font-heading font-extrabold text-primary mt-2">Direktori UMKM</h1>
-    <p class="text-muted text-lg mt-2 max-w-2xl">Produk lokal dari pelaku usaha Desa Loji. Temukan, lihat detail, lalu hubungi langsung.</p>
+    <p class="text-muted text-lg mt-2 max-w-2xl">Produk lokal dari pelaku usaha Desa Citarik. Temukan, lihat detail, lalu hubungi langsung.</p>
   </div>
 
   <div class="mx-auto max-w-[1152px] px-4 sm:px-6 py-6">

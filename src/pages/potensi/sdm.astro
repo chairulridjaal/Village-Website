@@ -3,11 +3,11 @@ import Layout from '../../components/Layout.astro';
 
 const fmt = (n: number) => n.toLocaleString('id-ID');
 
-// Sumber: Profil Desa Loji / RPJMDes 2026
+// Sumber: Profil Desa Citarik / RPJMDes 2026
 const organisasi = [
   { icon: 'landmark', nama: 'Badan Permusyawaratan Desa (BPD)', desc: '9 anggota mewakili keempat kedusunan, menetapkan peraturan desa bersama Kepala Desa.' },
   { icon: 'handshake', nama: 'Lembaga Pemberdayaan Masyarakat Desa (LPMD)', desc: 'Mendampingi perencanaan dan pelaksanaan pembangunan desa bersama warga.' },
-  { icon: 'sparkles', nama: 'Karang Taruna Loji', desc: 'Wadah generasi muda desa di bidang kepemudaan, seni, olahraga, dan kegiatan sosial.' },
+  { icon: 'sparkles', nama: 'Karang Taruna Citarik', desc: 'Wadah generasi muda desa di bidang kepemudaan, seni, olahraga, dan kegiatan sosial.' },
   { icon: 'book-open', nama: 'Majelis Ulama Indonesia (MUI) Desa', desc: 'Membina kegiatan keagamaan, dakwah, dan pendidikan Islam di tingkat desa.' },
   { icon: 'heart-handshake', nama: 'PKK (Pemberdayaan Kesejahteraan Keluarga)', desc: 'Program pemberdayaan perempuan dan keluarga di setiap dusun.' },
   { icon: 'stethoscope', nama: 'Posyandu', desc: '22 unit tersebar di seluruh dusun, melayani kesehatan ibu, anak, dan lansia.' },
@@ -29,15 +29,15 @@ const prasarana = [
 ---
 
 <Layout
-  title="Potensi Sumber Daya Manusia | Desa Loji"
-  description="Potensi SDM Desa Loji: kelembagaan dan organisasi masyarakat, angkatan kerja, serta prasarana pendidikan dan kesehatan."
+  title="Potensi Sumber Daya Manusia | Desa Citarik"
+  description="Potensi SDM Desa Citarik: kelembagaan dan organisasi masyarakat, angkatan kerja, serta prasarana pendidikan dan kesehatan."
 >
 
 <section class="relative">
   <div class="h-48 sm:h-64 overflow-hidden">
     <img
       src="/images/nelayan.png"
-      alt="Warga dan kegiatan masyarakat Desa Loji"
+      alt="Warga dan kegiatan masyarakat Desa Citarik"
       class="w-full h-full object-cover"
     />
   </div>
@@ -60,7 +60,7 @@ const prasarana = [
 
   <div class="max-w-3xl space-y-4">
     <p class="text-lg text-muted leading-relaxed">
-      Kekuatan Desa Loji tidak hanya terletak pada alam dan potensi ekonominya, tetapi juga pada masyarakat yang aktif berorganisasi. Berbagai lembaga dan kelompok masyarakat tumbuh di setiap dusun, menjadi mitra pemerintah desa dalam pembangunan dan pemberdayaan warga.
+      Kekuatan Desa Citarik tidak hanya terletak pada alam dan potensi ekonominya, tetapi juga pada masyarakat yang aktif berorganisasi. Berbagai lembaga dan kelompok masyarakat tumbuh di setiap dusun, menjadi mitra pemerintah desa dalam pembangunan dan pemberdayaan warga.
     </p>
   </div>
 
@@ -82,7 +82,7 @@ const prasarana = [
   <!-- Kelembagaan & organisasi -->
   <div>
     <h2 class="text-2xl font-heading font-extrabold text-primary mb-1">Kelembagaan & Organisasi Masyarakat</h2>
-    <p class="text-muted mb-6 max-w-2xl">Lembaga dan kelompok masyarakat yang aktif menjadi mitra pembangunan Desa Loji.</p>
+    <p class="text-muted mb-6 max-w-2xl">Lembaga dan kelompok masyarakat yang aktif menjadi mitra pembangunan Desa Citarik.</p>
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {organisasi.map(o => (
         <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
@@ -97,7 +97,7 @@ const prasarana = [
   <!-- Prasarana pendidikan & kesehatan -->
   <div>
     <h2 class="text-2xl font-heading font-extrabold text-primary mb-1">Prasarana Pendidikan & Kesehatan</h2>
-    <p class="text-muted mb-6 max-w-2xl">Fasilitas yang menopang kualitas sumber daya manusia di Desa Loji.</p>
+    <p class="text-muted mb-6 max-w-2xl">Fasilitas yang menopang kualitas sumber daya manusia di Desa Citarik.</p>
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
       {prasarana.map(item => (
         <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">

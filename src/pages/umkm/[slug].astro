@@ -19,8 +19,8 @@ const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? SITE_URL).href;
 ---
 
 <Layout
-  title={`${umkm.nama} | UMKM Desa Loji`}
-  description={`${umkm.nama} · ${umkm.kategori} · ${umkm.lokasi ?? 'Desa Loji'}`}
+  title={`${umkm.nama} | UMKM Desa Citarik`}
+  description={`${umkm.nama} · ${umkm.kategori} · ${umkm.lokasi ?? 'Desa Citarik'}`}
   ogImage={cover ? `/api/media/${encodeURIComponent(cover.r2_key_display)}` : undefined}
 >
 
@@ -180,7 +180,7 @@ const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? SITE_URL).href;
 
         <!-- Disclaimer -->
         <p class="text-xs text-text-muted mt-3 text-center italic">
-          Transaksi dilakukan langsung dengan UMKM. Pemerintah Desa Loji tidak memungut biaya apapun.
+          Transaksi dilakukan langsung dengan UMKM. Pemerintah Desa Citarik tidak memungut biaya apapun.
         </p>
       </aside>
 

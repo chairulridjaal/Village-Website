@@ -12,18 +12,18 @@ const [wisataList, covers] = await Promise.all([
 ]);
 
 const demoWisata = [
-  { slug: 'pantai-loji', nama: 'Pantai Loji', deskripsi_html: 'Garis pantai sepanjang ±4 km di tepi Samudra Hindia, bagian dari kawasan Geopark Ciletuh-Palabuhanratu.', img: '/images/pantai_loji.png', tag: 'Pantai' },
-  { slug: 'danau-talanca', nama: 'Danau Talanca', deskripsi_html: 'Danau seluas 20 hektar yang berpotensi dikembangkan untuk wisata air sekaligus kawasan perikanan.', img: '/images/pantai_loji.png', tag: 'Wisata Air' },
-  { slug: 'muara-loji-sidat', nama: 'Muara Loji (Kampung Sidat)', deskripsi_html: 'Kawasan muara tempat budidaya sidat (belut), berpotensi sebagai wisata edukasi dan penelitian.', img: '/images/nelayan.png', tag: 'Edukasi' },
-  { slug: 'air-panas-sawah-beura', nama: 'Pemandian Air Panas Sawah Beura', deskripsi_html: 'Sumber air panas alami di Kampung Sawah Beura yang berpotensi menjadi wisata pemandian.', img: '/images/pantai_loji.png', tag: 'Alam' },
-  { slug: 'puncak-gelendrung', nama: 'Puncak Gelendrung', deskripsi_html: 'Puncak di kawasan Gunung Rompang dengan panorama alam yang cocok untuk paralayang.', img: '/images/pantai_loji.png', tag: 'Alam' },
-  { slug: 'benteng-loji', nama: 'Benteng Peninggalan Belanda', deskripsi_html: 'Benteng pertahanan masa kolonial di pesisir desa, asal-usul nama Desa Loji (dari kata Loge).', img: '/images/pantai_loji.png', tag: 'Sejarah' },
+  { slug: 'pantai-Citarik', nama: 'Pantai Citarik', deskripsi_html: 'Garis pantai sepanjang ±4 km di tepi Samudra Hindia, bagian dari kawasan Geopark Ciletuh-Palabuhanratu.', img: '/images/pantai_Citarik.png', tag: 'Pantai' },
+  { slug: 'danau-talanca', nama: 'Danau Talanca', deskripsi_html: 'Danau seluas 20 hektar yang berpotensi dikembangkan untuk wisata air sekaligus kawasan perikanan.', img: '/images/pantai_Citarik.png', tag: 'Wisata Air' },
+  { slug: 'muara-Citarik-sidat', nama: 'Muara Citarik (Kampung Sidat)', deskripsi_html: 'Kawasan muara tempat budidaya sidat (belut), berpotensi sebagai wisata edukasi dan penelitian.', img: '/images/nelayan.png', tag: 'Edukasi' },
+  { slug: 'air-panas-sawah-beura', nama: 'Pemandian Air Panas Sawah Beura', deskripsi_html: 'Sumber air panas alami di Kampung Sawah Beura yang berpotensi menjadi wisata pemandian.', img: '/images/pantai_Citarik.png', tag: 'Alam' },
+  { slug: 'puncak-gelendrung', nama: 'Puncak Gelendrung', deskripsi_html: 'Puncak di kawasan Gunung Rompang dengan panorama alam yang cocok untuk paralayang.', img: '/images/pantai_Citarik.png', tag: 'Alam' },
+  { slug: 'benteng-Citarik', nama: 'Benteng Peninggalan Belanda', deskripsi_html: 'Benteng pertahanan masa kolonial di pesisir desa, asal-usul nama Desa Citarik (dari kata Loge).', img: '/images/pantai_Citarik.png', tag: 'Sejarah' },
 ];
 
 const getWisataImg = (slug: string) => {
-  if (slug === 'pantai-loji') return '/images/pantai_loji.png';
+  if (slug === 'pantai-Citarik') return '/images/pantai_Citarik.png';
   if (slug === 'pantai-karang-sari') return '/images/karang_sari.png';
-  return '/images/pantai_loji.png';
+  return '/images/pantai_Citarik.png';
 };
 
 const displayList = wisataList.length > 0
@@ -35,16 +35,16 @@ const displayList = wisataList.length > 0
 ---
 
 <Layout
-  title="Wisata | Desa Loji"
-  description="Jelajahi 8 destinasi wisata unggulan Desa Loji: pantai, danau, situs sejarah, dan budaya pesisir Sukabumi, bagian dari Geopark Ciletuh-Palabuhanratu."
+  title="Wisata | Desa Citarik"
+  description="Jelajahi 8 destinasi wisata unggulan Desa Citarik: pantai, danau, situs sejarah, dan budaya pesisir Sukabumi, bagian dari Geopark Ciletuh-Palabuhanratu."
 >
 
 <!-- Hero -->
 <section class="relative">
   <div class="h-48 sm:h-64 overflow-hidden">
     <img
-      src="/images/pantai_loji.png"
-      alt="Pantai Loji dan kawasan Geopark Ciletuh"
+      src="/images/pantai_Citarik.png"
+      alt="Pantai Citarik dan kawasan Geopark Ciletuh"
       class="w-full h-full object-cover"
     />
   </div>
@@ -56,7 +56,7 @@ const displayList = wisataList.length > 0
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
         <span class="font-medium">Wisata</span>
       </nav>
-      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1">Destinasi Wisata Desa Loji</h1>
+      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1">Destinasi Wisata Desa Citarik</h1>
       <p class="text-white/85 mt-1">Temukan keindahan alam dan budaya pesisir selatan Sukabumi</p>
     </div>
   </div>

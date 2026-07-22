@@ -1,19 +1,19 @@
-name = "web-desa-loji"
+name = "web-desa-citarik"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
 workers_dev = false
-routes = [{ pattern = "loji.web.id/*", zone_name = "loji.web.id" }]
+routes = [{ pattern = "citarik.web.id/*", zone_name = "citarik.web.id" }]
 
 # ─── Cloudflare D1 (konten SQLite) ───────────────────────────────────────────
 [[d1_databases]]
 binding = "DB"
-database_name = "web-desa-loji-db"
+database_name = "web-desa-citarik-db"
 database_id = "c578c1ca-4e96-4142-b0f0-4ceffe035ed9"
 
 # ─── Cloudflare R2 (media binary) ────────────────────────────────────────────
 [[r2_buckets]]
 binding = "MEDIA_BUCKET"
-bucket_name = "web-desa-loji-media"
+bucket_name = "web-desa-citarik-media"
 
 # ─── Cloudflare KV (sesi TTL) ────────────────────────────────────────────────
 [[kv_namespaces]]

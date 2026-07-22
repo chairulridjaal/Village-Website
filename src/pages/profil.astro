@@ -32,16 +32,16 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
 ---
 
 <Layout
-  title="Profil Desa | Desa Loji"
-  description="Profil lengkap Desa Loji: sejarah, kondisi geografis, visi misi, dan gambaran desa pesisir Kecamatan Simpenan Sukabumi."
+  title="Profil Desa | Desa Citarik"
+  description="Profil lengkap Desa Citarik: sejarah, kondisi geografis, visi misi, dan gambaran desa pesisir Kecamatan Simpenan Sukabumi."
 >
 
 <!-- Hero -->
 <section class="relative">
   <div class="h-48 sm:h-64 overflow-hidden">
     <img
-      src="/images/pantai_loji.png"
-      alt="Pantai dan alam Desa Loji"
+      src="/images/pantai_Citarik.png"
+      alt="Pantai dan alam Desa Citarik"
       class="w-full h-full object-cover"
     />
   </div>
@@ -53,7 +53,7 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
         <span class="font-medium">Profil Desa</span>
       </nav>
-      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1">Profil Desa Loji</h1>
+      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1">Profil Desa Citarik</h1>
       <p class="text-white/85 mt-1 max-w-xl">Kecamatan Simpenan, Kabupaten Sukabumi, Jawa Barat</p>
     </div>
   </div>
@@ -103,7 +103,7 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
   <section id="umum" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Profil Umum</h2>
     <p class="text-muted mt-2 max-w-3xl leading-relaxed">
-      Desa Loji adalah desa pesisir yang terletak di Kecamatan Simpenan, Kabupaten Sukabumi, Provinsi Jawa Barat. Berbatasan langsung dengan Samudra Hindia di sebelah selatan, desa ini dikenal sebagai lumbung padi wilayah Palabuhanratu sekaligus bagian dari penyangga kawasan Geopark Ciletuh-Palabuhanratu.
+      Desa Citarik adalah desa pesisir yang terletak di Kecamatan Simpenan, Kabupaten Sukabumi, Provinsi Jawa Barat. Berbatasan langsung dengan Samudra Hindia di sebelah selatan, desa ini dikenal sebagai lumbung padi wilayah Palabuhanratu sekaligus bagian dari penyangga kawasan Geopark Ciletuh-Palabuhanratu.
     </p>
     <div class="prose max-w-none mt-4 text-muted leading-relaxed" set:html={umum?.content_html ?? ''} />
     <div class="grid sm:grid-cols-2 gap-4 mt-6">
@@ -125,7 +125,7 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
   <section id="geografis" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Kondisi Geografis</h2>
     <p class="text-muted mt-2 max-w-3xl leading-relaxed">
-      Secara geografis, Desa Loji berada di koordinat sekitar -7.059° LS, 106.578° BT. Wilayahnya meliputi kawasan pantai, bukit, dan hutan pesisir. Topografi bervariasi dari dataran rendah di pinggir pantai hingga perbukitan yang menjorok ke dalam.
+      Secara geografis, Desa Citarik berada di koordinat sekitar -7.059° LS, 106.578° BT. Wilayahnya meliputi kawasan pantai, bukit, dan hutan pesisir. Topografi bervariasi dari dataran rendah di pinggir pantai hingga perbukitan yang menjorok ke dalam.
     </p>
     <div class="prose max-w-none mt-4 text-muted leading-relaxed" set:html={geografis?.content_html ?? ''} />
     <div class="grid sm:grid-cols-3 gap-4 mt-6">
@@ -143,11 +143,11 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
     </div>
   </section>
 
-  <!-- Demografi (sumber: Profil Desa Loji / RPJMDes 2026 dan rekap penduduk April 2026) -->
+  <!-- Demografi (sumber: Profil Desa Citarik / RPJMDes 2026 dan rekap penduduk April 2026) -->
   <section id="demografi" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Demografi Penduduk</h2>
     <p class="text-muted mt-2 max-w-3xl leading-relaxed">
-      Data kependudukan Desa Loji per dusun, golongan umur, tingkat pendidikan, dan mata pencaharian, berdasarkan rekapitulasi Pemerintah Desa Loji tahun 2026.
+      Data kependudukan Desa Citarik per dusun, golongan umur, tingkat pendidikan, dan mata pencaharian, berdasarkan rekapitulasi Pemerintah Desa Citarik tahun 2026.
     </p>
 
     <div class="mt-6 space-y-10">
@@ -278,15 +278,15 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
   <section id="sejarah" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Sejarah Desa</h2>
     <div class="prose max-w-none mt-4 text-muted leading-relaxed" set:html={sejarah?.content_html ?? `
-      <p>Desa Loji memiliki sejarah panjang sebagai perkampungan nelayan di tepi Samudra Hindia. Nama "Loji" diyakini berasal dari bangunan loji peninggalan masa kolonial yang pernah berdiri di kawasan ini. Masyarakat desa secara turun-temurun hidup dari hasil laut dan pertanian pesisir.</p>
-      <p>Posisi strategis Desa Loji sebagai gerbang Geopark Ciletuh mulai membuka babak baru bagi perekonomian desa, dengan pariwisata menjadi sektor yang terus berkembang di samping perikanan tradisional yang menjadi tulang punggung.</p>
+      <p>Desa Citarik memiliki sejarah panjang sebagai perkampungan nelayan di tepi Samudra Hindia. Nama "Citarik" diyakini berasal dari bangunan Citarik peninggalan masa kolonial yang pernah berdiri di kawasan ini. Masyarakat desa secara turun-temurun hidup dari hasil laut dan pertanian pesisir.</p>
+      <p>Posisi strategis Desa Citarik sebagai gerbang Geopark Ciletuh mulai membuka babak baru bagi perekonomian desa, dengan pariwisata menjadi sektor yang terus berkembang di samping perikanan tradisional yang menjadi tulang punggung.</p>
     `} />
   </section>
 
   <!-- Peta -->
   <section id="peta" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Peta Desa</h2>
-    <p class="text-muted mt-2">Lokasi Desa Loji di Kecamatan Simpenan, Kabupaten Sukabumi.</p>
+    <p class="text-muted mt-2">Lokasi Desa Citarik di Kecamatan Simpenan, Kabupaten Sukabumi.</p>
     <div id="profil-map" class="mt-4 rounded-2xl overflow-hidden border border-line shadow-[0_4px_10px_rgba(15,36,51,.08)]" style="height: 380px;"></div>
     <p class="text-sm text-muted mt-2 flex items-center gap-1.5">
       <i data-lucide="info" class="w-4 h-4"></i>
@@ -300,7 +300,7 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
     <div class="bg-primary text-white rounded-2xl p-8 flex flex-col sm:flex-row items-center gap-6">
       <div class="flex-1">
         <h2 class="text-2xl font-heading font-extrabold">Pemerintahan Desa</h2>
-        <p class="text-white/80 mt-2">Pelajari struktur organisasi, perangkat desa, visi misi, dan tugas fungsi pemerintahan Desa Loji.</p>
+        <p class="text-white/80 mt-2">Pelajari struktur organisasi, perangkat desa, visi misi, dan tugas fungsi pemerintahan Desa Citarik.</p>
       </div>
       <a href="/pemerintahan" class="inline-flex items-center gap-2 bg-white text-primary font-heading font-semibold px-6 py-3 rounded-lg hover:bg-sand transition-colors min-h-[44px] shrink-0">
         <i data-lucide="landmark" class="w-5 h-5"></i> Lihat Pemerintahan
@@ -318,7 +318,7 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
   document.addEventListener('DOMContentLoaded', function() {
     var map = L.map('profil-map', { scrollWheelZoom: false }).setView([-7.0589, 106.5778], 14);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
-    L.marker([-7.0589, 106.5778]).addTo(map).bindPopup('<b>Desa Loji</b><br>Kec. Simpenan, Sukabumi');
+    L.marker([-7.0589, 106.5778]).addTo(map).bindPopup('<b>Desa Citarik</b><br>Kec. Simpenan, Sukabumi');
     if (typeof lucide !== 'undefined') lucide.createIcons();
   });
   setTimeout(function() {

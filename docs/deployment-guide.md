@@ -1,7 +1,7 @@
-# Panduan Deployment — Web Desa Loji
+# Panduan Deployment — Web Desa Citarik
 
 Dokumen ini untuk **pengembang** (mahasiswa KKN berikutnya / teknisi) yang perlu mengubah
-**kode program** situs https://loji.web.id. Perangkat desa **tidak perlu** dokumen ini —
+**kode program** situs https://citarik.web.id. Perangkat desa **tidak perlu** dokumen ini —
 pengelolaan konten sehari-hari cukup lewat panel admin (lihat `panduan-admin.md`) dan
 langsung tayang tanpa deploy.
 
@@ -13,11 +13,11 @@ langsung tayang tanpa deploy.
 
 - **Framework:** Astro (SSR) + sedikit React, Tailwind CSS 4, peta Leaflet + OpenStreetMap.
 - **Hosting:** Cloudflare Workers (akun `desaloji.sukabumi@gmail.com`, paket gratis).
-- **Data:** Cloudflare D1 (SQLite, nama `web-desa-loji-db`) — semua konten.
-- **Media:** Cloudflare R2 (bucket `web-desa-loji-media`) — file foto.
+- **Data:** Cloudflare D1 (SQLite, nama `web-desa-citarik-db`) — semua konten.
+- **Media:** Cloudflare R2 (bucket `web-desa-citarik-media`) — file foto.
 - **Sesi login:** Cloudflare KV (`SESSION_KV`).
-- **Domain:** `loji.web.id` (registrar dewabiz.com, DNS di Cloudflare). Worker terpasang
-  lewat **route** `loji.web.id/*` di `wrangler.toml` (bukan custom domain — ada A record
+- **Domain:** `citarik.web.id` (registrar dewabiz.com, DNS di Cloudflare). Worker terpasang
+  lewat **route** `citarik.web.id/*` di `wrangler.toml` (bukan custom domain — ada A record
   proxied dummy `192.0.2.1` di zone yang membuat custom domain konflik). `workers_dev = false`.
 - **Kode sumber:** https://github.com/Raphcel/Village-Website
 
@@ -53,7 +53,7 @@ aman untuk bereksperimen.
 npm run deploy      # = astro build && wrangler deploy
 ```
 
-Selesai — perubahan langsung aktif di https://loji.web.id. Verifikasi dengan membuka situs
+Selesai — perubahan langsung aktif di https://citarik.web.id. Verifikasi dengan membuka situs
 dan mengecek halaman yang diubah.
 
 ### Jika ada migrasi database baru
@@ -62,7 +62,7 @@ File SQL bernomor di folder `migrations/`. Setelah menambah file migrasi baru:
 
 ```bash
 # terapkan ke database PRODUKSI (hati-hati!)
-npx wrangler d1 migrations apply web-desa-loji-db --remote
+npx wrangler d1 migrations apply web-desa-citarik-db --remote
 ```
 
 **Selalu backup dulu** sebelum migrasi produksi: panel admin → Statistik → Ekspor Semua
@@ -100,8 +100,8 @@ Catatan: rollback Worker TIDAK membatalkan migrasi database — migrasi harus di
 | `npm run dev` | Build + jalankan lokal (port 4321) |
 | `npm run db:setup` | Terapkan migrasi ke DB lokal |
 | `npm run deploy` | Build + deploy ke produksi |
-| `npx wrangler d1 migrations apply web-desa-loji-db --remote` | Migrasi DB produksi |
-| `npx wrangler d1 execute web-desa-loji-db --remote --command "SELECT ..."` | Query langsung DB produksi (mis. reset admin) |
+| `npx wrangler d1 migrations apply web-desa-citarik-db --remote` | Migrasi DB produksi |
+| `npx wrangler d1 execute web-desa-citarik-db --remote --command "SELECT ..."` | Query langsung DB produksi (mis. reset admin) |
 | `npx wrangler tail` | Lihat log Worker produksi langsung |
 | `npx wrangler rollback` | Kembalikan Worker ke versi sebelumnya |
 
@@ -111,13 +111,13 @@ Tidak ada fitur "lupa password". Jika akun admin terkunci permanen, pengembang d
 menghapus baris admin lalu membuka ulang halaman pendaftaran awal:
 
 ```bash
-# HATI-HATI: hapus akun admin, lalu buka https://loji.web.id/admin/setup
+# HATI-HATI: hapus akun admin, lalu buka https://citarik.web.id/admin/setup
 # untuk mendaftar ulang (halaman setup hanya aktif saat belum ada admin).
-npx wrangler d1 execute web-desa-loji-db --remote --command "DELETE FROM admin_user"
+npx wrangler d1 execute web-desa-citarik-db --remote --command "DELETE FROM admin_user"
 ```
 
 Backup ekspor JSON dulu sebelum menjalankan perintah destruktif apa pun.
 
 ---
 
-*Dokumen serah terima Program DIGDAYA DESA — KKNT Inovasi IPB 2026, Desa Loji, Kec. Simpenan, Kab. Sukabumi.*
+*Dokumen serah terima Program DIGDAYA DESA — KKNT Inovasi IPB 2026, Desa Citarik, Kec. Simpenan, Kab. Sukabumi.*

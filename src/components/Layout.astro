@@ -23,7 +23,7 @@ const {
 
 const site = Astro.site ?? new URL(SITE_URL);
 const canonicalUrl = new URL(Astro.url.pathname, site).href;
-const ogImageUrl = new URL(ogImage ?? '/images/pantai_loji.png', site).href;
+const ogImageUrl = new URL(ogImage ?? '/images/pantai_Citarik.png', site).href;
 const currentPath = Astro.url.pathname;
 
 // Data organisasi untuk mesin pencari (schema.org)
@@ -31,11 +31,11 @@ const orgJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'GovernmentOrganization',
   name: `Pemerintah ${SITE_NAME}`,
-  alternateName: ['Desa Loji', 'Desa Loji Sukabumi', 'Desa Loji Simpenan'],
+  alternateName: ['Desa Citarik', 'Desa Citarik Sukabumi', 'Desa Citarik Simpenan'],
   url: SITE_URL,
-  email: 'desalojimaju@gmail.com',
+  email: 'desacitarik@gmail.com',
   logo: new URL('/favicon.svg', site).href,
-  areaServed: 'Desa Loji, Kecamatan Simpenan, Kabupaten Sukabumi, Jawa Barat',
+  areaServed: 'Desa Citarik, Kecamatan Simpenan, Kabupaten Sukabumi, Jawa Barat',
   address: {
     '@type': 'PostalAddress',
     streetAddress: 'Jl. Raya Bojongkopo KM.02',
@@ -46,12 +46,12 @@ const orgJsonLd = {
   },
 };
 
-// Skema WebSite — memperkuat "Desa Loji" sebagai nama situs di hasil pencarian.
+// Skema WebSite — memperkuat "Desa Citarik" sebagai nama situs di hasil pencarian.
 const websiteJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: SITE_NAME,
-  alternateName: 'Situs Resmi Desa Loji',
+  alternateName: 'Situs Resmi Desa Citarik',
   url: SITE_URL,
   inLanguage: 'id-ID',
   publisher: { '@type': 'GovernmentOrganization', name: `Pemerintah ${SITE_NAME}` },

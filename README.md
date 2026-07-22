@@ -1,8 +1,8 @@
-# Website Desa Loji
+# Website Desa Citarik
 
-Website resmi Desa Loji, dibangun sebagai bagian dari program **KKN-T Inovasi IPB University 2026** di Desa Loji, Kabupaten Sukabumi. Situs ini menampilkan profil desa, potensi (pertanian, perikanan, pariwisata, sumber daya manusia), direktori UMKM, peta interaktif, dan berita desa, lengkap dengan panel admin agar perangkat desa dapat mengelola konten sendiri tanpa bantuan teknis.
+Website resmi Desa Citarik, dibangun sebagai bagian dari program **KKN-T Inovasi IPB University 2026** di Desa Citarik, Kabupaten Sukabumi. Situs ini menampilkan profil desa, potensi (pertanian, perikanan, pariwisata, sumber daya manusia), direktori UMKM, peta interaktif, dan berita desa, lengkap dengan panel admin agar perangkat desa dapat mengelola konten sendiri tanpa bantuan teknis.
 
-Situs berjalan langsung di [loji.web.id](https://loji.web.id).
+Situs berjalan langsung di [citarik.web.id](https://citarik.web.id).
 
 ## Tumpukan Teknologi (Tech Stack)
 
@@ -79,15 +79,15 @@ npm run deploy   # astro build && wrangler deploy
 Sebelum deploy pertama, buat resource Cloudflare berikut dan tempel ID-nya ke `wrangler.toml`:
 
 ```bash
-wrangler d1 create web-desa-loji-db
-wrangler r2 bucket create web-desa-loji-media
+wrangler d1 create web-desa-citarik-db
+wrangler r2 bucket create web-desa-citarik-media
 wrangler kv namespace create SESSION_KV
 ```
 
 Lalu terapkan seluruh migration ke database produksi:
 
 ```bash
-wrangler d1 migrations apply web-desa-loji-db --remote
+wrangler d1 migrations apply web-desa-citarik-db --remote
 ```
 
 Backup database dilakukan **manual** lewat tombol export di panel admin (`/admin/export`), bukan cron otomatis. Cron mingguan tersedia di kode namun sengaja dinonaktifkan (`crons = []` di `wrangler.toml`) karena memerlukan subdomain `workers.dev` yang terdaftar di akun; aktifkan kembali dengan mengisi `crons = ["0 0 * * 0"]` bila diperlukan.
@@ -111,7 +111,7 @@ Proyek ini dirancang agar mudah dipakai ulang oleh desa lain. Ganti nilai-nilai 
 | Bucket R2 | `wrangler.toml` (`bucket_name`) | Buat baru dengan `wrangler r2 bucket create` |
 | Namespace KV | `wrangler.toml` (`id` pada `kv_namespaces`) | Buat baru dengan `wrangler kv namespace create` |
 | URL situs | `astro.config.mjs` (`site`), `src/lib/site.ts` | Domain publik desa Anda |
-| Nama file ekspor | `src/pages/api/admin/export.ts` (prefix `web-desa-loji-export`) | Opsional, kosmetik saja |
+| Nama file ekspor | `src/pages/api/admin/export.ts` (prefix `web-desa-citarik-export`) | Opsional, kosmetik saja |
 | Konten & data desa | `migrations/0002_seed.sql`, `0003_*.sql`, `0004_*.sql`, serta teks di `src/pages/**/*.astro` | Ganti seluruh data profil, wisata, UMKM, dan perangkat desa dengan data desa Anda |
 | Gambar | `public/images/*`, `public/favicon.svg` | Ganti dengan foto dan lambang desa Anda |
 | Analitik | `src/components/Layout.astro` (`data-cf-beacon` token) | Buat token baru di Cloudflare Web Analytics |
@@ -124,4 +124,4 @@ Dibangun mengikuti alur perencanaan terstruktur (brief, PRD, UX, arsitektur, epi
 
 ---
 
-*Dikembangkan oleh tim KKN-T Inovasi IPB University 2026, Desa Loji, Kabupaten Sukabumi.*
+*Dikembangkan oleh tim KKN-T Inovasi IPB University 2026, Desa Citarik, Kabupaten Sukabumi.*

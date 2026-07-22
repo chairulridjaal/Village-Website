@@ -1,11 +1,11 @@
-# Product Brief: Sistem Informasi Desa (SID) & UMKM Directory — Desa Loji
+# Product Brief: Sistem Informasi Desa (SID) & UMKM Directory — Desa Citarik
 
 > BMAD Phase 1 artifact. Source document for `bmad-prd`.
-> Project: KKNT Inovasi IPB 2026 — Desa Loji, Kabupaten Sukabumi.
+> Project: KKNT Inovasi IPB 2026 — Desa Citarik, Kabupaten Sukabumi.
 
 ## 1. Vision / Problem Statement
 
-Desa Loji has no official web presence and its active UMKM cannot be discovered online. We will build a **Village Information System (Sistem Informasi Desa)** that acts as the village's official digital identity — profile, public services, demographics, public information, legal products, village potential, and a photo gallery — and embeds a public **UMKM directory** with direct links to each business's WhatsApp, Instagram, marketplace, and Google Maps.
+Desa Citarik has no official web presence and its active UMKM cannot be discovered online. We will build a **Village Information System (Sistem Informasi Desa)** that acts as the village's official digital identity — profile, public services, demographics, public information, legal products, village potential, and a photo gallery — and embeds a public **UMKM directory** with direct links to each business's WhatsApp, Instagram, marketplace, and Google Maps.
 
 The single most important constraint: **the system must be operable by village staff with no coding knowledge after the student team leaves.** Sustainability beats sophistication. Every feature is judged by "who maintains this in August?"
 

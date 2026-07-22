@@ -1,11 +1,11 @@
 {
-  "name": "web-desa-loji",
+  "name": "web-desa-citarik",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "astro build && wrangler dev",
-    "db:setup": "wrangler d1 migrations apply web-desa-loji-db --local",
+    "db:setup": "wrangler d1 migrations apply web-desa-citarik-db --local",
     "build": "astro build",
     "astro": "astro",
     "deploy": "astro build && wrangler deploy"
