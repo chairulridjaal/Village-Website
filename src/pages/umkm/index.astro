@@ -37,15 +37,14 @@ const totalCount = displayUmkm.length;
   description="Direktori UMKM Desa Citarik: temukan produk kuliner, kriya, jasa, dan hasil tani lokal beserta kontak langsung."
 >
 
-<!-- Sticky header with search/filter -->
-<div id="filterbar" class="sticky top-16 z-30 bg-white border-b border-line shadow-[0_4px_12px_rgba(15,36,51,.08)]">
-  <div class="mx-auto max-w-[1152px] px-4 sm:px-6 py-3">
+<div id="filterbar" class="sticky top-16 z-30 bg-white/95 backdrop-blur-md border-b border-border">
+  <div class="container-page py-3">
     <div class="flex flex-col lg:flex-row lg:items-center gap-3">
       <div class="relative lg:w-72 shrink-0">
         <i data-lucide="search" class="w-5 h-5 text-muted absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
         <label for="umkm-search" class="sr-only">Cari UMKM berdasarkan nama</label>
         <input id="umkm-search" type="search" placeholder="Cari nama UMKM…"
-          class="w-full pl-10 pr-3 py-2.5 min-h-[44px] text-base border border-line rounded-lg focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/25" />
+          class="w-full pl-10 pr-3 py-2.5 min-h-[44px] text-base border border-border rounded-md bg-surface focus:border-accent focus:outline-none focus:ring-4 focus:ring-accent/20" />
       </div>
       <div class="flex flex-wrap gap-2" role="group" aria-label="Saring berdasarkan kategori">
         {['Semua', 'Kuliner', 'Kriya', 'Jasa', 'Hasil Tani'].map((cat, i) => (
@@ -53,8 +52,8 @@ const totalCount = displayUmkm.length;
             data-cat={cat.toLowerCase().replace(' ', '-')}
             data-cat-label={cat}
             class:list={[
-              'chip-filter px-3.5 py-2 min-h-[40px] rounded-full text-sm font-heading font-semibold border-2 transition-colors',
-              i === 0 ? 'border-primary bg-primary text-white is-active' : 'border-line text-ink hover:border-accent'
+              'chip-filter px-3.5 py-2 min-h-[40px] rounded-full text-sm font-heading font-semibold border transition-colors',
+              i === 0 ? 'border-primary bg-primary text-white is-active' : 'border-border text-ink hover:border-accent'
             ]}
           >
             {cat}
@@ -66,39 +65,42 @@ const totalCount = displayUmkm.length;
   </div>
 </div>
 
-<main id="main">
-  <div class="mx-auto max-w-[1152px] px-4 sm:px-6 pt-4 pb-2">
-    <nav aria-label="Breadcrumb" class="text-sm text-muted flex items-center gap-1.5">
-      <a href="/" class="hover:text-accent">Beranda</a>
-      <i data-lucide="chevron-right" class="w-4 h-4"></i>
-      <span class="text-ink font-medium">Direktori UMKM</span>
-    </nav>
-    <h1 class="text-3xl sm:text-4xl font-heading font-extrabold text-primary mt-2">Direktori UMKM</h1>
-    <p class="text-muted text-lg mt-2 max-w-2xl">Produk lokal dari pelaku usaha Desa Citarik. Temukan, lihat detail, lalu hubungi langsung.</p>
-  </div>
+<div class="container-page pt-6 pb-2">
+  <nav aria-label="Breadcrumb" class="breadcrumb breadcrumb--dark text-sm">
+    <a href="/">Beranda</a>
+    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+    <span class="text-ink font-medium">Direktori UMKM</span>
+  </nav>
+  <h1 class="text-3xl sm:text-4xl font-heading font-extrabold text-primary mt-2">Direktori UMKM</h1>
+  <p class="text-muted text-lg mt-2 max-w-2xl leading-relaxed">Produk lokal dari pelaku usaha Desa Citarik. Temukan, lihat detail, lalu hubungi langsung.</p>
+</div>
 
-  <div class="mx-auto max-w-[1152px] px-4 sm:px-6 py-6">
-    <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
+<div class="container-page py-6 pb-12">
+  <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
 
-    <div id="empty" class="hidden text-center py-20">
-      <div class="w-14 h-14 mx-auto rounded-full bg-sand grid place-items-center">
-        <i data-lucide="search-x" class="w-7 h-7 text-primary"></i>
-      </div>
-      <h2 class="font-heading font-bold text-xl text-ink mt-4">UMKM tidak ditemukan</h2>
-      <p class="text-muted mt-1">Coba kata kunci lain atau ganti kategori.</p>
-      <button id="reset" class="mt-4 inline-flex items-center gap-2 border-2 border-primary text-primary font-heading font-semibold px-4 py-2.5 rounded-lg hover:bg-primary hover:text-white transition-colors min-h-[44px]">
-        <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset filter
-      </button>
+  <div id="empty" class="hidden empty-state">
+    <div class="empty-state__icon">
+      <i data-lucide="search-x" class="w-7 h-7"></i>
     </div>
+    <h2 class="font-heading font-bold text-xl text-ink mt-4">UMKM tidak ditemukan</h2>
+    <p class="text-muted mt-1">Coba kata kunci lain atau ganti kategori.</p>
+    <button id="reset" class="btn btn-secondary mt-4">
+      <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset filter
+    </button>
   </div>
-</main>
+</div>
 
 </Layout>
 
 <script define:vars={{ displayJson }}>
   const UMKM = JSON.parse(displayJson);
-  const CAT_MAP = { 'kuliner': 'Kuliner', 'kriya': 'Kriya', 'jasa': 'Jasa', 'hasil-tani': 'Hasil Tani', 'semua': 'Semua' };
-  const TAG_COLOR = { 'Kuliner': 'bg-orange-100 text-orange-700', 'Kriya': 'bg-purple-100 text-purple-700', 'Jasa': 'bg-blue-100 text-blue-700', 'Hasil Tani': 'bg-green-100 text-green-700', 'default': 'bg-sand text-primary' };
+  const TAG_CLASS = {
+    'Kuliner': 'chip chip-kuliner',
+    'Kriya': 'chip chip-kriya',
+    'Jasa': 'chip chip-jasa',
+    'Hasil Tani': 'chip chip-tani',
+    'default': 'chip chip-umkm',
+  };
 
   let activeCat = 'semua', query = '';
   const grid = document.getElementById('grid');
@@ -106,23 +108,23 @@ const totalCount = displayUmkm.length;
   const emptyEl = document.getElementById('empty');
 
   function cardHTML(u) {
-    const tagColor = TAG_COLOR[u.kategori] ?? TAG_COLOR['default'];
+    const tagClass = TAG_CLASS[u.kategori] ?? TAG_CLASS['default'];
     const imgHTML = u.img
       ? `<img src="${u.img}" alt="${u.nama}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />`
       : `<div class="w-full h-full" style="background: linear-gradient(135deg, #0E4A6E, #0E9AA7);"></div>`;
     const contactHTML = u.wa_number
-      ? `<a href="https://wa.me/${u.wa_number}" target="_blank" rel="noopener noreferrer" class="mt-3 inline-flex items-center justify-center gap-2 w-full bg-cta hover:bg-ctaDark text-white text-sm font-heading font-semibold py-2.5 rounded-lg transition-colors min-h-[44px]"><i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp</a>`
-      : `<a href="/umkm/${u.slug}" class="mt-3 inline-flex items-center justify-center gap-2 w-full border-2 border-primary text-primary hover:bg-primary hover:text-white text-sm font-heading font-semibold py-2.5 rounded-lg transition-colors min-h-[44px]"><i data-lucide="phone" class="w-4 h-4"></i> Kontak</a>`;
-    const locHTML = u.lokasi ? `<p class="text-xs text-muted mt-1 flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> ${u.lokasi}</p>` : '';
-    const descHTML = u.desc ? `<p class="text-sm text-muted mt-1 flex-1 line-clamp-2">${u.desc}</p>` : '';
-    return `<article class="umkm-card group bg-white border border-line rounded-xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)] hover:shadow-[0_12px_24px_rgba(15,36,51,.12)] hover:border-accent transition-all flex flex-col" data-name="${u.nama.toLowerCase()}" data-cat="${(u.kategori ?? '').toLowerCase()}">
+      ? `<a href="https://wa.me/${u.wa_number}" target="_blank" rel="noopener noreferrer" class="mt-3 btn btn-cta w-full text-sm py-2.5"><i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp</a>`
+      : `<a href="/umkm/${u.slug}" class="mt-3 btn btn-secondary w-full text-sm py-2.5"><i data-lucide="phone" class="w-4 h-4"></i> Kontak</a>`;
+    const locHTML = u.lokasi ? `<p class="text-xs text-muted mt-1.5 flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> ${u.lokasi}</p>` : '';
+    const descHTML = u.desc ? `<p class="text-sm text-muted mt-1.5 flex-1 line-clamp-2">${u.desc}</p>` : '';
+    return `<article class="umkm-card group card-surface card-surface-hover overflow-hidden flex flex-col" data-name="${u.nama.toLowerCase()}" data-cat="${(u.kategori ?? '').toLowerCase()}">
       <a href="/umkm/${u.slug}" class="block aspect-[16/10] overflow-hidden">${imgHTML}</a>
       <div class="p-4 flex flex-col flex-1">
-        <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full w-max ${tagColor}">${u.kategori}</span>
+        <span class="${tagClass} w-max">${u.kategori}</span>
         <h3 class="font-heading font-semibold text-ink mt-2"><a href="/umkm/${u.slug}" class="hover:text-primary">${u.nama}</a></h3>
         ${locHTML}${descHTML}
         <div class="mt-2">
-          <a href="/umkm/${u.slug}" class="text-sm font-heading font-semibold text-accent hover:underline">Lihat Detail</a>
+          <a href="/umkm/${u.slug}" class="text-sm font-heading font-semibold text-accent hover:text-primary">Lihat Detail</a>
         </div>
         ${contactHTML}
       </div>
@@ -140,7 +142,7 @@ const totalCount = displayUmkm.length;
     countEl.textContent = `Menampilkan ${list.length} UMKM`;
     emptyEl.classList.toggle('hidden', list.length > 0);
     grid.classList.toggle('hidden', list.length === 0);
-    if (typeof lucide !== 'undefined') lucide.createIcons();
+    if (typeof window.refreshIcons === 'function') window.refreshIcons();
   }
 
   document.getElementById('umkm-search').addEventListener('input', e => { query = e.target.value.trim().toLowerCase(); render(); });
@@ -148,10 +150,10 @@ const totalCount = displayUmkm.length;
   document.querySelectorAll('.chip-filter').forEach(btn => btn.addEventListener('click', () => {
     document.querySelectorAll('.chip-filter').forEach(b => {
       b.classList.remove('is-active','bg-primary','text-white','border-primary');
-      b.classList.add('border-line','text-ink');
+      b.classList.add('border-border','text-ink');
     });
     btn.classList.add('is-active','bg-primary','text-white','border-primary');
-    btn.classList.remove('border-line','text-ink');
+    btn.classList.remove('border-border','text-ink');
     activeCat = btn.dataset.cat;
     render();
   }));
@@ -160,10 +162,10 @@ const totalCount = displayUmkm.length;
     activeCat = 'semua'; query = '';
     document.getElementById('umkm-search').value = '';
     document.querySelectorAll('.chip-filter').forEach(b => {
-      b.classList.remove('bg-primary','text-white','border-primary'); b.classList.add('border-line','text-ink');
+      b.classList.remove('bg-primary','text-white','border-primary'); b.classList.add('border-border','text-ink');
     });
     const allBtn = document.querySelector('[data-cat="semua"]');
-    if (allBtn) { allBtn.classList.add('bg-primary','text-white','border-primary'); allBtn.classList.remove('border-line','text-ink'); }
+    if (allBtn) { allBtn.classList.add('bg-primary','text-white','border-primary'); allBtn.classList.remove('border-border','text-ink'); }
     render();
   });
 

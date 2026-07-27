@@ -2,9 +2,10 @@
 import Layout from '../../components/Layout.astro';
 import { getBeritaBySlug, formatTanggal } from '../../lib/db/berita';
 import { getMediaForEntity } from '../../lib/db/media';
+import { getEnv } from '@lib/env';
+import { SITE_URL, SITE_NAME } from '@lib/site';
 
 const { slug } = Astro.params as { slug: string };
-import { getEnv } from '@lib/env';
 const env = getEnv();
 
 const berita = env ? await getBeritaBySlug(slug, env.DB) : null;
@@ -13,11 +14,9 @@ if (!berita) return Astro.redirect('/404');
 const mediaList = env ? await getMediaForEntity('berita', berita.id, env.DB) : [];
 const coverMedia = mediaList[0];
 
-import { SITE_URL, SITE_NAME } from '@lib/site';
 const canonicalUrl = new URL(`/berita/${slug}`, Astro.site ?? SITE_URL).href;
 const plainDescription = berita.content_html.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,160);
 
-// Structured data artikel untuk hasil pencarian Google
 const articleJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'NewsArticle',
@@ -39,91 +38,84 @@ const articleJsonLd = {
   jsonLd={articleJsonLd}
 >
 
-  <!-- Header -->
-  <div class="py-10 md:py-12" style="background:linear-gradient(135deg,#0E4A6E,#0A3650);">
-    <div class="mx-auto max-w-6xl px-4 md:px-6 text-white">
-      <nav aria-label="Breadcrumb" class="text-sm mb-3 opacity-75">
-        <a href="/" class="hover:underline">Beranda</a> /
-        <a href="/berita" class="hover:underline">Berita</a> /
-        <span>{berita.judul}</span>
+  <div class="border-b border-border bg-primary-dark">
+    <div class="container-page py-4">
+      <nav aria-label="Breadcrumb" class="breadcrumb text-sm">
+        <a href="/">Beranda</a>
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        <a href="/berita">Berita</a>
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        <span class="text-white/90 line-clamp-1">{berita.judul}</span>
       </nav>
     </div>
   </div>
 
-  <div class="mx-auto max-w-3xl px-4 md:px-6 py-10">
+  <div class="container-page py-10 md:py-12">
+    <article class="max-w-3xl">
+      <header class="mb-6">
+        <h1 class="font-heading font-extrabold text-3xl md:text-4xl leading-tight text-primary">
+          {berita.judul}
+        </h1>
+        <p class="text-muted text-sm mt-3">
+          Diterbitkan: {berita.published_at ? formatTanggal(berita.published_at) : ''}
+          · Pemerintah Desa Citarik
+        </p>
+      </header>
 
-    <!-- Article header -->
-    <header class="mb-6">
-      <h1 class="font-heading font-bold text-3xl md:text-4xl leading-tight mb-3" style="color:var(--color-primary);">
-        {berita.judul}
-      </h1>
-      <p class="text-text-muted text-sm">
-        Diterbitkan: {berita.published_at ? formatTanggal(berita.published_at) : ''}
-        &nbsp;·&nbsp; Pemerintah Desa Citarik
-      </p>
-    </header>
+      {coverMedia && (
+        <div class="aspect-[16/8] rounded-xl overflow-hidden mb-8 border border-border shadow-sm">
+          <img
+            src={`/api/media/${encodeURIComponent(coverMedia.r2_key_display)}`}
+            alt={coverMedia.alt}
+            class="w-full h-full object-cover"
+            loading="lazy"
+          />
+        </div>
+      )}
 
-    <!-- Cover image -->
-    {coverMedia && (
-      <div class="aspect-[16/8] rounded-xl overflow-hidden mb-8 border border-border" style="box-shadow:var(--shadow-md);">
-        <img
-          src={`/api/media/${encodeURIComponent(coverMedia.r2_key_display)}`}
-          alt={coverMedia.alt}
-          class="w-full h-full object-cover"
-          loading="lazy"
-        />
-      </div>
-    )}
+      <div class="prose max-w-none mb-10" set:html={berita.content_html} />
 
-    <!-- Content -->
-    <div class="prose max-w-none mb-10" set:html={berita.content_html} />
+      {mediaList.length > 1 && (
+        <div class="mb-10">
+          <h2 class="font-heading font-semibold text-xl mb-4 text-primary">Galeri Foto</h2>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {mediaList.slice(1).map(m => (
+              <div class="aspect-[4/3] rounded-lg overflow-hidden border border-border">
+                <img src={`/api/media/${encodeURIComponent(m.r2_key_display)}`} alt={m.alt}
+                  class="w-full h-full object-cover" loading="lazy" />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
-    <!-- Gallery -->
-    {mediaList.length > 1 && (
-      <div class="mb-10">
-        <h2 class="font-heading font-semibold text-xl mb-4" style="color:var(--color-primary);">Galeri Foto</h2>
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {mediaList.slice(1).map(m => (
-            <div class="aspect-[4/3] rounded-lg overflow-hidden border border-border">
-              <img src={`/api/media/${encodeURIComponent(m.r2_key_display)}`} alt={m.alt}
-                class="w-full h-full object-cover" loading="lazy" />
-            </div>
-          ))}
+      <div class="border-t border-border pt-6">
+        <p class="font-heading font-semibold text-sm mb-3 text-primary">Bagikan Berita Ini</p>
+        <div class="flex flex-wrap items-center gap-3">
+          <a
+            href={`https://wa.me/?text=${encodeURIComponent(berita.judul + '\n' + canonicalUrl)}`}
+            target="_blank" rel="noopener noreferrer"
+            class="btn btn-cta text-sm py-2.5"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+            WhatsApp
+          </a>
+          <button
+            id="copy-link" type="button"
+            class="btn btn-secondary text-sm py-2.5"
+          >
+            Salin Tautan
+          </button>
+          <span id="copy-msg" class="text-sm font-medium hidden text-cta">Tautan disalin</span>
         </div>
       </div>
-    )}
 
-    <!-- Share -->
-    <div class="border-t border-border pt-6">
-      <p class="font-heading font-semibold text-sm mb-3" style="color:var(--color-primary);">Bagikan Berita Ini</p>
-      <div class="flex items-center gap-3">
-        <a
-          href={`https://wa.me/?text=${encodeURIComponent(berita.judul + '\n' + canonicalUrl)}`}
-          target="_blank" rel="noopener noreferrer"
-          class="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-heading font-semibold text-sm text-white focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
-          style="background:var(--color-cta); min-height:44px;"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
-          WhatsApp
+      <div class="mt-8">
+        <a href="/berita" class="font-heading font-medium text-sm text-accent hover:text-primary transition-colors">
+          ← Kembali ke Daftar Berita
         </a>
-        <button
-          id="copy-link" type="button"
-          class="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-heading font-medium text-sm border cursor-pointer hover:bg-sand focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
-          style="border-color:var(--color-border); min-height:44px;"
-        >
-          Salin Tautan
-        </button>
-        <span id="copy-msg" class="text-sm font-medium hidden" style="color:var(--color-cta);">Tautan disalin!</span>
       </div>
-    </div>
-
-    <!-- Back link -->
-    <div class="mt-8">
-      <a href="/berita" class="font-heading font-medium text-sm hover:underline focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent rounded" style="color:var(--color-accent);">
-        ← Kembali ke Daftar Berita
-      </a>
-    </div>
-
+    </article>
   </div>
 
 </Layout>
@@ -135,13 +127,3 @@ const articleJsonLd = {
     if (msg) { msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 2500); }
   });
 </script>
-
-<style>
-  .prose h2 { font-size:1.25rem; font-weight:700; color:var(--color-primary); margin:1.5rem 0 .5rem; }
-  .prose h3 { font-size:1.1rem; font-weight:600; color:var(--color-primary); margin:1.25rem 0 .25rem; }
-  .prose p  { margin:.5rem 0; line-height:1.8; }
-  .prose ul { list-style:disc; padding-left:1.5rem; margin:.5rem 0; }
-  .prose ol { list-style:decimal; padding-left:1.5rem; margin:.5rem 0; }
-  .prose li { margin:.25rem 0; }
-  .prose a  { color:var(--color-accent); text-decoration:underline; }
-</style>

@@ -5,75 +5,69 @@ import { getEnv } from '@lib/env';
 
 const env = getEnv();
 const titikList = env ? await getAllTitikPeta(env.DB) : [];
-const titikJson = JSON.stringify(titikList);
 
-const counts = { wisata: 0, umkm: 0, potensi: 0 };
+const counts = { umkm: 0, potensi: 0 };
 for (const t of titikList) {
   if (t.jenis in counts) counts[t.jenis as keyof typeof counts]++;
 }
 
-// Titik peta diisi lewat panel admin setelah pengambilan koordinat GPS di lapangan.
-// Koordinat di bawah bersifat perkiraan (fallback) sampai titik asli dimasukkan.
 const demoPoints = [
-  { jenis: 'wisata', label: 'Pantai Citarik', lat: -7.0508, lng: 106.5444, linked_slug: 'pantai-Citarik', desc: 'Garis pantai ±4 km di tepi Samudra Hindia.' },
-  { jenis: 'potensi', label: 'Kantor Desa Citarik', lat: -7.059, lng: 106.578, linked_slug: 'profil', desc: 'Pusat pemerintahan Desa Citarik, Kp. Bojongkopo.' },
+  { jenis: 'potensi', label: 'Kantor Desa Citarik', lat: -7.009933224557312, lng: 106.58103748650889, linked_slug: 'profil', desc: 'Jl. Raya Citarik Km. 06, Kp. Legok Loa RT 001/RW 014, Kec. Palabuhanratu.' },
 ];
 
-const finalPoints = titikList.length > 0 ? titikList : demoPoints;
+const finalPoints = (titikList.length > 0 ? titikList : demoPoints).filter(p => p.jenis !== 'wisata');
 const finalJson = JSON.stringify(finalPoints);
 const finalCounts = titikList.length > 0
   ? counts
-  : { wisata: demoPoints.filter(p => p.jenis === 'wisata').length, umkm: demoPoints.filter(p => p.jenis === 'umkm').length, potensi: demoPoints.filter(p => p.jenis === 'potensi').length };
+  : { umkm: 0, potensi: demoPoints.filter(p => p.jenis === 'potensi').length };
 ---
 
 <Layout
   title="Peta Desa | Desa Citarik"
-  description="Peta interaktif Desa Citarik: titik wisata, UMKM, dan potensi desa. Klik penanda untuk detail."
+  description="Peta interaktif Desa Citarik: titik UMKM dan potensi desa. Klik penanda untuk detail."
 >
 
-<main id="main" class="mx-auto max-w-[1152px] px-4 sm:px-6 py-6">
-  <h1 class="text-2xl sm:text-3xl font-heading font-extrabold text-primary">Peta Desa Citarik</h1>
-  <p class="text-muted mt-1">Jelajahi titik wisata, UMKM, dan potensi desa. Klik penanda untuk detail.</p>
+<div class="container-page py-6 md:py-8">
+  <span class="section-label">Eksplorasi</span>
+  <h1 class="text-2xl sm:text-3xl font-heading font-extrabold text-primary mt-2">Peta Desa Citarik</h1>
+  <p class="text-muted mt-1.5 leading-relaxed">Jelajahi titik UMKM dan potensi desa. Klik penanda untuk detail.</p>
 
-  <div class="grid lg:grid-cols-[280px_1fr] gap-5 mt-5">
-    <!-- Filter panel -->
-    <aside class="bg-white border border-line rounded-2xl p-5 h-max shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+  <div class="grid lg:grid-cols-[280px_1fr] gap-5 mt-6">
+    <aside class="card-surface p-5 h-max">
       <h2 class="font-heading font-semibold text-ink">Tampilkan</h2>
-      <div class="space-y-2 mt-3">
+      <div class="space-y-1.5 mt-3">
         {[
-          { type: 'wisata', label: 'Wisata', icon: 'palmtree', color: '#0E9AA7', count: finalCounts.wisata },
           { type: 'umkm', label: 'UMKM', icon: 'store', color: '#15803D', count: finalCounts.umkm },
           { type: 'potensi', label: 'Potensi', icon: 'sprout', color: '#0E4A6E', count: finalCounts.potensi },
         ].map(item => (
-          <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-sand cursor-pointer">
+          <label class="flex items-center gap-3 p-2 rounded-md hover:bg-sand cursor-pointer transition-colors">
             <input type="checkbox" class="filter-check w-4 h-4 rounded text-accent" data-type={item.type} checked />
             <span class="w-7 h-7 rounded-full grid place-items-center shrink-0" style={`background:${item.color}; transform:rotate(-45deg);`}>
               <i data-lucide={item.icon} class="w-3.5 h-3.5 text-white" style="transform:rotate(45deg);"></i>
             </span>
             <span class="font-medium text-sm">{item.label}</span>
-            <span class="ml-auto text-sm text-muted">{item.count}</span>
+            <span class="ml-auto text-sm text-muted tabular-nums">{item.count}</span>
           </label>
         ))}
       </div>
-      <hr class="my-4 border-line" />
-      <button id="resetView" class="inline-flex items-center gap-2 w-full justify-center border-2 border-primary text-primary font-heading font-semibold py-2.5 rounded-lg hover:bg-primary hover:text-white transition-colors min-h-[44px] text-sm">
+      <hr class="my-4 border-border" />
+      <button id="resetView" class="btn btn-secondary w-full text-sm">
         <i data-lucide="locate-fixed" class="w-5 h-5"></i> Pusatkan ke Desa
       </button>
-      <p class="text-xs text-muted mt-3 flex items-center gap-1.5">
-        <i data-lucide="info" class="w-4 h-4"></i> Peta gratis berbasis OpenStreetMap.
+      <p class="text-xs text-muted mt-3 flex items-center gap-1.5 leading-relaxed">
+        <i data-lucide="info" class="w-4 h-4 shrink-0"></i> Peta gratis berbasis OpenStreetMap.
       </p>
-      <div class="mt-4 bg-sand/60 border border-line rounded-lg p-3 flex gap-2">
+      <div class="mt-4 bg-sand/60 border border-border rounded-md p-3 flex gap-2">
         <i data-lucide="shield-check" class="w-4 h-4 text-primary shrink-0 mt-0.5"></i>
-        <p class="text-xs text-muted">
+        <p class="text-xs text-muted leading-relaxed">
           <span class="font-heading font-semibold text-ink">Pengelola desa</span> dapat menambah, menyunting, atau menghapus titik peta melalui <span class="font-medium text-primary">Panel Admin › Kelola Peta</span>.
         </p>
       </div>
     </aside>
 
-    <!-- Map -->
-    <div id="peta-map" class="rounded-2xl overflow-hidden border border-line shadow-[0_4px_12px_rgba(15,36,51,.10)]" style="height: min(70vh, 640px); z-index: 0;"></div>
+    <div id="peta-map" class="rounded-xl overflow-hidden border border-border shadow-sm" style="height: min(70vh, 640px); z-index: 0;"></div>
   </div>
-</main>
+</div>
 
 </Layout>
 
@@ -81,31 +75,32 @@ const finalCounts = titikList.length > 0
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
 <script define:vars={{ finalJson }}>
-  const CENTER = [-7.0589, 106.5778], ZOOM = 13;
+  const CENTER = [-7.009933224557312, 106.58103748650889], ZOOM = 14;
   const map = L.map('peta-map', { scrollWheelZoom: false }).setView(CENTER, ZOOM);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
   map.on('focus', () => map.scrollWheelZoom.enable());
   map.on('blur', () => map.scrollWheelZoom.disable());
 
-  const COLORS = { wisata: '#0E9AA7', umkm: '#15803D', potensi: '#0E4A6E' };
-  const LINK = { wisata: '/wisata/', umkm: '/umkm/', potensi: '/potensi' };
+  const COLORS = { umkm: '#15803D', potensi: '#0E4A6E' };
+  const LINK = { umkm: '/umkm/', potensi: '/potensi' };
 
   const points = JSON.parse(finalJson);
-  const layers = { wisata: L.layerGroup(), umkm: L.layerGroup(), potensi: L.layerGroup() };
+  const layers = { umkm: L.layerGroup(), potensi: L.layerGroup() };
 
   points.forEach(p => {
+    if (!layers[p.jenis]) return;
     const color = COLORS[p.jenis] ?? '#666';
     const icon = L.divIcon({
       className: '',
-      html: `<div style="width:24px;height:24px;background:${color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.3);"></div>`,
+      html: `<div style="width:24px;height:24px;background:${color};border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,.25);"></div>`,
       iconSize: [24, 24],
       iconAnchor: [12, 24],
-      popupAnchor: [0, -26]
+      popupAnchor: [0, -20],
     });
-    const href = p.jenis === 'potensi' ? '/potensi' : (LINK[p.jenis] ?? '/') + p.linked_slug;
+    const href = p.jenis === 'potensi' ? '/potensi' : (LINK[p.jenis] ?? '/') + (p.linked_slug ?? '');
     L.marker([p.lat, p.lng], { icon, title: p.label })
-      .bindPopup(`<h3 style="font-family:Lexend,sans-serif;font-weight:700;color:#0E4A6E;margin:0 0 4px">${p.label}</h3><p style="margin:0 0 6px;color:#475569;font-size:.85rem">${p.desc ?? ''}</p><a href="${href}" style="color:#0E9AA7;font-weight:600;font-size:.85rem">Lihat detail →</a>`)
-      .addTo(layers[p.jenis] ?? layers.wisata);
+      .bindPopup(`<h3 style="font-family:Lexend,sans-serif;font-weight:700;color:#0E4A6E;margin:0 0 4px">${p.label}</h3><p style="margin:0 0 6px;color:#5B6B75;font-size:.85rem">${p.desc ?? ''}</p><a href="${href}" style="color:#0E9AA7;font-weight:600;font-size:.85rem">Lihat detail →</a>`)
+      .addTo(layers[p.jenis]);
   });
 
   Object.values(layers).forEach(l => l.addTo(map));
@@ -117,7 +112,6 @@ const finalCounts = titikList.length > 0
     });
   });
 
-  document.getElementById('resetView').addEventListener('click', () => map.setView(CENTER, ZOOM));
-
-  setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 150);
+  document.getElementById('resetView')?.addEventListener('click', () => map.setView(CENTER, ZOOM));
+  if (typeof window.refreshIcons === 'function') window.refreshIcons();
 </script>

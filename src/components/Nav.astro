@@ -11,7 +11,7 @@ const navItems = [
   { href: '/profil', label: 'Profil' },
   { href: '/pemerintahan', label: 'Pemerintahan' },
   { href: '/potensi', label: 'Potensi' },
-  { href: '/wisata', label: 'Wisata' },
+  { href: '/pelayanan', label: 'Pelayanan' },
   { href: '/umkm', label: 'UMKM' },
   { href: '/peta', label: 'Peta' },
   { href: '/berita', label: 'Berita' },
@@ -27,15 +27,14 @@ const isActive = (href: string) =>
   data-transparent={transparent ? 'true' : 'false'}
   class="fixed top-0 inset-x-0 z-40 transition-[background-color,box-shadow] duration-200"
 >
-  <!-- Nav inner: height transitions from 80px to 64px on scroll -->
-  <div class="nav-inner mx-auto max-w-6xl px-4 md:px-6 flex items-center justify-between" style="height: 80px; transition: height 200ms ease;">
+  <div class="nav-inner container-page flex items-center justify-between" style="height: 80px; transition: height 200ms ease;">
 
     <!-- Logo -->
-    <a href="/" class="flex items-center gap-3 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent focus-visible:rounded-sm">
+    <a href="/" class="flex items-center gap-3 rounded-md focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent">
       <span class="nav-logo-circle w-10 h-10 rounded-full grid place-items-center font-heading font-bold text-sm transition-colors duration-200"
         style="background: #fff; color: var(--color-primary);"
         aria-hidden="true"
-      >DL</span>
+      >DC</span>
       <span class="leading-tight">
         <span class="nav-brand-title block font-heading font-bold transition-colors duration-200" style="color: #fff;">Desa Citarik</span>
         <span class="nav-brand-sub block text-xs transition-colors duration-200" style="color: rgba(255,255,255,0.85);">Pemerintah Desa Citarik</span>
@@ -43,7 +42,7 @@ const isActive = (href: string) =>
     </a>
 
     <!-- Desktop nav links -->
-    <nav aria-label="Navigasi utama" class="hidden lg:flex items-center gap-1 font-heading font-medium text-[15px]">
+    <nav aria-label="Navigasi utama" class="hidden lg:flex items-center gap-0.5 font-heading font-medium text-[15px]">
       {navItems.map(({ href, label }) => (
         <a
           href={href}
@@ -59,7 +58,7 @@ const isActive = (href: string) =>
       <a
         href="/kontak"
         aria-current={isKontak ? 'page' : undefined}
-        class="ml-2 nav-kontak inline-flex items-center gap-1.5 px-3 py-2 rounded-md font-semibold transition-colors duration-150 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent focus-visible:outline-offset-1"
+        class="ml-2 nav-kontak inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md font-semibold transition-colors duration-150 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent focus-visible:outline-offset-1"
       >
         Kontak
       </a>
@@ -73,7 +72,6 @@ const isActive = (href: string) =>
       aria-expanded="false"
       aria-controls="nav-drawer"
     >
-      <!-- Hamburger SVG -->
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <line x1="3" y1="6" x2="21" y2="6"/>
         <line x1="3" y1="12" x2="21" y2="12"/>
@@ -94,13 +92,12 @@ const isActive = (href: string) =>
 <!-- Mobile drawer -->
 <div
   id="nav-drawer"
-  class="fixed inset-y-0 right-0 w-72 bg-white z-50 shadow-lg flex flex-col"
-  style="transform: translateX(100%); transition: transform 200ms ease;"
+  class="fixed inset-y-0 right-0 w-72 bg-white z-50 border-l border-border flex flex-col"
+  style="transform: translateX(100%); transition: transform 200ms ease; box-shadow: var(--shadow-lg);"
   role="dialog"
   aria-label="Menu navigasi"
   aria-modal="true"
 >
-  <!-- Drawer header -->
   <div class="flex items-center justify-between px-4 py-4 border-b border-border">
     <span class="font-heading font-bold text-primary">Menu</span>
     <button
@@ -108,7 +105,6 @@ const isActive = (href: string) =>
       class="w-11 h-11 rounded-md flex items-center justify-center cursor-pointer hover:bg-sand transition-colors duration-150 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
       aria-label="Tutup menu"
     >
-      <!-- Close SVG -->
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <line x1="18" y1="6" x2="6" y2="18"/>
         <line x1="6" y1="6" x2="18" y2="18"/>
@@ -116,7 +112,6 @@ const isActive = (href: string) =>
     </button>
   </div>
 
-  <!-- Drawer nav links -->
   <nav aria-label="Navigasi mobile" class="flex flex-col p-4 gap-1 font-heading font-medium">
     {navItems.map(({ href, label }) => (
       <a
@@ -146,16 +141,14 @@ const isActive = (href: string) =>
 </div>
 
 <style>
-  /* ── Solid state (always applied on interior pages; toggled via JS on homepage) ── */
   #site-nav.nav-scrolled {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(8px);
-    box-shadow: 0 4px 12px rgba(15, 36, 51, 0.10);
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 1px 0 rgba(15, 36, 51, 0.06);
   }
   #site-nav.nav-scrolled .nav-inner {
     height: 64px !important;
   }
-  /* Logo in solid state */
   #site-nav.nav-scrolled .nav-logo-circle {
     background: var(--color-primary) !important;
     color: #fff !important;
@@ -166,7 +159,6 @@ const isActive = (href: string) =>
   #site-nav.nav-scrolled .nav-brand-sub {
     color: var(--color-text-muted) !important;
   }
-  /* Desktop links in solid state */
   #site-nav.nav-scrolled .nav-link {
     color: var(--color-text);
   }
@@ -177,13 +169,11 @@ const isActive = (href: string) =>
     background: var(--color-sand);
     color: var(--color-primary);
   }
-  /* Hamburger in solid state */
   #site-nav.nav-scrolled .nav-burger {
     color: var(--color-primary);
     background: transparent;
   }
 
-  /* ── Kontak CTA button ── */
   .nav-kontak {
     background: var(--color-primary);
     color: #fff;
@@ -199,7 +189,6 @@ const isActive = (href: string) =>
     background: var(--color-primary-dark);
   }
 
-  /* ── Transparent state (homepage at top) ── */
   #site-nav:not(.nav-scrolled) .nav-link {
     color: #fff;
   }
@@ -215,14 +204,13 @@ const isActive = (href: string) =>
     background: rgba(255, 255, 255, 0.15);
   }
   #site-nav:not(.nav-scrolled) .nav-kontak {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.18);
     color: #fff;
   }
   #site-nav:not(.nav-scrolled) .nav-kontak:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.28);
   }
 
-  /* ── Mobile drawer open state ── */
   #nav-drawer.drawer-open {
     transform: translateX(0) !important;
   }
@@ -232,7 +220,6 @@ const isActive = (href: string) =>
   const nav = document.getElementById('site-nav') as HTMLElement | null;
   const isTransparent = nav?.dataset.transparent === 'true';
 
-  // ── Two-state scroll logic ──
   function updateNavState() {
     if (!nav) return;
     if (isTransparent) {
@@ -247,7 +234,6 @@ const isActive = (href: string) =>
   }
   updateNavState();
 
-  // ── Mobile drawer logic ──
   const hamburger = document.getElementById('nav-hamburger');
   const drawer = document.getElementById('nav-drawer');
   const overlay = document.getElementById('nav-overlay');

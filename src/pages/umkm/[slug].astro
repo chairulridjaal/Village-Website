@@ -2,9 +2,10 @@
 import Layout from '../../components/Layout.astro';
 import { getUmkmBySlug } from '../../lib/db/umkm';
 import { getMediaForEntity } from '../../lib/db/media';
+import { getEnv } from '@lib/env';
+import { SITE_URL } from '@lib/site';
 
 const { slug } = Astro.params as { slug: string };
-import { getEnv } from '@lib/env';
 const env = getEnv();
 
 const umkm = env ? await getUmkmBySlug(slug, env.DB) : null;
@@ -14,7 +15,6 @@ const mediaList = env ? await getMediaForEntity('umkm', umkm.id, env.DB) : [];
 const cover = mediaList[0];
 const menuItems = (umkm.menu ?? '').split('\n').map(s => s.trim()).filter(Boolean);
 const caraPesanLines = (umkm.cara_pesan ?? '').split('\n').map(s => s.trim()).filter(Boolean);
-import { SITE_URL } from '@lib/site';
 const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? SITE_URL).href;
 ---
 
@@ -24,37 +24,34 @@ const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? SITE_URL).href;
   ogImage={cover ? `/api/media/${encodeURIComponent(cover.r2_key_display)}` : undefined}
 >
 
-  <!-- Header -->
-  <div class="py-10 md:py-12" style="background:linear-gradient(135deg,#0E4A6E,#0A3650);">
-    <div class="mx-auto max-w-6xl px-4 md:px-6 text-white">
-      <nav aria-label="Breadcrumb" class="text-sm mb-3 opacity-75">
-        <a href="/" class="hover:underline">Beranda</a> /
-        <a href="/umkm" class="hover:underline">Direktori UMKM</a> /
-        <span>{umkm.nama}</span>
-      </nav>
-      <h1 class="font-heading font-bold text-3xl md:text-4xl">{umkm.nama}</h1>
-      <p class="text-white/70 mt-1">{umkm.kategori}</p>
+  <section class="page-hero">
+    <div class="page-hero__media" style="height: 10.5rem;">
+      {cover ? (
+        <img src={`/api/media/${encodeURIComponent(cover.r2_key_display)}`} alt={cover.alt || umkm.nama} />
+      ) : (
+        <div class="w-full h-full" style="background: linear-gradient(135deg, #0E4A6E, #0A3650);"></div>
+      )}
     </div>
-  </div>
+    <div class="page-hero__overlay"></div>
+    <div class="page-hero__content">
+      <div class="container-page">
+        <nav aria-label="Breadcrumb" class="breadcrumb">
+          <a href="/">Beranda</a>
+          <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          <a href="/umkm">Direktori UMKM</a>
+          <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          <span class="font-medium text-white">{umkm.nama}</span>
+        </nav>
+        <h1 class="text-3xl md:text-4xl font-heading font-extrabold mt-1.5">{umkm.nama}</h1>
+        <p class="text-white/75 mt-1">{umkm.kategori}</p>
+      </div>
+    </div>
+  </section>
 
-  <div class="mx-auto max-w-6xl px-4 md:px-6 py-10">
+  <div class="container-page py-10 md:py-12">
     <div class="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-10">
 
-      <!-- Left: gallery + description + location -->
       <div>
-        <!-- Cover image -->
-        {cover ? (
-          <div class="aspect-[16/10] rounded-xl overflow-hidden mb-6 border border-border" style="box-shadow:var(--shadow-md);">
-            <img src={`/api/media/${encodeURIComponent(cover.r2_key_display)}`} alt={cover.alt}
-              class="w-full h-full object-cover" loading="lazy" />
-          </div>
-        ) : (
-          <div class="aspect-[16/10] rounded-xl overflow-hidden mb-6 flex items-center justify-center" style="background:var(--color-sand);">
-            <span class="font-heading font-bold text-6xl" style="color:var(--color-primary); opacity:.2;">{umkm.nama[0]}</span>
-          </div>
-        )}
-
-        <!-- Gallery -->
         {mediaList.length > 1 && (
           <div class="grid grid-cols-3 gap-2 mb-6">
             {mediaList.slice(1, 7).map(m => (
@@ -66,7 +63,6 @@ const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? SITE_URL).href;
           </div>
         )}
 
-        <!-- Description + structured sections -->
         <div class="umkm-content mb-6">
           <div class="prose max-w-none" set:html={umkm.deskripsi_html} />
 
@@ -92,16 +88,15 @@ const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? SITE_URL).href;
           )}
         </div>
 
-        <!-- Location -->
         {umkm.lokasi && (
-          <div class="flex items-start gap-3 p-4 rounded-xl border border-border" style="background:var(--color-bg);">
+          <div class="flex items-start gap-3 p-4 rounded-xl border border-border bg-bg">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" class="mt-0.5 shrink-0" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
             <div>
               <p class="font-heading font-medium text-sm">Lokasi</p>
-              <p class="text-text-muted text-sm">{umkm.lokasi}</p>
+              <p class="text-muted text-sm">{umkm.lokasi}</p>
               {umkm.google_maps_url && (
                 <a href={umkm.google_maps_url} target="_blank" rel="noopener noreferrer"
-                  class="text-accent text-sm hover:underline focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent rounded">
+                  class="text-accent text-sm hover:underline">
                   Buka di Google Maps →
                 </a>
               )}
@@ -110,80 +105,72 @@ const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? SITE_URL).href;
         )}
       </div>
 
-      <!-- Right: sticky contact card -->
       <aside class="lg:sticky lg:top-24 self-start">
-        <div class="bg-white rounded-xl border border-border p-6 space-y-3" style="box-shadow:var(--shadow-md);">
-          <h2 class="font-heading font-bold text-lg mb-4" style="color:var(--color-primary);">Hubungi UMKM</h2>
+        <div class="card-surface p-6 space-y-3">
+          <h2 class="font-heading font-bold text-lg mb-2 text-primary">Hubungi UMKM</h2>
 
-          <!-- 1. Primary contact -->
           {umkm.wa_number ? (
             <a href={`https://wa.me/${umkm.wa_number.replace(/\D/g,'')}`} target="_blank" rel="noopener noreferrer"
-              class="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg font-heading font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
-              style="background:var(--color-cta); min-height:44px;">
+              class="btn btn-cta w-full">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
               Hubungi via WhatsApp
             </a>
           ) : umkm.telepon ? (
-            <a href={`tel:${umkm.telepon}`}
-              class="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg font-heading font-semibold border transition-colors hover:bg-primary hover:text-white focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
-              style="border-color:var(--color-primary); color:var(--color-primary); min-height:44px;">
-              Telepon
-            </a>
+            <a href={`tel:${umkm.telepon}`} class="btn btn-secondary w-full">Telepon</a>
           ) : null}
 
-          <!-- 2. Toko online -->
           {umkm.toko_online_url && (
             <a href={umkm.toko_online_url} target="_blank" rel="noopener noreferrer"
-              class="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg font-heading font-semibold border transition-colors hover:bg-primary hover:text-white focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
-              style="border-color:var(--color-primary); color:var(--color-primary); min-height:44px;">
+              class="btn btn-secondary w-full">
               Beli di Toko Online
             </a>
           )}
 
-          <!-- 3. Secondary: Maps + QRIS -->
           {(umkm.google_maps_url || umkm.qris_r2_key) && (
             <div class="grid grid-cols-2 gap-2">
               {umkm.google_maps_url && (
                 <a href={umkm.google_maps_url} target="_blank" rel="noopener noreferrer"
-                  class="flex items-center justify-center px-3 py-2 rounded-lg font-heading font-medium text-sm border hover:bg-sand focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
-                  style="border-color:var(--color-border); color:var(--color-text); min-height:44px;">
+                  class="flex items-center justify-center px-3 py-2 rounded-md font-heading font-medium text-sm border border-border hover:bg-sand min-h-[44px]">
                   Google Maps
                 </a>
               )}
               {umkm.qris_r2_key && (
                 <a href={`/api/media/${encodeURIComponent(umkm.qris_r2_key)}`} target="_blank"
-                  class="flex items-center justify-center px-3 py-2 rounded-lg font-heading font-medium text-sm border hover:bg-sand focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
-                  style="border-color:var(--color-border); color:var(--color-text); min-height:44px;">
+                  class="flex items-center justify-center px-3 py-2 rounded-md font-heading font-medium text-sm border border-border hover:bg-sand min-h-[44px]">
                   QRIS
                 </a>
               )}
             </div>
           )}
 
-          <!-- 4. Share -->
           <div class="pt-3 border-t border-border">
-            <p class="text-text-muted text-xs font-heading mb-2">Bagikan</p>
+            <p class="text-muted text-xs font-heading mb-2">Bagikan</p>
             <div class="flex gap-2">
               <a href={`https://wa.me/?text=${encodeURIComponent(umkm.nama + ': ' + canonicalUrl)}`}
                 target="_blank" rel="noopener noreferrer" aria-label="Bagikan via WhatsApp"
-                class="w-10 h-10 rounded-lg border border-border flex items-center justify-center hover:bg-sand focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent">
+                class="w-10 h-10 rounded-md border border-border flex items-center justify-center hover:bg-sand">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
               </a>
               <button id="copy-link" type="button" aria-label="Salin tautan"
-                class="w-10 h-10 rounded-lg border border-border flex items-center justify-center hover:bg-sand cursor-pointer focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent">
+                class="w-10 h-10 rounded-md border border-border flex items-center justify-center hover:bg-sand cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
               </button>
-              <span id="copy-confirm" class="text-xs text-cta hidden self-center ml-1">Tautan disalin!</span>
+              <span id="copy-confirm" class="text-xs text-cta hidden self-center ml-1">Tautan disalin</span>
             </div>
           </div>
         </div>
 
-        <!-- Disclaimer -->
-        <p class="text-xs text-text-muted mt-3 text-center italic">
+        <p class="text-xs text-muted mt-3 text-center italic leading-relaxed">
           Transaksi dilakukan langsung dengan UMKM. Pemerintah Desa Citarik tidak memungut biaya apapun.
         </p>
       </aside>
 
+    </div>
+
+    <div class="mt-10">
+      <a href="/umkm" class="font-heading font-medium text-sm text-accent hover:text-primary transition-colors">
+        ← Kembali ke Direktori UMKM
+      </a>
     </div>
   </div>
 
@@ -196,21 +183,3 @@ const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? SITE_URL).href;
     if (msg) { msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 2000); }
   });
 </script>
-
-<!-- is:global: konten set:html tidak mendapat atribut scoping Astro, jadi selector scoped tidak mengenainya -->
-<style is:global>
-  .umkm-content h2 {
-    font-family: var(--font-heading);
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: var(--color-primary);
-    border-left: 3px solid var(--color-accent);
-    padding-left: .625rem;
-    margin: 1.75rem 0 .625rem;
-  }
-  .umkm-content p { margin: .5rem 0; line-height: 1.7; }
-  .umkm-content ul { list-style: disc; padding-left: 1.5rem; margin: .5rem 0; }
-  .umkm-content ol { list-style: decimal; padding-left: 1.5rem; margin: .5rem 0; }
-  .umkm-content li { margin: .3rem 0; line-height: 1.6; }
-  .umkm-content .prose > p:first-child { font-size: 1.0625rem; }
-</style>

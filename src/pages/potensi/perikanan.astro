@@ -4,47 +4,43 @@ import Layout from '../../components/Layout.astro';
 
 <Layout
   title="Potensi Perikanan | Desa Citarik"
-  description="Potensi perikanan dan hasil laut Desa Citarik: nelayan tradisional, ikan asin, kerupuk, dan sambal khas pesisir."
+  description="Potensi perikanan Desa Citarik menurut Prodeskel 2025: pancing, empang/kolam, ikan mas dan nila."
 >
 
-<section class="relative">
-  <div class="h-48 sm:h-64 overflow-hidden">
-    <img
-      src="/images/nelayan.png"
-      alt="Nelayan Desa Citarik"
-      class="w-full h-full object-cover"
-    />
+<section class="page-hero">
+  <div class="page-hero__media">
+    <img src="/images/nelayan.png" alt="Nelayan Desa Citarik" />
   </div>
-  <div class="absolute inset-0" style="background: rgba(10,54,80,0.55);"></div>
-  <div class="absolute inset-0 flex items-end">
-    <div class="mx-auto max-w-[1152px] px-4 sm:px-6 w-full pb-6 text-white">
-      <nav aria-label="Breadcrumb" class="text-sm text-white/80 flex items-center gap-1.5">
-        <a href="/" class="hover:text-white">Beranda</a>
+  <div class="page-hero__overlay"></div>
+  <div class="page-hero__content">
+    <div class="container-page">
+      <nav aria-label="Breadcrumb" class="breadcrumb">
+        <a href="/">Beranda</a>
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
-        <a href="/potensi" class="hover:text-white">Potensi</a>
+        <a href="/potensi">Potensi</a>
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
-        <span class="font-medium">Perikanan</span>
+        <span class="font-medium text-white">Perikanan</span>
       </nav>
-      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1">Perikanan & Hasil Laut</h1>
+      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1.5">Perikanan</h1>
     </div>
   </div>
 </section>
 
-<main id="main" class="mx-auto max-w-[1152px] px-4 sm:px-6 py-10">
+<div class="container-page py-10">
   <div class="max-w-3xl space-y-6">
     <p class="text-lg text-muted leading-relaxed">
-      Sebagai desa pesisir yang berbatasan langsung dengan Samudra Hindia, Desa Citarik memiliki potensi perikanan tangkap yang besar. Ratusan warga bermata pencaharian sebagai nelayan dan melaut menggunakan perahu tradisional untuk menangkap beragam hasil laut.
+      Data Prodeskel Maret 2025 mencatat produksi perikanan skala kecil di Desa Citarik: alat pancing (14 unit, ±1 ton/tahun) dan empang/kolam (3 unit, ±2 ton/tahun). Jenis ikan yang dilaporkan meliputi mas dan nila (masing-masing ±1 ton/tahun).
     </p>
     <p class="text-muted leading-relaxed">
-      Selain perikanan tangkap, kawasan Muara Citarik dikenal sebagai lokasi budidaya sidat (belut), sementara Danau Talanca menyimpan potensi perikanan air tawar. Hasil laut dapat diolah menjadi produk bernilai tambah oleh UMKM lokal, seperti ikan asin, kerupuk, dan sambal ikan, yang kini mulai dipasarkan secara digital.
+      Pemasaran hasil perikanan menurut form dilakukan melalui pasar, KUD, tengkulak, dan lumbung desa. Terdapat juga 1 sungai dengan kondisi air keruh.
     </p>
     <div class="grid sm:grid-cols-3 gap-4 mt-6">
       {[
-        { icon: 'ship', label: 'Warga Nelayan', value: '±800' },
-        { icon: 'fish', label: 'Budidaya Sidat', value: 'Muara Citarik' },
-        { icon: 'package', label: 'Produk Olahan', value: 'Beragam' },
+        { icon: 'fish', label: 'Empang/kolam', value: '3 unit' },
+        { icon: 'anchor', label: 'Alat pancing', value: '14 unit' },
+        { icon: 'package', label: 'Mas & nila', value: '±2 ton/th' },
       ].map(item => (
-        <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)] text-center">
+        <div class="card-surface p-5 text-center">
           <i data-lucide={item.icon} class="w-8 h-8 text-accent mx-auto"></i>
           <p class="font-heading font-extrabold text-2xl text-primary mt-2">{item.value}</p>
           <p class="text-sm text-muted mt-0.5">{item.label}</p>
@@ -52,15 +48,13 @@ import Layout from '../../components/Layout.astro';
       ))}
     </div>
     <div class="mt-6">
-      <a href="/umkm" class="inline-flex items-center gap-2 bg-primary text-white font-heading font-semibold px-5 py-3 rounded-lg hover:bg-primaryDark transition-colors">
-        <i data-lucide="store" class="w-5 h-5"></i> Lihat UMKM Perikanan
+      <a href="/umkm" class="btn btn-primary">
+        <i data-lucide="store" class="w-5 h-5"></i> Lihat UMKM
       </a>
     </div>
   </div>
-</main>
+</div>
 
 </Layout>
 
-<script is:inline>
-  setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 300);
-</script>
+

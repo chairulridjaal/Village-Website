@@ -12,9 +12,7 @@ const { href, imageSrc, imageAlt = '', class: className } = Astro.props;
 <a
   href={href}
   class:list={[
-    'block bg-surface border border-border rounded-[12px] overflow-hidden cursor-pointer',
-    'transition-[box-shadow,border-color] duration-200',
-    'hover:shadow-lg hover:border-accent',
+    'block card-surface card-surface-hover overflow-hidden cursor-pointer',
     'focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent focus-visible:outline-offset-2',
     className,
   ]}

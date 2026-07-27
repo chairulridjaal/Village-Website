@@ -4,47 +4,43 @@ import Layout from '../../components/Layout.astro';
 
 <Layout
   title="Potensi Pertanian | Desa Citarik"
-  description="Potensi pertanian Desa Citarik: lumbung padi Palabuhanratu, aneka buah, kopi, dan hasil kayu."
+  description="Potensi pertanian Desa Citarik menurut Prodeskel 2025: padi sawah, buah, dan keluarga petani."
 >
 
-<section class="relative">
-  <div class="h-48 sm:h-64 overflow-hidden">
-    <img
-      src="/images/kebun_sayur.png"
-      alt="Lahan pertanian Desa Citarik"
-      class="w-full h-full object-cover"
-    />
+<section class="page-hero">
+  <div class="page-hero__media">
+    <img src="/images/kebun_sayur.png" alt="Lahan pertanian Desa Citarik" />
   </div>
-  <div class="absolute inset-0" style="background: rgba(10,54,80,0.55);"></div>
-  <div class="absolute inset-0 flex items-end">
-    <div class="mx-auto max-w-[1152px] px-4 sm:px-6 w-full pb-6 text-white">
-      <nav aria-label="Breadcrumb" class="text-sm text-white/80 flex items-center gap-1.5">
-        <a href="/" class="hover:text-white">Beranda</a>
+  <div class="page-hero__overlay"></div>
+  <div class="page-hero__content">
+    <div class="container-page">
+      <nav aria-label="Breadcrumb" class="breadcrumb">
+        <a href="/">Beranda</a>
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
-        <a href="/potensi" class="hover:text-white">Potensi</a>
+        <a href="/potensi">Potensi</a>
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
-        <span class="font-medium">Pertanian</span>
+        <span class="font-medium text-white">Pertanian</span>
       </nav>
-      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1">Pertanian & Perkebunan</h1>
+      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1.5">Pertanian & Perkebunan</h1>
     </div>
   </div>
 </section>
 
-<main id="main" class="mx-auto max-w-[1152px] px-4 sm:px-6 py-10">
+<div class="container-page py-10">
   <div class="max-w-3xl space-y-6">
     <p class="text-lg text-muted leading-relaxed">
-      Desa Citarik dikenal sebagai salah satu lumbung padi wilayah Palabuhanratu. Hamparan persawahan yang luas dialiri Sungai Cidadap menjadikan padi sebagai komoditas utama, ditopang sektor pertanian yang menjadi mata pencaharian sebagian besar warga.
+      Menurut isian Prodeskel Maret 2025, Desa Citarik memiliki <strong>773 keluarga petani</strong>, di antaranya 207 keluarga memiliki tanah pertanian. Luas tanah sawah tercatat 2.330 hektar, dengan komoditas padi sawah yang dilaporkan 53 Ha berproduktivitas sekitar 26 ton/ha.
     </p>
     <p class="text-muted leading-relaxed">
-      Selain padi, desa menghasilkan aneka buah (mangga, rambutan, cengkeh, petai, jengkol, jeruk, dan kopi) serta kayu (jati, albasia, dan mahoni). Dengan pendampingan yang tepat, komoditas ini dapat menjadi basis kemitraan yang menguntungkan antara petani lokal dan pasar yang lebih luas.
+      Selain padi, form mencatat budidaya pisang (26 Ha, ±5 ton/ha). Pemasaran hasil tanaman pangan dan buah dilakukan antara lain melalui KUD, pengecer, dan lumbung desa.
     </p>
     <div class="grid sm:grid-cols-3 gap-4 mt-6">
       {[
-        { icon: 'wheat', label: 'Komoditas Utama', value: 'Padi' },
-        { icon: 'leaf', label: 'Hasil Kebun', value: 'Buah & Kopi' },
-        { icon: 'trees', label: 'Hasil Kayu', value: 'Jati, Albasia' },
+        { icon: 'users', label: 'Keluarga petani', value: '773' },
+        { icon: 'wheat', label: 'Padi sawah', value: '53 Ha' },
+        { icon: 'layers', label: 'Tanah sawah total', value: '2.330 Ha' },
       ].map(item => (
-        <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)] text-center">
+        <div class="card-surface p-5 text-center">
           <i data-lucide={item.icon} class="w-8 h-8 text-cta mx-auto"></i>
           <p class="font-heading font-extrabold text-2xl text-primary mt-2">{item.value}</p>
           <p class="text-sm text-muted mt-0.5">{item.label}</p>
@@ -57,10 +53,8 @@ import Layout from '../../components/Layout.astro';
       </a>
     </div>
   </div>
-</main>
+</div>
 
 </Layout>
 
-<script is:inline>
-  setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 300);
-</script>
+

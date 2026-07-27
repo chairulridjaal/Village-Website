@@ -4,135 +4,88 @@ import Layout from '../components/Layout.astro';
 
 <Layout
   title="Potensi Desa | Desa Citarik"
-  description="Potensi Desa Citarik: perikanan, pertanian, pariwisata, dan UMKM pesisir yang siap dikembangkan."
+  description="Potensi Desa Citarik: pertanian, perikanan, sumber daya manusia, dan peluang kemitraan."
 >
 
-<!-- Hero -->
-<section class="relative">
-  <div class="h-48 sm:h-60 overflow-hidden">
-    <img
-      src="/images/nelayan.png"
-      alt="Nelayan dan potensi laut Desa Citarik"
-      class="w-full h-full object-cover"
-    />
+<section class="page-hero">
+  <div class="page-hero__media">
+    <img src="/images/nelayan.png" alt="Nelayan dan potensi laut Desa Citarik" />
   </div>
-  <div class="absolute inset-0" style="background: rgba(10,54,80,0.55);"></div>
-  <div class="absolute inset-0 flex items-end">
-    <div class="mx-auto max-w-[1152px] px-4 sm:px-6 w-full pb-6 text-white">
-      <nav aria-label="Breadcrumb" class="text-sm text-white/80 flex items-center gap-1.5">
-        <a href="/" class="hover:text-white">Beranda</a>
+  <div class="page-hero__overlay"></div>
+  <div class="page-hero__content">
+    <div class="container-page">
+      <nav aria-label="Breadcrumb" class="breadcrumb">
+        <a href="/">Beranda</a>
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
-        <span class="font-medium">Potensi Desa</span>
+        <span class="font-medium text-white">Potensi Desa</span>
       </nav>
-      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1">Potensi Desa Citarik</h1>
-      <p class="text-white/85 mt-1 max-w-xl">Sumber daya dan peluang ekonomi yang menanti mitra & pembeli.</p>
+      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1.5">Potensi Desa Citarik</h1>
+      <p class="text-white/85 mt-1.5 max-w-xl">Sumber daya dan peluang ekonomi yang menanti mitra & pembeli.</p>
     </div>
   </div>
 </section>
 
-<main id="main" class="mx-auto max-w-[1152px] px-4 sm:px-6 py-10 space-y-6">
+<div class="container-page py-10 md:py-12 space-y-5">
 
-  <!-- Perikanan -->
-  <article class="grid md:grid-cols-2 gap-0 items-stretch bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+  <article class="grid md:grid-cols-2 gap-0 items-stretch card-surface overflow-hidden">
     <a href="/potensi/perikanan" class="block aspect-[16/11] md:aspect-auto overflow-hidden">
-      <img
-        src="/images/ikan_bakar.png"
-        alt="Perikanan dan nelayan Desa Citarik"
-        class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-        loading="lazy"
-      />
+      <img src="/images/ikan_bakar.png" alt="Perikanan dan nelayan Desa Citarik"
+        class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy" />
     </a>
     <div class="p-7">
-      <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-[#E3ECF3] text-primary">Perikanan</span>
-      <h2 class="text-2xl font-heading font-extrabold text-primary mt-2">
-        <a href="/potensi/perikanan" class="hover:underline">Perikanan & Hasil Laut</a>
+      <span class="chip chip-potensi">Perikanan</span>
+      <h2 class="text-2xl font-heading font-extrabold text-primary mt-2.5">
+        <a href="/potensi/perikanan" class="hover:underline">Perikanan</a>
       </h2>
-      <p class="text-muted leading-relaxed mt-2">Sebagai desa pesisir, Citarik memiliki potensi perikanan tangkap yang kuat. Hasil laut segar diolah menjadi produk bernilai tambah seperti ikan asin, kerupuk, dan sambal ikan oleh UMKM setempat.</p>
-      <a href="/potensi/perikanan" class="inline-flex items-center gap-1.5 mt-4 text-accent font-heading font-semibold hover:underline">
+      <p class="text-muted leading-relaxed mt-2">Menurut Prodeskel 2025: empang/kolam, alat pancing, serta produksi ikan mas dan nila. Pemasaran melalui pasar, KUD, dan lumbung desa.</p>
+      <a href="/potensi/perikanan" class="inline-flex items-center gap-1.5 mt-4 text-accent font-heading font-semibold hover:text-primary transition-colors">
         Selengkapnya <i data-lucide="arrow-right" class="w-4 h-4"></i>
       </a>
     </div>
   </article>
 
-  <!-- Pertanian -->
-  <article class="grid md:grid-cols-2 gap-0 items-stretch bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+  <article class="grid md:grid-cols-2 gap-0 items-stretch card-surface overflow-hidden">
     <a href="/potensi/pertanian" class="block aspect-[16/11] md:aspect-auto md:order-2 overflow-hidden">
-      <img
-        src="/images/kebun_sayur.png"
-        alt="Pertanian dan perkebunan Desa Citarik"
-        class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-        loading="lazy"
-      />
+      <img src="/images/kebun_sayur.png" alt="Pertanian dan perkebunan Desa Citarik"
+        class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy" />
     </a>
     <div class="p-7 md:order-1">
-      <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-[#E3F2E8] text-cta">Pertanian</span>
-      <h2 class="text-2xl font-heading font-extrabold text-primary mt-2">
+      <span class="chip chip-umkm">Pertanian</span>
+      <h2 class="text-2xl font-heading font-extrabold text-primary mt-2.5">
         <a href="/potensi/pertanian" class="hover:underline">Pertanian & Perkebunan</a>
       </h2>
-      <p class="text-muted leading-relaxed mt-2">Sebagai lumbung padi wilayah Palabuhanratu, lahan desa menghasilkan padi, aneka buah (mangga, rambutan, cengkeh, petai, kopi), dan kayu (jati, albasia, mahoni), sekaligus peluang kemitraan yang menjanjikan.</p>
-      <a href="/potensi/pertanian" class="inline-flex items-center gap-1.5 mt-4 text-accent font-heading font-semibold hover:underline">
+      <p class="text-muted leading-relaxed mt-2">Prodeskel 2025: 773 keluarga petani, 2.330 Ha tanah sawah, padi sawah 53 Ha (±26 ton/ha), dan budidaya pisang. Peluang kemitraan pertanian terbuka.</p>
+      <a href="/potensi/pertanian" class="inline-flex items-center gap-1.5 mt-4 text-accent font-heading font-semibold hover:text-primary transition-colors">
         Selengkapnya <i data-lucide="arrow-right" class="w-4 h-4"></i>
       </a>
     </div>
   </article>
 
-  <!-- Pariwisata -->
-  <article class="grid md:grid-cols-2 gap-0 items-stretch bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)]">
-    <a href="/potensi/pariwisata" class="block aspect-[16/11] md:aspect-auto overflow-hidden">
-      <img
-        src="/images/pantai_Citarik.png"
-        alt="Wisata pantai Desa Citarik"
-        class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-        loading="lazy"
-      />
+  <article class="grid md:grid-cols-2 gap-0 items-stretch card-surface overflow-hidden">
+    <a href="/potensi/sdm" class="block aspect-[16/11] md:aspect-auto overflow-hidden">
+      <img src="/images/nelayan.png" alt="Warga dan organisasi masyarakat Desa Citarik"
+        class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy" />
     </a>
     <div class="p-7">
-      <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-[#E0F5F7] text-[#0A6B74]">Pariwisata</span>
-      <h2 class="text-2xl font-heading font-extrabold text-primary mt-2">
-        <a href="/potensi/pariwisata" class="hover:underline">Pariwisata Pesisir</a>
-      </h2>
-      <p class="text-muted leading-relaxed mt-2">Pantai Citarik, pemandian air panas Sawah Beura, Puncak Gelendrung untuk paralayang, dan situs sejarah menjadikan pariwisata potensi unggulan sebagai bagian kawasan Geopark Ciletuh-Palabuhanratu.</p>
-      <a href="/potensi/pariwisata" class="inline-flex items-center gap-1.5 mt-4 text-accent font-heading font-semibold hover:underline">
-        Selengkapnya <i data-lucide="arrow-right" class="w-4 h-4"></i>
-      </a>
-    </div>
-  </article>
-
-  <!-- SDM -->
-  <article class="grid md:grid-cols-2 gap-0 items-stretch bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)]">
-    <a href="/potensi/sdm" class="block aspect-[16/11] md:aspect-auto md:order-2 overflow-hidden">
-      <img
-        src="/images/nelayan.png"
-        alt="Warga dan organisasi masyarakat Desa Citarik"
-        class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-        loading="lazy"
-      />
-    </a>
-    <div class="p-7 md:order-1">
-      <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-[#F4EBDD] text-cta">Sumber Daya Manusia</span>
-      <h2 class="text-2xl font-heading font-extrabold text-primary mt-2">
+      <span class="chip chip-kuliner">Sumber Daya Manusia</span>
+      <h2 class="text-2xl font-heading font-extrabold text-primary mt-2.5">
         <a href="/potensi/sdm" class="hover:underline">Potensi Sumber Daya Manusia</a>
       </h2>
-      <p class="text-muted leading-relaxed mt-2">Kelembagaan aktif seperti BPD, LPMD, Karang Taruna, PKK, dan 17 kelompok tani, ditopang 3.440 angkatan kerja usia produktif dan prasarana pendidikan serta kesehatan di setiap dusun.</p>
-      <a href="/potensi/sdm" class="inline-flex items-center gap-1.5 mt-4 text-accent font-heading font-semibold hover:underline">
+      <p class="text-muted leading-relaxed mt-2">8.553 warga usia 18–56 tahun bekerja, 4 dusun, 10 RW, 50 RT, BPD 9 anggota, LPMD, dan BUMDes — fondasi kelembagaan desa (Prodeskel & rekap PEMDES 2025).</p>
+      <a href="/potensi/sdm" class="inline-flex items-center gap-1.5 mt-4 text-accent font-heading font-semibold hover:text-primary transition-colors">
         Selengkapnya <i data-lucide="arrow-right" class="w-4 h-4"></i>
       </a>
     </div>
   </article>
 
-  <!-- CTA -->
-  <div class="bg-primary text-white rounded-2xl p-8 text-center">
-    <h2 class="text-2xl font-heading font-extrabold">Tertarik bermitra dengan Desa Citarik?</h2>
-    <p class="text-white/80 mt-2 max-w-xl mx-auto">Hubungi pemerintah desa untuk informasi investasi, kemitraan, atau kerja sama potensi desa.</p>
-    <a href="/kontak" class="inline-flex items-center gap-2 mt-5 bg-white text-primary font-heading font-semibold px-6 py-3 rounded-lg hover:bg-sand transition-colors min-h-[44px]">
+  <div class="bg-primary text-white rounded-xl p-8 text-center">
+    <h2 class="text-2xl font-heading font-extrabold text-white">Tertarik bermitra dengan Desa Citarik?</h2>
+    <p class="text-white/80 mt-2 max-w-xl mx-auto leading-relaxed">Hubungi pemerintah desa untuk informasi investasi, kemitraan, atau kerja sama potensi desa.</p>
+    <a href="/kontak" class="btn mt-5 bg-white text-primary hover:bg-sand border border-transparent">
       <i data-lucide="phone" class="w-5 h-5"></i> Hubungi Desa
     </a>
   </div>
 
-</main>
+</div>
 
 </Layout>
-
-<script is:inline>
-  setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 300);
-</script>

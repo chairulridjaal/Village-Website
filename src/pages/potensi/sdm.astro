@@ -1,77 +1,63 @@
----
+﻿---
 import Layout from '../../components/Layout.astro';
 
 const fmt = (n: number) => n.toLocaleString('id-ID');
 
-// Sumber: Profil Desa Citarik / RPJMDes 2026
 const organisasi = [
-  { icon: 'landmark', nama: 'Badan Permusyawaratan Desa (BPD)', desc: '9 anggota mewakili keempat kedusunan, menetapkan peraturan desa bersama Kepala Desa.' },
-  { icon: 'handshake', nama: 'Lembaga Pemberdayaan Masyarakat Desa (LPMD)', desc: 'Mendampingi perencanaan dan pelaksanaan pembangunan desa bersama warga.' },
-  { icon: 'sparkles', nama: 'Karang Taruna Citarik', desc: 'Wadah generasi muda desa di bidang kepemudaan, seni, olahraga, dan kegiatan sosial.' },
-  { icon: 'book-open', nama: 'Majelis Ulama Indonesia (MUI) Desa', desc: 'Membina kegiatan keagamaan, dakwah, dan pendidikan Islam di tingkat desa.' },
-  { icon: 'heart-handshake', nama: 'PKK (Pemberdayaan Kesejahteraan Keluarga)', desc: 'Program pemberdayaan perempuan dan keluarga di setiap dusun.' },
-  { icon: 'stethoscope', nama: 'Posyandu', desc: '22 unit tersebar di seluruh dusun, melayani kesehatan ibu, anak, dan lansia.' },
-  { icon: 'moon-star', nama: 'Remaja Masjid & Jamiyah Yasin/Tahlil', desc: 'Kegiatan keagamaan rutin yang aktif di tingkat kampung dan RW.' },
-  { icon: 'wheat', nama: 'Kelompok Tani', desc: '17 kelompok tani tersebar di seluruh wilayah desa, mendukung sektor pertanian.' },
-  { icon: 'briefcase', nama: 'BUMDes', desc: 'Badan Usaha Milik Desa yang mengelola potensi ekonomi dan permodalan untuk warga.' },
+  { icon: 'landmark', nama: 'Badan Permusyawaratan Desa (BPD)', desc: '9 anggota (rekap BPD Juni 2025), menetapkan peraturan desa bersama Kepala Desa.' },
+  { icon: 'handshake', nama: 'LPMD', desc: '1 lembaga · 12 pengurus (Prodeskel). Mendampingi perencanaan dan pelaksanaan pembangunan desa.' },
+  { icon: 'briefcase', nama: 'BUMDes', desc: '1 unit usaha desa (Prodeskel) untuk pengelolaan potensi ekonomi lokal.' },
+  { icon: 'home', nama: 'Rukun Warga (RW)', desc: '10 RW dengan pengurus di tingkat wilayah.' },
+  { icon: 'users', nama: 'Rukun Tetangga (RT)', desc: '50 RT sebagai ujung tombak pelayanan warga.' },
+  { icon: 'map', nama: 'Kepala Dusun', desc: '4 dusun, masing-masing dipimpin kepala dusun aktif.' },
 ];
 
 const prasarana = [
-  { icon: 'stethoscope', label: 'Posyandu', value: '22 unit' },
-  { icon: 'user-round', label: 'Bidan Desa', value: '2 orang' },
-  { icon: 'school', label: 'SD / MI', value: '7 / 1 unit' },
-  { icon: 'graduation-cap', label: 'SLTP / MTs', value: '1 / 2 unit' },
-  { icon: 'graduation-cap', label: 'SLTA / MA', value: '1 / 1 unit' },
-  { icon: 'book-open', label: 'TPA / TPQ', value: '4 unit' },
-  { icon: 'landmark', label: 'Masjid', value: '22 unit' },
-  { icon: 'home', label: 'Mushola', value: '48 unit' },
+  { icon: 'users', label: 'Dusun', value: '4' },
+  { icon: 'home', label: 'RW / RT', value: '10 / 50' },
+  { icon: 'landmark', label: 'Anggota BPD', value: '9 orang' },
+  { icon: 'briefcase', label: 'BUMDes', value: '1 unit' },
+  { icon: 'handshake', label: 'LPMD', value: '1 · 12 pengurus' },
+  { icon: 'building', label: 'Aparat desa', value: '12 orang' },
 ];
 ---
 
 <Layout
   title="Potensi Sumber Daya Manusia | Desa Citarik"
-  description="Potensi SDM Desa Citarik: kelembagaan dan organisasi masyarakat, angkatan kerja, serta prasarana pendidikan dan kesehatan."
+  description="Potensi SDM Desa Citarik: kelembagaan, tenaga kerja, RW/RT, BPD, LPMD, dan BUMDes (Prodeskel 2025)."
 >
 
-<section class="relative">
-  <div class="h-48 sm:h-64 overflow-hidden">
-    <img
-      src="/images/nelayan.png"
-      alt="Warga dan kegiatan masyarakat Desa Citarik"
-      class="w-full h-full object-cover"
-    />
+<section class="page-hero">
+  <div class="page-hero__media">
+    <img src="/images/nelayan.png" alt="Warga dan organisasi masyarakat Desa Citarik" />
   </div>
-  <div class="absolute inset-0" style="background: rgba(10,54,80,0.55);"></div>
-  <div class="absolute inset-0 flex items-end">
-    <div class="mx-auto max-w-[1152px] px-4 sm:px-6 w-full pb-6 text-white">
-      <nav aria-label="Breadcrumb" class="text-sm text-white/80 flex items-center gap-1.5">
-        <a href="/" class="hover:text-white">Beranda</a>
+  <div class="page-hero__overlay"></div>
+  <div class="page-hero__content">
+    <div class="container-page">
+      <nav aria-label="Breadcrumb" class="breadcrumb">
+        <a href="/">Beranda</a>
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
-        <a href="/potensi" class="hover:text-white">Potensi</a>
+        <a href="/potensi">Potensi</a>
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
-        <span class="font-medium">Sumber Daya Manusia</span>
+        <span class="font-medium text-white">SDM</span>
       </nav>
-      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1">Potensi Sumber Daya Manusia</h1>
+      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1.5">Sumber Daya Manusia</h1>
     </div>
   </div>
 </section>
 
-<main id="main" class="mx-auto max-w-[1152px] px-4 sm:px-6 py-10 space-y-12">
+<div class="container-page py-10 space-y-12">
+  <p class="text-lg text-muted leading-relaxed max-w-3xl">
+    Data kelembagaan dan tenaga kerja merujuk Prodeskel Maret 2025 serta rekap PEMDES/BPD Juni 2025. Penduduk usia 18–56 tahun yang bekerja tercatat {fmt(8553)} orang (laki-laki {fmt(4609)}, perempuan {fmt(3944)}).
+  </p>
 
-  <div class="max-w-3xl space-y-4">
-    <p class="text-lg text-muted leading-relaxed">
-      Kekuatan Desa Citarik tidak hanya terletak pada alam dan potensi ekonominya, tetapi juga pada masyarakat yang aktif berorganisasi. Berbagai lembaga dan kelompok masyarakat tumbuh di setiap dusun, menjadi mitra pemerintah desa dalam pembangunan dan pemberdayaan warga.
-    </p>
-  </div>
-
-  <!-- Angkatan kerja -->
   <div class="grid sm:grid-cols-3 gap-4">
     {[
-      { icon: 'users', label: 'Angkatan Kerja (15-55 tahun)', value: fmt(3440) },
-      { icon: 'briefcase', label: 'Kepala Keluarga', value: fmt(4355) },
-      { icon: 'graduation-cap', label: 'Penduduk (15-55) Belum Bekerja', value: fmt(1295) },
+      { icon: 'briefcase', label: 'Usia 18–56 thn bekerja', value: fmt(8553) },
+      { icon: 'users', label: 'Kepala keluarga', value: fmt(4220) },
+      { icon: 'user-check', label: 'Penduduk total', value: fmt(13187) },
     ].map(item => (
-      <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)] text-center">
+      <div class="card-surface p-5 text-center">
         <i data-lucide={item.icon} class="w-8 h-8 text-accent mx-auto"></i>
         <p class="font-heading font-extrabold text-2xl text-primary mt-2">{item.value}</p>
         <p class="text-sm text-muted mt-0.5">{item.label}</p>
@@ -79,46 +65,31 @@ const prasarana = [
     ))}
   </div>
 
-  <!-- Kelembagaan & organisasi -->
-  <div>
-    <h2 class="text-2xl font-heading font-extrabold text-primary mb-1">Kelembagaan & Organisasi Masyarakat</h2>
-    <p class="text-muted mb-6 max-w-2xl">Lembaga dan kelompok masyarakat yang aktif menjadi mitra pembangunan Desa Citarik.</p>
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  <section>
+    <h2 class="text-2xl font-heading font-extrabold text-primary">Kelembagaan</h2>
+    <div class="grid sm:grid-cols-2 gap-4 mt-6">
       {organisasi.map(o => (
-        <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
-          <i data-lucide={o.icon} class="w-6 h-6 text-cta"></i>
-          <p class="font-heading font-bold text-ink mt-2">{o.nama}</p>
+        <div class="card-surface p-5">
+          <i data-lucide={o.icon} class="w-6 h-6 text-accent"></i>
+          <h3 class="font-heading font-bold text-ink mt-2">{o.nama}</h3>
           <p class="text-sm text-muted mt-1 leading-relaxed">{o.desc}</p>
         </div>
       ))}
     </div>
-  </div>
+  </section>
 
-  <!-- Prasarana pendidikan & kesehatan -->
-  <div>
-    <h2 class="text-2xl font-heading font-extrabold text-primary mb-1">Prasarana Pendidikan & Kesehatan</h2>
-    <p class="text-muted mb-6 max-w-2xl">Fasilitas yang menopang kualitas sumber daya manusia di Desa Citarik.</p>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+  <section>
+    <h2 class="text-2xl font-heading font-extrabold text-primary">Ringkasan wilayah & lembaga</h2>
+    <div class="grid sm:grid-cols-3 gap-4 mt-6">
       {prasarana.map(item => (
-        <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
-          <i data-lucide={item.icon} class="w-6 h-6 text-accent"></i>
-          <p class="text-xs font-heading font-semibold text-muted uppercase mt-2">{item.label}</p>
-          <p class="font-heading font-bold text-lg text-primary mt-0.5">{item.value}</p>
+        <div class="card-surface p-5 text-center">
+          <i data-lucide={item.icon} class="w-7 h-7 text-cta mx-auto"></i>
+          <p class="font-heading font-extrabold text-xl text-primary mt-2">{item.value}</p>
+          <p class="text-sm text-muted mt-0.5">{item.label}</p>
         </div>
       ))}
     </div>
-  </div>
-
-  <div class="mt-2">
-    <a href="/kontak" class="inline-flex items-center gap-2 bg-cta text-white font-heading font-semibold px-5 py-3 rounded-lg hover:bg-ctaDark transition-colors">
-      <i data-lucide="handshake" class="w-5 h-5"></i> Hubungi untuk Kolaborasi
-    </a>
-  </div>
-
-</main>
+  </section>
+</div>
 
 </Layout>
-
-<script is:inline>
-  setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 300);
-</script>

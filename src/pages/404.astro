@@ -7,9 +7,9 @@ import Layout from '../components/Layout.astro';
   description="Halaman yang Anda cari tidak ditemukan."
 >
 
-  <div class="min-h-[70vh] flex flex-col items-center justify-center px-4 text-center">
+  <div class="min-h-[70vh] flex flex-col items-center justify-center px-4 text-center py-16">
 
-    <div class="mb-8" style="color:var(--color-accent); opacity:.15;">
+    <div class="mb-8 text-accent/15">
       <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
         <circle cx="12" cy="12" r="10"/>
         <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
@@ -17,25 +17,17 @@ import Layout from '../components/Layout.astro';
       </svg>
     </div>
 
-    <h1 class="font-heading font-bold text-6xl mb-3" style="color:var(--color-primary);">404</h1>
-    <p class="font-heading font-semibold text-xl mb-2" style="color:var(--color-primary);">
+    <h1 class="font-heading font-extrabold text-6xl mb-3 text-primary">404</h1>
+    <p class="font-heading font-semibold text-xl mb-2 text-primary">
       Halaman Tidak Ditemukan
     </p>
-    <p class="text-text-muted text-base mb-8 max-w-sm">
-      Maaf, halaman yang Anda cari tidak tersedia atau mungkin telah dipindahkan.
+    <p class="text-muted text-base mb-8 max-w-sm leading-relaxed">
+      Halaman yang Anda cari tidak tersedia atau mungkin telah dipindahkan.
     </p>
 
     <div class="flex flex-wrap gap-3 justify-center">
-      <a href="/"
-        class="inline-flex items-center gap-2 px-5 py-3 rounded-lg font-heading font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
-        style="background:var(--color-primary); min-height:44px;">
-        ← Kembali ke Beranda
-      </a>
-      <a href="/berita"
-        class="inline-flex items-center gap-2 px-5 py-3 rounded-lg font-heading font-medium border transition-colors hover:bg-sand focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
-        style="border-color:var(--color-border); color:var(--color-text); min-height:44px;">
-        Lihat Berita
-      </a>
+      <a href="/" class="btn btn-primary">← Kembali ke Beranda</a>
+      <a href="/berita" class="btn btn-secondary">Lihat Berita</a>
     </div>
 
   </div>

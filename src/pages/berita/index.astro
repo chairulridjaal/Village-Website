@@ -40,15 +40,15 @@ const restBerita = finalBerita.slice(1);
   description="Berita dan pengumuman resmi terbaru dari Pemerintah Desa Citarik, Kecamatan Simpenan, Kabupaten Sukabumi."
 >
 
-<main id="main" class="mx-auto max-w-[1152px] px-4 sm:px-6 py-10">
-  <h1 class="text-3xl sm:text-4xl font-heading font-extrabold text-primary">Berita & Pengumuman</h1>
-  <p class="text-muted mt-2">Kabar terbaru dari Desa Citarik.</p>
+<div class="container-page py-10 md:py-12">
+  <span class="section-label">Informasi desa</span>
+  <h1 class="text-3xl sm:text-4xl font-heading font-extrabold text-primary mt-2">Berita & Pengumuman</h1>
+  <p class="text-muted mt-2 max-w-xl">Kabar terbaru dari Desa Citarik.</p>
 
-  {/* Featured article */}
   {featuredBerita && (
     <a href={`/berita/${featuredBerita.slug}`}
-       class="group grid md:grid-cols-2 gap-0 items-stretch bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)] hover:shadow-[0_12px_24px_rgba(15,36,51,.12)] hover:border-accent transition-all mt-6">
-      <div class="aspect-[16/10] md:aspect-auto overflow-hidden">
+       class="group grid md:grid-cols-2 gap-0 items-stretch card-surface card-surface-hover overflow-hidden mt-8">
+      <div class="aspect-[16/10] md:aspect-auto overflow-hidden min-h-[14rem]">
         {featuredBerita.img ? (
           <img
             src={featuredBerita.img}
@@ -57,18 +57,18 @@ const restBerita = finalBerita.slice(1);
             loading="eager"
           />
         ) : (
-          <div class="w-full h-full min-h-[200px]" style="background: linear-gradient(135deg, #0E4A6E 0%, #0E9AA7 60%, #3FB5BF 100%);"></div>
+          <div class="w-full h-full min-h-[200px]" style="background: linear-gradient(135deg, #0E4A6E 0%, #0E9AA7 100%);"></div>
         )}
       </div>
       <div class="p-6 sm:p-8 flex flex-col justify-center">
-        <span class="text-[13px] font-heading font-semibold px-2.5 py-1 rounded-full bg-[#E0F5F7] text-[#0A6B74] w-max">Terbaru</span>
+        <span class="chip chip-potensi w-max">Terbaru</span>
         <time class="text-sm text-muted mt-3">
           {featuredBerita.published_at ? formatTanggal(featuredBerita.published_at) : ''}
         </time>
         <h2 class="font-heading font-extrabold text-2xl text-ink mt-1 group-hover:text-primary transition-colors leading-snug">
           {featuredBerita.judul}
         </h2>
-        <p class="text-muted mt-2 line-clamp-3">{excerpt(featuredBerita.content_html, 160)}</p>
+        <p class="text-muted mt-2 line-clamp-3 leading-relaxed">{excerpt(featuredBerita.content_html, 160)}</p>
         <span class="inline-flex items-center gap-1.5 mt-4 text-accent font-heading font-semibold">
           Baca selengkapnya <i data-lucide="arrow-right" class="w-4 h-4"></i>
         </span>
@@ -76,25 +76,24 @@ const restBerita = finalBerita.slice(1);
     </a>
   )}
 
-  {/* Rest grid */}
   {restBerita.length > 0 && (
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-6">
       {restBerita.map(b => (
         <a href={`/berita/${b.slug}`}
-           class="group block bg-white border border-line rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)] hover:shadow-[0_12px_24px_rgba(15,36,51,.12)] hover:border-accent transition-all">
+           class="group block card-surface card-surface-hover overflow-hidden">
           <div class="aspect-[16/9] overflow-hidden">
             {b.img ? (
               <img src={b.img} alt={b.judul} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
             ) : (
-              <div class="w-full h-full" style="background: linear-gradient(135deg, #0E4A6E 0%, #0E9AA7 60%, #3FB5BF 100%);"></div>
+              <div class="w-full h-full" style="background: linear-gradient(135deg, #0E4A6E 0%, #0E9AA7 100%);"></div>
             )}
           </div>
           <div class="p-5">
             <time class="text-xs font-heading font-semibold text-muted">
               {b.published_at ? formatTanggal(b.published_at) : ''}
             </time>
-            <h3 class="font-heading font-semibold text-ink mt-1 group-hover:text-primary transition-colors leading-snug">{b.judul}</h3>
-            <p class="text-sm text-muted mt-1 line-clamp-2">{excerpt(b.content_html, 100)}</p>
+            <h3 class="font-heading font-semibold text-ink mt-1.5 group-hover:text-primary transition-colors leading-snug">{b.judul}</h3>
+            <p class="text-sm text-muted mt-1.5 line-clamp-2 leading-relaxed">{excerpt(b.content_html, 100)}</p>
           </div>
         </a>
       ))}
@@ -102,14 +101,13 @@ const restBerita = finalBerita.slice(1);
   )}
 
   {finalBerita.length === 0 && (
-    <div class="text-center py-20">
-      <p class="font-heading font-medium text-lg text-muted">Belum ada berita. Kunjungi lagi nanti.</p>
+    <div class="empty-state">
+      <div class="empty-state__icon">
+        <i data-lucide="newspaper" class="w-7 h-7"></i>
+      </div>
+      <p class="font-heading font-medium text-lg text-muted mt-4">Belum ada berita. Kunjungi lagi nanti.</p>
     </div>
   )}
-</main>
+</div>
 
 </Layout>
-
-<script is:inline>
-  setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 300);
-</script>

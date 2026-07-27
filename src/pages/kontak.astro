@@ -8,11 +8,11 @@ const s = env ? await getPengaturan(env.DB) : {};
 
 const kanal = [
   { key: 'sosial_whatsapp', label: 'WhatsApp resmi desa', icon: 'message-circle', text: 'WhatsApp',
-    cls: 'bg-cta hover:bg-ctaDark text-white' },
+    cls: 'btn btn-cta' },
   { key: 'sosial_facebook', label: 'Facebook resmi desa', icon: 'facebook', text: 'Facebook',
-    cls: 'border-2 border-primary text-primary hover:bg-primary hover:text-white' },
+    cls: 'btn btn-secondary' },
   { key: 'sosial_instagram', label: 'Instagram resmi desa', icon: 'instagram', text: 'Instagram',
-    cls: 'border-2 border-primary text-primary hover:bg-primary hover:text-white' },
+    cls: 'btn btn-secondary' },
 ].filter(x => s[x.key]);
 ---
 
@@ -21,12 +21,12 @@ const kanal = [
   description="Alamat, telepon, email, dan kanal resmi Pemerintah Desa Citarik, Kecamatan Simpenan, Kabupaten Sukabumi."
 >
 
-<main id="main" class="mx-auto max-w-[1152px] px-4 sm:px-6 py-10">
-  <h1 class="text-3xl sm:text-4xl font-heading font-extrabold text-primary">Kontak & Info Desa</h1>
-  <p class="text-muted mt-2 max-w-xl">Hubungi Pemerintah Desa Citarik melalui kanal resmi berikut.</p>
+<div class="container-page py-10 md:py-12">
+  <span class="section-label">Hubungi kami</span>
+  <h1 class="text-3xl sm:text-4xl font-heading font-extrabold text-primary mt-2">Kontak & Info Desa</h1>
+  <p class="text-muted mt-2 max-w-xl leading-relaxed">Hubungi Pemerintah Desa Citarik melalui kanal resmi berikut.</p>
 
   <div class="grid lg:grid-cols-2 gap-6 mt-8">
-    <!-- Info cards -->
     <div class="space-y-4">
       {[
         { icon: 'map-pin', title: 'Alamat Kantor', content: s.kontak_alamat },
@@ -34,44 +34,42 @@ const kanal = [
         { icon: 'mail', title: 'Email', content: s.kontak_email },
         { icon: 'clock', title: 'Jam Layanan', content: s.kontak_jam },
       ].map(item => (
-        <div class="bg-white border border-line rounded-xl p-5 flex gap-4 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+        <div class="card-surface p-5 flex gap-4">
           <span class="w-11 h-11 rounded-full bg-sand grid place-items-center text-primary shrink-0">
             <i data-lucide={item.icon} class="w-5 h-5"></i>
           </span>
           <div>
             <h2 class="font-heading font-semibold text-ink">{item.title}</h2>
-            <p class="text-muted mt-0.5">{item.content}</p>
+            <p class="text-muted mt-0.5 leading-relaxed">{item.content}</p>
           </div>
         </div>
       ))}
 
-      <!-- Kanal resmi -->
       {kanal.length > 0 && (
-        <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+        <div class="card-surface p-5">
           <h2 class="font-heading font-semibold text-ink">Kanal Resmi</h2>
           <div class="flex flex-wrap gap-3 mt-3">
             {kanal.map(item => (
               <a href={s[item.key]} target="_blank" rel="noopener noreferrer" aria-label={item.label}
-                 class:list={['inline-flex items-center gap-2 font-heading font-semibold px-4 py-2.5 rounded-lg transition-colors min-h-[44px]', item.cls]}>
+                 class={item.cls}>
                 <i data-lucide={item.icon} class="w-5 h-5"></i> {item.text}
               </a>
             ))}
           </div>
-          <p class="text-xs text-muted mt-3">Tidak ada formulir kontak di situs ini, silakan hubungi kami langsung lewat kanal di atas.</p>
+          <p class="text-xs text-muted mt-3 leading-relaxed">Tidak ada formulir kontak di situs ini. Silakan hubungi kami langsung lewat kanal di atas.</p>
         </div>
       )}
     </div>
 
-    <!-- Map -->
-    <div class="relative rounded-2xl overflow-hidden shadow-[0_4px_10px_rgba(15,36,51,.08)] border border-line min-h-[20rem]">
+    <div class="relative rounded-xl overflow-hidden border border-border shadow-sm min-h-[20rem]">
       <div id="kontak-map" class="w-full h-full absolute inset-0"></div>
       <a href="/peta"
-         class="absolute bottom-4 right-4 inline-flex items-center gap-2 bg-white text-primary font-heading font-semibold px-4 py-2 rounded-lg shadow-[0_4px_10px_rgba(15,36,51,.12)] z-10 hover:bg-sand transition-colors">
+         class="absolute bottom-4 right-4 btn btn-primary z-10 shadow-md">
         <i data-lucide="map" class="w-5 h-5"></i> Buka Peta Desa
       </a>
     </div>
   </div>
-</main>
+</div>
 
 </Layout>
 
@@ -79,10 +77,9 @@ const kanal = [
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script is:inline>
   document.addEventListener('DOMContentLoaded', function() {
-    var map = L.map('kontak-map', { scrollWheelZoom: false }).setView([-7.0589, 106.5778], 14);
+    var map = L.map('kontak-map', { scrollWheelZoom: false }).setView([-7.009933224557312, 106.58103748650889], 15);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
-    L.marker([-7.0589, 106.5778]).addTo(map).bindPopup('<b>Kantor Desa Citarik</b><br>Kec. Simpenan, Sukabumi');
-    if (typeof lucide !== 'undefined') lucide.createIcons();
+    L.marker([-7.009933224557312, 106.58103748650889]).addTo(map).bindPopup('<b>Kantor Desa Citarik</b><br>Kp. Legok Loa · Kec. Palabuhanratu');
+    if (typeof window.refreshIcons === 'function') window.refreshIcons();
   });
-  setTimeout(() => { if (typeof lucide !== 'undefined') lucide.createIcons(); }, 300);
 </script>

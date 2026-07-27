@@ -33,35 +33,29 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
 
 <Layout
   title="Profil Desa | Desa Citarik"
-  description="Profil lengkap Desa Citarik: sejarah, kondisi geografis, visi misi, dan gambaran desa pesisir Kecamatan Simpenan Sukabumi."
+  description="Profil lengkap Desa Citarik: kondisi geografis, demografi, dan gambaran desa di Kecamatan Palabuhanratu, Kabupaten Sukabumi (Prodeskel 2025)."
 >
 
-<!-- Hero -->
-<section class="relative">
-  <div class="h-48 sm:h-64 overflow-hidden">
-    <img
-      src="/images/pantai_Citarik.png"
-      alt="Pantai dan alam Desa Citarik"
-      class="w-full h-full object-cover"
-    />
+<section class="page-hero">
+  <div class="page-hero__media">
+    <img src="/images/pantai_Citarik.png" alt="Pantai dan alam Desa Citarik" />
   </div>
-  <div class="absolute inset-0" style="background: rgba(10,54,80,0.6);"></div>
-  <div class="absolute inset-0 flex items-end">
-    <div class="mx-auto max-w-[1152px] px-4 sm:px-6 w-full pb-6 text-white">
-      <nav aria-label="Breadcrumb" class="text-sm text-white/80 flex items-center gap-1.5">
-        <a href="/" class="hover:text-white">Beranda</a>
+  <div class="page-hero__overlay"></div>
+  <div class="page-hero__content">
+    <div class="container-page">
+      <nav aria-label="Breadcrumb" class="breadcrumb">
+        <a href="/">Beranda</a>
         <i data-lucide="chevron-right" class="w-4 h-4"></i>
-        <span class="font-medium">Profil Desa</span>
+        <span class="font-medium text-white">Profil Desa</span>
       </nav>
-      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1">Profil Desa Citarik</h1>
-      <p class="text-white/85 mt-1 max-w-xl">Kecamatan Simpenan, Kabupaten Sukabumi, Jawa Barat</p>
+      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1.5">Profil Desa Citarik</h1>
+      <p class="text-white/85 mt-1.5 max-w-xl">Kecamatan Palabuhanratu, Kabupaten Sukabumi, Jawa Barat</p>
     </div>
   </div>
 </section>
 
-<!-- Sticky subnav -->
-<div class="subnav sticky top-16 z-30 bg-white border-b border-line" style="scroll-behavior:smooth;">
-  <div class="mx-auto max-w-[1152px] px-4 sm:px-6 py-2 flex gap-2 overflow-x-auto">
+<div class="subnav">
+  <div class="container-page py-2 flex gap-2 overflow-x-auto">
     {[
       ['#umum', 'Umum'],
       ['#geografis', 'Geografis'],
@@ -70,27 +64,22 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
       ['#peta', 'Peta'],
       ['/pemerintahan', 'Pemerintahan ↗'],
     ].map(([href, label]) => (
-      <a
-        href={href}
-        class="whitespace-nowrap px-3 py-1.5 rounded-full text-sm font-heading font-semibold border-2 border-line text-ink hover:border-accent transition-colors"
-      >
-        {label}
-      </a>
+      <a href={href} class="subnav-link">{label}</a>
     ))}
   </div>
 </div>
 
-<main id="main" class="mx-auto max-w-[1152px] px-4 sm:px-6 py-10 space-y-14">
+<div class="container-page py-10 space-y-14">
 
   <!-- Stats -->
   <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
     {[
-      { icon: 'users', label: 'Penduduk', value: fmt(totalPenduduk), sub: 'Jiwa' },
+      { icon: 'users', label: 'Penduduk', value: fmt(totalPenduduk || Number(stUmum.penduduk) || 0), sub: 'Jiwa' },
       { icon: 'layers', label: 'Wilayah', value: stUmum.luas ?? '-', sub: 'Hektar' },
-      { icon: 'home', label: 'Dusun', value: String(dusunData.length), sub: 'Wilayah' },
+      { icon: 'home', label: 'Dusun', value: String(stUmum.dusun ?? dusunData.length), sub: 'Wilayah' },
       { icon: 'map-pin', label: 'RW / RT', value: `${stUmum.rw ?? '-'} / ${stUmum.rt ?? '-'}`, sub: 'Administratif' },
     ].map(tile => (
-      <div class="bg-white border border-line rounded-2xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+      <div class="card-surface p-5">
         <i data-lucide={tile.icon} class="w-6 h-6 text-accent"></i>
         <p class="font-heading font-extrabold text-2xl text-primary mt-2">{tile.value}</p>
         <p class="text-xs font-heading font-semibold text-muted uppercase mt-0.5">{tile.sub}</p>
@@ -103,17 +92,17 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
   <section id="umum" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Profil Umum</h2>
     <p class="text-muted mt-2 max-w-3xl leading-relaxed">
-      Desa Citarik adalah desa pesisir yang terletak di Kecamatan Simpenan, Kabupaten Sukabumi, Provinsi Jawa Barat. Berbatasan langsung dengan Samudra Hindia di sebelah selatan, desa ini dikenal sebagai lumbung padi wilayah Palabuhanratu sekaligus bagian dari penyangga kawasan Geopark Ciletuh-Palabuhanratu.
+      Desa Citarik terletak di Kecamatan Palabuhanratu, Kabupaten Sukabumi, Provinsi Jawa Barat. Data profil di halaman ini mengacu pada isian resmi Prodeskel (Profil Desa dan Kelurahan) Maret 2025, kode desa 3202110005.
     </p>
     <div class="prose max-w-none mt-4 text-muted leading-relaxed" set:html={umum?.content_html ?? ''} />
     <div class="grid sm:grid-cols-2 gap-4 mt-6">
       {[
-        { label: 'Kecamatan', value: 'Simpenan' },
+        { label: 'Kecamatan', value: 'Palabuhanratu' },
         { label: 'Kabupaten', value: 'Sukabumi' },
         { label: 'Provinsi', value: 'Jawa Barat' },
-        { label: 'Kode Pos', value: '43361' },
+        { label: 'Kode desa', value: '3202110005' },
       ].map(row => (
-        <div class="flex justify-between py-3 border-b border-line">
+        <div class="flex justify-between py-3 border-b border-border">
           <span class="font-heading font-semibold text-ink">{row.label}</span>
           <span class="text-muted">{row.value}</span>
         </div>
@@ -125,16 +114,16 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
   <section id="geografis" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Kondisi Geografis</h2>
     <p class="text-muted mt-2 max-w-3xl leading-relaxed">
-      Secara geografis, Desa Citarik berada di koordinat sekitar -7.059° LS, 106.578° BT. Wilayahnya meliputi kawasan pantai, bukit, dan hutan pesisir. Topografi bervariasi dari dataran rendah di pinggir pantai hingga perbukitan yang menjorok ke dalam.
+      Menurut Prodeskel 2025, wilayah Desa Citarik mencakup dataran rendah, perbukitan, dataran tinggi/pegunungan, lereng gunung, serta kawasan aliran dan bantaran sungai. Batas utara berdekatan dengan Gunung Jayanti; selatan berbatasan dengan Desa Cidadap / Sungai Cimandiri.
     </p>
     <div class="prose max-w-none mt-4 text-muted leading-relaxed" set:html={geografis?.content_html ?? ''} />
     <div class="grid sm:grid-cols-3 gap-4 mt-6">
       {[
-        { icon: 'mountain', label: 'Ketinggian', value: '0 sampai 250 m dpl' },
-        { icon: 'thermometer', label: 'Iklim', value: 'Tropis Basah' },
-        { icon: 'waves', label: 'Garis Pantai', value: '±4 km' },
+        { icon: 'layers', label: 'Luas wilayah', value: (stUmum.luas ? `${stUmum.luas} Ha` : '526,38 Ha') },
+        { icon: 'thermometer', label: 'Suhu rata-rata', value: '30 °C' },
+        { icon: 'cloud-rain', label: 'Bulan hujan', value: '±5 bulan' },
       ].map(item => (
-        <div class="bg-white border border-line rounded-xl p-5 shadow-[0_4px_10px_rgba(15,36,51,.08)]">
+        <div class="card-surface p-5">
           <i data-lucide={item.icon} class="w-6 h-6 text-accent"></i>
           <p class="text-xs font-heading font-semibold text-muted uppercase mt-2">{item.label}</p>
           <p class="font-heading font-bold text-xl text-primary mt-0.5">{item.value}</p>
@@ -143,18 +132,18 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
     </div>
   </section>
 
-  <!-- Demografi (sumber: Profil Desa Citarik / RPJMDes 2026 dan rekap penduduk April 2026) -->
+  <!-- Demografi (sumber: Prodeskel Profil Desa dan Kelurahan, Maret 2025) -->
   <section id="demografi" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Demografi Penduduk</h2>
     <p class="text-muted mt-2 max-w-3xl leading-relaxed">
-      Data kependudukan Desa Citarik per dusun, golongan umur, tingkat pendidikan, dan mata pencaharian, berdasarkan rekapitulasi Pemerintah Desa Citarik tahun 2026.
+      Data kependudukan Desa Citarik: jumlah penduduk, golongan umur (agregat), tingkat pendidikan, dan mata pencaharian pokok berdasarkan isian Prodeskel Maret 2025. Rincian L/P/KK per dusun tidak tersedia di sumber tersebut, sehingga ditampilkan sebagai total desa. Beberapa kategori pendidikan/pekerjaan kosong di form resmi dan tidak ditampilkan.
     </p>
 
     <div class="mt-6 space-y-10">
 
       <!-- Penduduk per dusun -->
       <div>
-        <h3 class="font-heading font-bold text-lg text-primary mb-1">Penduduk per Dusun</h3>
+        <h3 class="font-heading font-bold text-lg text-primary mb-1">Penduduk (L/P &amp; KK)</h3>
         <div class="flex items-center gap-4 mb-3 text-sm text-muted">
           <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm inline-block" style="background:var(--color-accent);"></span>Laki-laki</span>
           <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm inline-block" style="background:var(--color-cta);"></span>Perempuan</span>
@@ -163,7 +152,7 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
           {dusunData.map(d => (
             <div>
               <div class="flex items-baseline justify-between mb-1">
-                <span class="font-heading font-semibold text-sm text-ink">Dusun {d.label}</span>
+                <span class="font-heading font-semibold text-sm text-ink">{d.label}</span>
                 <span class="text-xs text-muted">{fmt(d.l + d.p)} jiwa · {fmt(d.kk)} KK</span>
               </div>
               <div class="flex items-center gap-2 mb-1">
@@ -232,15 +221,15 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
       </div>
 
       <!-- Tabel data (aksesibilitas) -->
-      <details class="border border-line rounded-xl p-4">
+      <details class="border border-border rounded-xl p-4">
         <summary class="font-heading font-semibold text-sm text-primary cursor-pointer">Lihat semua data dalam bentuk tabel</summary>
         <div class="mt-4 grid sm:grid-cols-2 gap-6 text-sm">
           <table class="w-full">
-            <caption class="text-left font-heading font-semibold mb-1">Penduduk per Dusun</caption>
-            <thead><tr class="text-muted text-xs"><th class="text-left font-normal py-1">Dusun</th><th class="text-right font-normal">L</th><th class="text-right font-normal">P</th><th class="text-right font-normal">KK</th></tr></thead>
+            <caption class="text-left font-heading font-semibold mb-1">Penduduk L/P &amp; KK</caption>
+            <thead><tr class="text-muted text-xs"><th class="text-left font-normal py-1">Wilayah</th><th class="text-right font-normal">L</th><th class="text-right font-normal">P</th><th class="text-right font-normal">KK</th></tr></thead>
             <tbody>
               {dusunData.map(d => (
-                <tr class="border-t border-line"><td class="py-1">{d.label}</td><td class="text-right tabular-nums">{fmt(d.l)}</td><td class="text-right tabular-nums">{fmt(d.p)}</td><td class="text-right tabular-nums">{fmt(d.kk)}</td></tr>
+                <tr class="border-t border-border"><td class="py-1">{d.label}</td><td class="text-right tabular-nums">{fmt(d.l)}</td><td class="text-right tabular-nums">{fmt(d.p)}</td><td class="text-right tabular-nums">{fmt(d.kk)}</td></tr>
               ))}
             </tbody>
           </table>
@@ -248,7 +237,7 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
             <caption class="text-left font-heading font-semibold mb-1">Golongan Umur</caption>
             <tbody>
               {umurData.map(d => (
-                <tr class="border-t border-line"><td class="py-1">{d.label}</td><td class="text-right tabular-nums">{fmt(d.value)}</td></tr>
+                <tr class="border-t border-border"><td class="py-1">{d.label}</td><td class="text-right tabular-nums">{fmt(d.value)}</td></tr>
               ))}
             </tbody>
           </table>
@@ -256,7 +245,7 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
             <caption class="text-left font-heading font-semibold mb-1">Tingkat Pendidikan</caption>
             <tbody>
               {pendidikanData.map(d => (
-                <tr class="border-t border-line"><td class="py-1">{d.label}</td><td class="text-right tabular-nums">{fmt(d.value)}</td></tr>
+                <tr class="border-t border-border"><td class="py-1">{d.label}</td><td class="text-right tabular-nums">{fmt(d.value)}</td></tr>
               ))}
             </tbody>
           </table>
@@ -264,7 +253,7 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
             <caption class="text-left font-heading font-semibold mb-1">Mata Pencaharian</caption>
             <tbody>
               {pencaharianData.map(d => (
-                <tr class="border-t border-line"><td class="py-1">{d.label}</td><td class="text-right tabular-nums">{fmt(d.value)}</td></tr>
+                <tr class="border-t border-border"><td class="py-1">{d.label}</td><td class="text-right tabular-nums">{fmt(d.value)}</td></tr>
               ))}
             </tbody>
           </table>
@@ -278,37 +267,37 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
   <section id="sejarah" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Sejarah Desa</h2>
     <div class="prose max-w-none mt-4 text-muted leading-relaxed" set:html={sejarah?.content_html ?? `
-      <p>Desa Citarik memiliki sejarah panjang sebagai perkampungan nelayan di tepi Samudra Hindia. Nama "Citarik" diyakini berasal dari bangunan Citarik peninggalan masa kolonial yang pernah berdiri di kawasan ini. Masyarakat desa secara turun-temurun hidup dari hasil laut dan pertanian pesisir.</p>
-      <p>Posisi strategis Desa Citarik sebagai gerbang Geopark Ciletuh mulai membuka babak baru bagi perekonomian desa, dengan pariwisata menjadi sektor yang terus berkembang di samping perikanan tradisional yang menjadi tulang punggung.</p>
+      <p>Menurut dokumen Profil Desa Citarik (PPT), pemerintahan desa tercatat sejak tahun 1912. Nama desa berkembang dari Cihoe (sampai 1912), Kalideres (1912–1930), lalu Citarik sejak 1930—terkait pemaknaan Sunda dan batas alam Kali Citarik.</p>
+      <p>Pada 2012, Perda Kabupaten Sukabumi Nomor 21 Tahun 2012 memekarkan Desa Jayanti dari wilayah Citarik. Pusat pemerintahan berada di Dusun III, Kp. Legok Loa RT 001/RW 014.</p>
     `} />
   </section>
 
   <!-- Peta -->
   <section id="peta" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Peta Desa</h2>
-    <p class="text-muted mt-2">Lokasi Desa Citarik di Kecamatan Simpenan, Kabupaten Sukabumi.</p>
-    <div id="profil-map" class="mt-4 rounded-2xl overflow-hidden border border-line shadow-[0_4px_10px_rgba(15,36,51,.08)]" style="height: 380px;"></div>
+    <p class="text-muted mt-2">Lokasi Kantor Desa Citarik di Kecamatan Palabuhanratu, Kabupaten Sukabumi.</p>
+    <div id="profil-map" class="mt-4 rounded-xl overflow-hidden border border-border shadow-sm" style="height: 380px; z-index: 0;"></div>
     <p class="text-sm text-muted mt-2 flex items-center gap-1.5">
       <i data-lucide="info" class="w-4 h-4"></i>
-      Koordinat: -7.059, 106.578 ·
+      Kantor Desa: -7.009933, 106.581037 ·
       <a href="/peta" class="text-accent hover:underline font-medium">Buka peta interaktif lengkap →</a>
     </p>
   </section>
 
   <!-- CTA Pemerintahan -->
   <section style="scroll-margin-top: 120px;">
-    <div class="bg-primary text-white rounded-2xl p-8 flex flex-col sm:flex-row items-center gap-6">
+    <div class="bg-primary text-white rounded-xl p-8 flex flex-col sm:flex-row items-center gap-6">
       <div class="flex-1">
         <h2 class="text-2xl font-heading font-extrabold">Pemerintahan Desa</h2>
         <p class="text-white/80 mt-2">Pelajari struktur organisasi, perangkat desa, visi misi, dan tugas fungsi pemerintahan Desa Citarik.</p>
       </div>
-      <a href="/pemerintahan" class="inline-flex items-center gap-2 bg-white text-primary font-heading font-semibold px-6 py-3 rounded-lg hover:bg-sand transition-colors min-h-[44px] shrink-0">
+      <a href="/pemerintahan" class="btn shrink-0 bg-white text-primary hover:bg-sand border border-transparent">
         <i data-lucide="landmark" class="w-5 h-5"></i> Lihat Pemerintahan
       </a>
     </div>
   </section>
 
-</main>
+</div>
 
 </Layout>
 
@@ -316,18 +305,12 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script is:inline>
   document.addEventListener('DOMContentLoaded', function() {
-    var map = L.map('profil-map', { scrollWheelZoom: false }).setView([-7.0589, 106.5778], 14);
+    var map = L.map('profil-map', { scrollWheelZoom: false }).setView([-7.009933224557312, 106.58103748650889], 15);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
-    L.marker([-7.0589, 106.5778]).addTo(map).bindPopup('<b>Desa Citarik</b><br>Kec. Simpenan, Sukabumi');
-    if (typeof lucide !== 'undefined') lucide.createIcons();
+    L.marker([-7.009933224557312, 106.58103748650889]).addTo(map).bindPopup('<b>Kantor Desa Citarik</b><br>Kp. Legok Loa · Kec. Palabuhanratu');
   });
-  setTimeout(function() {
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-  }, 300);
 </script>
 
 <style>
-  .prose p { margin: .5rem 0; line-height: 1.75; }
-  .prose h3 { font-family: 'Lexend', sans-serif; font-weight: 700; color: #0E4A6E; margin: 1rem 0 .5rem; }
   [id] { scroll-margin-top: 120px; }
 </style>

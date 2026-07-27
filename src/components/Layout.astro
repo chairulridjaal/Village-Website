@@ -68,7 +68,7 @@ const websiteJsonLd = {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
 
@@ -108,20 +108,20 @@ const websiteJsonLd = {
     <script type="application/ld+json" set:html={JSON.stringify(websiteJsonLd)} />
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
 
-    <!-- Lucide icons -->
-    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <!-- Lucide icons (pinned version for stability) -->
+    <script src="https://unpkg.com/lucide@0.469.0" defer></script>
     {/* Cloudflare Web Analytics — aktifkan dengan mengganti token lalu buka comment:
     <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
       data-cf-beacon='{"token": "REPLACE_WITH_CF_ANALYTICS_TOKEN"}'></script>
     */}
   </head>
 
-  <body class="bg-bg text-text font-body min-h-screen">
+  <body class="bg-bg text-text font-body min-h-dvh">
 
     <!-- Skip to main content (first focusable element) -->
     <a
       href="#main-content"
-      class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:bg-primary focus:text-white focus:px-4 focus:py-2 focus:rounded focus:outline-none"
+      class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:bg-primary focus:text-white focus:px-4 focus:py-2 focus:rounded-md focus:outline-none"
     >
       Lewati ke konten utama
     </a>
@@ -129,7 +129,7 @@ const websiteJsonLd = {
     <!-- Navigation -->
     <Nav transparent={transparentNav} currentPath={currentPath} />
 
-    <!-- Main content -->
+    <!-- Main content (single landmark — pages must not nest another <main>) -->
     <main
       id="main-content"
       class={transparentNav ? '' : 'pt-20'}
@@ -140,5 +140,18 @@ const websiteJsonLd = {
     <!-- Footer -->
     <Footer />
 
+    <script is:inline>
+      function initLucideIcons() {
+        if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+          lucide.createIcons();
+        }
+      }
+      document.addEventListener('DOMContentLoaded', initLucideIcons);
+      // Fallback for late-loaded CDN script
+      window.addEventListener('load', initLucideIcons);
+      setTimeout(initLucideIcons, 400);
+      // Expose for dynamic page scripts (UMKM filter, etc.)
+      window.refreshIcons = initLucideIcons;
+    </script>
   </body>
 </html>
