@@ -12,6 +12,7 @@ export const GET: APIRoute = async ({ params, locals }) => {
   // served through this unauthenticated endpoint.
   const decodedKey = decodeURIComponent(key);
   if (!decodedKey.startsWith('media/') || decodedKey.includes('..')) return new Response('Not found', { status: 404 });
+  if (decodedKey.startsWith('media/lampiran/')) return new Response('Not found', { status: 404 });
 
   const obj = await env.MEDIA_BUCKET.get(decodedKey);
   if (!obj) return new Response('Not found', { status: 404 });

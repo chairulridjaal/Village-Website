@@ -1,7 +1,7 @@
 # Panduan Deployment — Web Desa Citarik
 
 Dokumen ini untuk **pengembang** (mahasiswa KKN berikutnya / teknisi) yang perlu mengubah
-**kode program** situs https://citarik.web.id. Perangkat desa **tidak perlu** dokumen ini —
+**kode program** situs https://desacitarik.web.id. Perangkat desa **tidak perlu** dokumen ini —
 pengelolaan konten sehari-hari cukup lewat panel admin (lihat `panduan-admin.md`) dan
 langsung tayang tanpa deploy.
 
@@ -16,8 +16,8 @@ langsung tayang tanpa deploy.
 - **Data:** Cloudflare D1 (SQLite, nama `web-desa-citarik-db`) — semua konten.
 - **Media:** Cloudflare R2 (bucket `web-desa-citarik-media`) — file foto.
 - **Sesi login:** Cloudflare KV (`SESSION_KV`).
-- **Domain:** `citarik.web.id` (registrar dewabiz.com, DNS di Cloudflare). Worker terpasang
-  lewat **route** `citarik.web.id/*` di `wrangler.toml` (bukan custom domain — ada A record
+- **Domain:** `desacitarik.web.id` (registrar dewabiz.com, DNS di Cloudflare). Worker terpasang
+  lewat **route** `desacitarik.web.id/*` di `wrangler.toml` (bukan custom domain — ada A record
   proxied dummy `192.0.2.1` di zone yang membuat custom domain konflik). `workers_dev = false`.
 - **Kode sumber:** https://github.com/Raphcel/Village-Website
 
@@ -53,7 +53,7 @@ aman untuk bereksperimen.
 npm run deploy      # = astro build && wrangler deploy
 ```
 
-Selesai — perubahan langsung aktif di https://citarik.web.id. Verifikasi dengan membuka situs
+Selesai — perubahan langsung aktif di https://desacitarik.web.id. Verifikasi dengan membuka situs
 dan mengecek halaman yang diubah.
 
 ### Jika ada migrasi database baru
@@ -111,7 +111,7 @@ Tidak ada fitur "lupa password". Jika akun admin terkunci permanen, pengembang d
 menghapus baris admin lalu membuka ulang halaman pendaftaran awal:
 
 ```bash
-# HATI-HATI: hapus akun admin, lalu buka https://citarik.web.id/admin/setup
+# HATI-HATI: hapus akun admin, lalu buka https://desacitarik.web.id/admin/setup
 # untuk mendaftar ulang (halaman setup hanya aktif saat belum ada admin).
 npx wrangler d1 execute web-desa-citarik-db --remote --command "DELETE FROM admin_user"
 ```

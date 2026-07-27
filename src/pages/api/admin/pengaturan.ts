@@ -28,7 +28,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
     const entries: Record<string, string> = {};
     for (const key of KONTAK_KEYS) entries[key] = ((fd.get(key) as string) ?? '').trim();
     await setPengaturan(entries, env.DB);
-    await purgeCache(['/', '/profil', '/pemerintahan', '/kontak', '/wisata', '/umkm', '/berita', '/peta', '/potensi']);
+    await purgeCache(['/', '/profil', '/pemerintahan', '/kontak', '/umkm', '/berita', '/peta', '/potensi']);
   } else if (form === 'statistik') {
     const stat_umum = JSON.stringify({
       luas: ((fd.get('luas') as string) ?? '').trim(),

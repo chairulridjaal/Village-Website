@@ -1,32 +1,25 @@
 name = "web-desa-citarik"
 compatibility_date = "2024-12-01"
 compatibility_flags = ["nodejs_compat"]
-workers_dev = false
-routes = [{ pattern = "citarik.web.id/*", zone_name = "citarik.web.id" }]
 
-# ─── Cloudflare D1 (konten SQLite) ───────────────────────────────────────────
+workers_dev = true
+routes = [{ pattern = "desacitarik.web.id/*", zone_name = "desacitarik.web.id" }]
+
 [[d1_databases]]
 binding = "DB"
 database_name = "web-desa-citarik-db"
-database_id = "c578c1ca-4e96-4142-b0f0-4ceffe035ed9"
+database_id = "99cfd971-5422-46f9-b9a9-4a57eb32adb3"
 
-# ─── Cloudflare R2 (media binary) ────────────────────────────────────────────
 [[r2_buckets]]
 binding = "MEDIA_BUCKET"
 bucket_name = "web-desa-citarik-media"
 
-# ─── Cloudflare KV (sesi TTL) ────────────────────────────────────────────────
 [[kv_namespaces]]
 binding = "SESSION_KV"
-id = "12efcdd486e54c86a30f5db20351a1ab"
+id = "d600a6633c8043238a1c57097b2d2b24"
 
-# ─── Cron triggers (dinonaktifkan) ───────────────────────────────────────────
-# Backup mingguan otomatis dimatikan. Backup dilakukan manual lewat tombol
-# export di panel admin (lihat docs handover). Untuk mengaktifkan lagi:
-# isi crons = ["0 0 * * 0"], butuh workers.dev subdomain akun terdaftar.
 [triggers]
 crons = []
 
-# ─── Local development ────────────────────────────────────────────────────────
 [dev]
 port = 4321

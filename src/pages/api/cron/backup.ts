@@ -10,7 +10,7 @@ export const GET: APIRoute = async ({ locals }) => {
 
   try {
     const date = new Date().toISOString().split('T')[0];
-    const tables = ['admin_user', 'page_section', 'wisata', 'umkm', 'berita', 'media', 'media_link', 'titik_peta', 'perangkat_desa'];
+    const tables = ['admin_user', 'page_section', 'umkm', 'berita', 'media', 'media_link', 'titik_peta', 'perangkat_desa', 'jenis_pelayanan', 'pengajuan_pelayanan', 'lampiran_pengajuan'];
 
     const backup: Record<string, unknown[]> = {};
     for (const table of tables) {

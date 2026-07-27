@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { fileURLToPath } from 'url';
 
 export default defineConfig({
-  site: 'https://citarik.web.id',
+  site: 'https://desacitarik.web.id',
   output: 'server',
   adapter: cloudflare(),
   integrations: [react()],

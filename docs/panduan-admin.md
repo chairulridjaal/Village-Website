@@ -1,6 +1,6 @@
 # Panduan Admin — Web Desa Citarik
 
-Panduan ini untuk **pengelola konten** situs https://citarik.web.id (perangkat desa / Karang Taruna).
+Panduan ini untuk **pengelola konten** situs https://desacitarik.web.id (perangkat desa / Karang Taruna).
 Anda **tidak perlu keahlian teknis** — semua dilakukan lewat browser (HP atau komputer).
 
 > **Prinsip penting:** Semua perubahan lewat Panel Admin **langsung tayang** di situs
@@ -10,7 +10,7 @@ Anda **tidak perlu keahlian teknis** — semua dilakukan lewat browser (HP atau 
 
 ## 1. Masuk ke Panel Admin
 
-1. Buka **https://citarik.web.id/admin** di browser.
+1. Buka **https://desacitarik.web.id/admin** di browser.
 2. Masukkan **nama pengguna** dan **kata sandi** admin desa.
 3. Klik **Masuk**.
 

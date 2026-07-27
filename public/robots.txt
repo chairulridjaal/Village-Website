@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /api
 
-Sitemap: https://citarik.web.id/sitemap.xml
+Sitemap: https://desacitarik.web.id/sitemap.xml

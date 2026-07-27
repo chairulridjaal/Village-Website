@@ -1,6 +1,6 @@
 # Checklist Kredensial & Serah Terima Aset Digital — Web Desa Citarik
 
-Dokumen ini mendata **semua akun dan aset digital** situs https://citarik.web.id yang harus
+Dokumen ini mendata **semua akun dan aset digital** situs https://desacitarik.web.id yang harus
 diserahterimakan dari tim KKN (Rafif Muhammad Farras, IPB) kepada Pemerintah Desa Citarik,
 **paling lambat 14 Agustus 2026** (akhir masa KKN).
 
@@ -31,8 +31,8 @@ Berisi semua infrastruktur situs:
 | D1 Database | `web-desa-citarik-db` | Semua konten (berita, UMKM, wisata, dll) |
 | R2 Storage | `web-desa-citarik-media` | File foto |
 | KV | `SESSION_KV` | Sesi login admin |
-| Zone/DNS | `citarik.web.id` | Pengarahan domain |
-| Web Analytics | citarik.web.id | Statistik pengunjung |
+| Zone/DNS | `desacitarik.web.id` | Pengarahan domain |
+| Web Analytics | desacitarik.web.id | Statistik pengunjung |
 
 - [ ] Kata sandi Cloudflare diserahkan (login = email Google desa di atas)
 - [ ] **PENTING — Kartu pembayaran:** akun saat ini memakai **kartu pribadi Rafif**
@@ -41,7 +41,7 @@ Berisi semua infrastruktur situs:
       kuota gratis — pemakaian desa saat ini jauh di bawah kuota.
 - [ ] Rafif memastikan kartunya sudah terhapus dari akun
 
-## 3. Domain `citarik.web.id` — dewabiz.com (BERBAYAR, tahunan)
+## 3. Domain `desacitarik.web.id` — dewabiz.com (BERBAYAR, tahunan)
 
 Domain disewa di **https://dewabiz.com** (client area), nameserver diarahkan ke Cloudflare.
 **Satu-satunya biaya rutin situs ini.**
@@ -53,7 +53,7 @@ Domain disewa di **https://dewabiz.com** (client area), nameserver diarahkan ke 
 
 > Jika domain tidak diperpanjang, situs mati total sampai domain diaktifkan kembali.
 
-## 4. Akun Panel Admin — citarik.web.id/admin
+## 4. Akun Panel Admin — desacitarik.web.id/admin
 
 Akun untuk mengelola konten sehari-hari (lihat `panduan-admin.md`).
 
