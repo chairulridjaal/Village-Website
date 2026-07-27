@@ -1,85 +1,149 @@
----
+﻿---
 import AdminLayout from '../../../components/AdminLayout.astro';
 import AdminEditorToolbar from '../../../components/AdminEditorToolbar.astro';
 import { getSection } from '../../../lib/db/page-section';
+import { getEnv } from '@lib/env';
 
 const { slug } = Astro.params as { slug: string };
-import { getEnv } from '@lib/env';
 const env = getEnv();
-
 const section = env ? await getSection(slug, env.DB) : null;
 if (!section) return Astro.redirect('/admin/konten');
 
 const saved = Astro.url.searchParams.get('saved');
-const sectionLabel = slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
+const META: Record<string, { label: string; publicPath: string; hint: string }> = {
+  'beranda-hero': { label: 'Teks hero beranda', publicPath: '/', hint: 'Tampil di bagian paling atas beranda.' },
+  'beranda-sekilas': { label: 'Sekilas desa', publicPath: '/', hint: 'Paragraf pengenalan di tengah beranda.' },
+  'profil-umum': { label: 'Profil umum', publicPath: '/profil', hint: 'Bagian profil umum desa.' },
+  'profil-geografis': { label: 'Kondisi geografis', publicPath: '/profil#geografis', hint: 'Bagian geografis di Profil.' },
+  'profil-sejarah': { label: 'Sejarah desa', publicPath: '/profil#sejarah', hint: 'Bagian sejarah di Profil.' },
+  'pemerintahan-visi-misi': { label: 'Visi & misi', publicPath: '/pemerintahan', hint: 'Halaman Pemerintahan.' },
+  'pemerintahan-ruang-lingkup': { label: 'Ruang lingkup', publicPath: '/pemerintahan', hint: 'Halaman Pemerintahan — tabel dusun diisi lewat Statistik Desa.' },
+  'pemerintahan-tugas-fungsi': { label: 'Tugas & fungsi', publicPath: '/pemerintahan', hint: 'Halaman Pemerintahan.' },
+};
+
+const meta = META[slug] ?? {
+  label: section.title || slug,
+  publicPath: '/',
+  hint: 'Bagian konten situs.',
+};
 ---
 
-<AdminLayout title={`Edit: ${sectionLabel}`} breadcrumb={`Konten / ${sectionLabel}`}>
+<AdminLayout title={`Edit: ${meta.label}`} breadcrumb={`Konten / ${meta.label}`}>
 
   {saved && (
-    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7;">
-      Konten berhasil disimpan.
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium flex flex-wrap items-center gap-3" style="background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7;">
+      <span>Konten berhasil disimpan.</span>
+      <a href={meta.publicPath} target="_blank" rel="noopener" class="underline font-semibold">Lihat di situs ↗</a>
     </div>
   )}
 
-  <div class="max-w-3xl">
-    <h2 class="font-heading font-bold text-xl mb-6" style="color:var(--color-primary);">{sectionLabel}</h2>
+  <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6">
+    <div>
+      <a href="/admin/konten" class="text-sm font-heading text-accent hover:underline">← Semua konten</a>
+      <h2 class="font-heading font-bold text-xl mt-1" style="color:var(--color-primary);">{meta.label}</h2>
+      <p class="text-sm text-text-muted mt-1">{meta.hint}</p>
+    </div>
+    <a
+      href={meta.publicPath}
+      target="_blank"
+      rel="noopener"
+      class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border text-sm font-heading font-medium hover:bg-sand"
+      style="border-color:var(--color-border); min-height:40px;"
+    >
+      Buka halaman publik ↗
+    </a>
+  </div>
 
-    <form method="POST" action="/api/admin/konten" class="space-y-5">
-      <input type="hidden" name="slug" value={slug} />
+  <form method="POST" action="/api/admin/konten" id="konten-form" class="space-y-5">
+    <input type="hidden" name="slug" value={slug} />
 
-      <div>
-        <label for="title" class="block font-heading font-medium text-sm mb-1.5">
-          Judul <span>*</span> <span class="font-normal text-text-muted">(wajib)</span>
-        </label>
-        <input
-          type="text" id="title" name="title" required
-          value={section.title}
-          class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
-          style="border-color:var(--color-border); min-height:44px;"
-        />
+    <div class="bg-white rounded-xl border border-border p-4 sm:p-5" style="box-shadow:var(--shadow-sm);">
+      <label for="title" class="block font-heading font-medium text-sm mb-1.5">
+        Judul internal <span class="text-red-500">*</span>
+      </label>
+      <input
+        type="text" id="title" name="title" required
+        value={section.title}
+        class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+        style="border-color:var(--color-border); min-height:44px;"
+      />
+      <p class="text-xs text-text-muted mt-1.5">Judul untuk admin (boleh sama dengan judul di situs).</p>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-5 items-start">
+      <div class="bg-white rounded-xl border border-border overflow-hidden" style="box-shadow:var(--shadow-sm);">
+        <div class="px-4 py-3 border-b border-border flex items-center justify-between gap-2" style="background:#F8FAFC;">
+          <div>
+            <p class="font-heading font-semibold text-sm text-ink">Editor</p>
+            <p class="text-xs text-text-muted">Tulis &amp; format di sini</p>
+          </div>
+          <span class="text-[10px] font-heading uppercase tracking-wide text-text-muted bg-white border border-border px-2 py-0.5 rounded">Sunting</span>
+        </div>
+        <div class="p-3 sm:p-4">
+          <AdminEditorToolbar withImage />
+          <div
+            id="editor"
+            contenteditable="true"
+            class="w-full min-h-[280px] border border-t-0 rounded-b-lg px-4 py-3 text-base focus:outline-none prose max-w-none"
+            style="border-color:var(--color-border);"
+            set:html={section.content_html}
+          ></div>
+          <input type="hidden" id="content_html" name="content_html" value={section.content_html} />
+          <p class="text-xs text-text-muted mt-2">Tip: tombol di atas untuk tebal, daftar, sub-judul, dan gambar.</p>
+        </div>
       </div>
 
-      <div>
-        <label for="content_html" class="block font-heading font-medium text-sm mb-1.5">
-          Konten
-        </label>
-        <AdminEditorToolbar withImage />
-
-        <div
-          id="editor"
-          contenteditable="true"
-          class="w-full min-h-48 border border-t-0 rounded-b-lg px-4 py-3 text-base focus:outline-none prose max-w-none"
-          style="border-color:var(--color-border);"
-          set:html={section.content_html}
-        ></div>
-        <input type="hidden" id="content_html" name="content_html" value={section.content_html} />
+      <div class="bg-white rounded-xl border border-border overflow-hidden lg:sticky lg:top-20" style="box-shadow:var(--shadow-sm);">
+        <div class="px-4 py-3 border-b border-border flex items-center justify-between gap-2" style="background:#F0FDF4;">
+          <div>
+            <p class="font-heading font-semibold text-sm text-ink">Pratinjau</p>
+            <p class="text-xs text-text-muted">Tampilan perkiraan di situs</p>
+          </div>
+          <span class="text-[10px] font-heading uppercase tracking-wide px-2 py-0.5 rounded" style="background:#D1FAE5;color:#065F46;">Live</span>
+        </div>
+        <div class="p-4 sm:p-5 min-h-[280px]">
+          <p id="preview-title" class="font-heading font-bold text-lg text-primary mb-3">{section.title}</p>
+          <div
+            id="preview"
+            class="prose max-w-none text-muted leading-relaxed text-base"
+            set:html={section.content_html || '<p class=\"text-text-muted italic\">Pratinjau akan muncul saat Anda mengetik…</p>'}
+          ></div>
+        </div>
       </div>
+    </div>
 
-      <!-- Sticky action bar -->
-      <div class="sticky bottom-0 bg-white border-t border-border -mx-4 md:-mx-6 px-4 md:px-6 py-3 flex justify-end gap-3" style="box-shadow:0 -2px 8px rgba(0,0,0,.06);">
-        <a href="/admin/konten"
-          class="px-4 py-2 rounded-lg font-heading font-medium text-sm border transition-colors hover:bg-sand cursor-pointer focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
-          style="border-color:var(--color-border); min-height:44px; display:flex; align-items:center;">
-          Batal
+    <div class="sticky bottom-0 z-[5] bg-white/95 backdrop-blur border-t border-border -mx-4 md:-mx-6 px-4 md:px-6 py-3 flex flex-wrap justify-between gap-3" style="box-shadow:0 -2px 8px rgba(0,0,0,.06);">
+      <a href="/admin/konten"
+        class="px-4 py-2 rounded-lg font-heading font-medium text-sm border transition-colors hover:bg-sand cursor-pointer"
+        style="border-color:var(--color-border); min-height:44px; display:flex; align-items:center;">
+        Batal
+      </a>
+      <div class="flex gap-2">
+        <a href={meta.publicPath} target="_blank" rel="noopener"
+          class="px-4 py-2 rounded-lg font-heading font-medium text-sm border hidden sm:inline-flex items-center"
+          style="border-color:var(--color-border); min-height:44px;">
+          Lihat situs ↗
         </a>
         <button type="submit"
-          class="px-5 py-2 rounded-lg font-heading font-semibold text-white text-sm cursor-pointer focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
+          class="px-6 py-2 rounded-lg font-heading font-semibold text-white text-sm cursor-pointer"
           style="background:var(--color-cta); min-height:44px;">
-          Simpan
+          Simpan perubahan
         </button>
       </div>
-    </form>
-  </div>
+    </div>
+  </form>
 
 </AdminLayout>
 
 <style>
-  #editor h2 { font-size:1.25rem; font-weight:700; margin:1rem 0 .5rem; }
-  #editor ul { list-style:disc; padding-left:1.5rem; }
-  #editor ol { list-style:decimal; padding-left:1.5rem; }
-  #editor p { margin:.25rem 0; }
-  #editor img { max-width:100%; height:auto; border-radius:.5rem; margin:.5rem 0; }
+  #editor h2, #preview h2 { font-size:1.25rem; font-weight:700; margin:1rem 0 .5rem; color: var(--color-primary); }
+  #editor h3, #preview h3 { font-size:1.1rem; font-weight:600; margin:.75rem 0 .4rem; }
+  #editor ul, #preview ul { list-style:disc; padding-left:1.5rem; margin:.5rem 0; }
+  #editor ol, #preview ol { list-style:decimal; padding-left:1.5rem; margin:.5rem 0; }
+  #editor p, #preview p { margin:.4rem 0; line-height:1.65; }
+  #editor img, #preview img { max-width:100%; height:auto; border-radius:.5rem; margin:.5rem 0; }
+  #editor:focus { outline: 2px solid var(--color-accent); outline-offset: -1px; }
 </style>
 
 <script>
@@ -87,9 +151,27 @@ const sectionLabel = slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase
 
   const editor = document.getElementById('editor') as HTMLDivElement;
   const hidden = document.getElementById('content_html') as HTMLInputElement;
+  const preview = document.getElementById('preview') as HTMLDivElement;
+  const previewTitle = document.getElementById('preview-title') as HTMLParagraphElement;
+  const titleInput = document.getElementById('title') as HTMLInputElement;
 
-  document.querySelector('form')?.addEventListener('submit', () => {
+  function syncPreview() {
+    hidden.value = editor.innerHTML;
+    const html = editor.innerHTML.trim();
+    preview.innerHTML = html || '<p class="text-text-muted italic">Pratinjau akan muncul saat Anda mengetik…</p>';
+  }
+
+  document.getElementById('konten-form')?.addEventListener('submit', () => {
     hidden.value = editor.innerHTML;
   });
+
   initEditor(editor, hidden);
+  editor.addEventListener('input', syncPreview);
+  document.querySelectorAll('[data-cmd]').forEach((btn) => {
+    btn.addEventListener('click', () => setTimeout(syncPreview, 30));
+  });
+
+  titleInput?.addEventListener('input', () => {
+    previewTitle.textContent = titleInput.value.trim() || 'Judul';
+  });
 </script>

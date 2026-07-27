@@ -14,14 +14,16 @@ const { title, breadcrumb, currentPath = Astro.url.pathname } = Astro.props;
 const user = Astro.locals.user;
 
 type MenuItem = { href: string; label: string; perm?: PermFlag | 'master' };
-type MenuGroup = { title: string; items: MenuItem[] };
+type MenuGroup = { id: string; title: string; items: MenuItem[] };
 
 const menuGroups: MenuGroup[] = [
   {
+    id: 'utama',
     title: 'Utama',
     items: [{ href: '/admin/dasbor', label: 'Dasbor' }],
   },
   {
+    id: 'konten',
     title: 'Konten',
     items: [
       { href: '/admin/konten', label: 'Halaman', perm: 'perm_konten' },
@@ -32,10 +34,12 @@ const menuGroups: MenuGroup[] = [
     ],
   },
   {
+    id: 'layanan',
     title: 'Layanan',
     items: [{ href: '/admin/pelayanan', label: 'Pelayanan', perm: 'perm_pelayanan' }],
   },
   {
+    id: 'direktori',
     title: 'Direktori',
     items: [
       { href: '/admin/umkm', label: 'UMKM', perm: 'perm_umkm' },
@@ -45,6 +49,7 @@ const menuGroups: MenuGroup[] = [
     ],
   },
   {
+    id: 'sistem',
     title: 'Sistem',
     items: [
       { href: '/admin/pengaturan', label: 'Pengaturan', perm: 'perm_pengaturan' },
@@ -62,8 +67,27 @@ function canSee(item: MenuItem): boolean {
 
 const isActive = (href: string) =>
   href === '/admin/dasbor'
-    ? currentPath === href
+    ? currentPath === href || currentPath === '/admin'
     : currentPath.startsWith(href);
+
+const visibleGroups = menuGroups
+  .map((g) => ({ ...g, items: g.items.filter(canSee) }))
+  .filter((g) => g.items.length > 0);
+
+type NavBlock =
+  | { kind: 'flat'; item: MenuItem }
+  | { kind: 'group'; id: string; title: string; items: MenuItem[]; defaultOpen: boolean };
+
+const navBlocks: NavBlock[] = visibleGroups.map((g) => {
+  if (g.items.length === 1) return { kind: 'flat' as const, item: g.items[0] };
+  return {
+    kind: 'group' as const,
+    id: g.id,
+    title: g.title,
+    items: g.items,
+    defaultOpen: g.items.some((i) => isActive(i.href)),
+  };
+});
 ---
 
 <!DOCTYPE html>
@@ -97,28 +121,64 @@ const isActive = (href: string) =>
     </a>
 
     <!-- Menu -->
-    <nav aria-label="Menu admin" class="flex flex-col p-3 gap-3 flex-1 overflow-y-auto">
-      {menuGroups.map((group) => {
-        const items = group.items.filter(canSee);
-        if (items.length === 0) return null;
+    <nav aria-label="Menu admin" class="flex flex-col p-3 gap-1 flex-1 overflow-y-auto">
+      {navBlocks.map((block) => {
+        if (block.kind === 'flat') {
+          const { href, label } = block.item;
+          const active = isActive(href);
+          return (
+            <a
+              href={href}
+              class:list={[
+                'flex items-center gap-3 px-3 py-2.5 rounded-md font-heading font-medium text-sm transition-colors duration-150 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent',
+                active ? 'bg-accent text-white' : 'text-white/75 hover:bg-white/10 hover:text-white',
+              ]}
+              aria-current={active ? 'page' : undefined}
+            >
+              {label}
+            </a>
+          );
+        }
+        const open = block.defaultOpen;
         return (
-          <div>
-            <p class="px-3 mb-1 text-[10px] font-heading font-semibold uppercase tracking-wider text-white/40">{group.title}</p>
-            <div class="flex flex-col gap-0.5">
-              {items.map(({ href, label }) => (
-                <a
-                  href={href}
-                  class:list={[
-                    'flex items-center gap-3 px-3 py-2.5 rounded-md font-heading font-medium text-sm transition-colors duration-150 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent',
-                    isActive(href)
-                      ? 'bg-accent text-white'
-                      : 'text-white/75 hover:bg-white/10 hover:text-white',
-                  ]}
-                  aria-current={isActive(href) ? 'page' : undefined}
-                >
-                  {label}
-                </a>
-              ))}
+          <div class="admin-nav-group" data-group-id={block.id} data-open={open ? '1' : '0'}>
+            <button
+              type="button"
+              class="admin-nav-toggle w-full flex items-center justify-between gap-2 px-3 py-2 rounded-md text-left cursor-pointer hover:bg-white/10 transition-colors focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
+              aria-expanded={open ? 'true' : 'false'}
+              data-group-toggle
+            >
+              <span class="text-[11px] font-heading font-semibold uppercase tracking-wider text-white/55">{block.title}</span>
+              <svg
+                class="admin-nav-chevron w-3.5 h-3.5 text-white/50 shrink-0 transition-transform duration-200"
+                style={open ? 'transform:rotate(0deg)' : 'transform:rotate(-90deg)'}
+                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div
+              class="admin-nav-panel flex flex-col gap-0.5 pl-1 border-l border-white/10 ml-3 mt-0.5 overflow-hidden"
+              data-group-panel
+              hidden={!open}
+            >
+              {block.items.map(({ href, label }) => {
+                const active = isActive(href);
+                return (
+                  <a
+                    href={href}
+                    class:list={[
+                      'flex items-center gap-2 pl-3 pr-3 py-2 rounded-md font-heading font-medium text-sm transition-colors duration-150 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent',
+                      active ? 'bg-accent text-white' : 'text-white/75 hover:bg-white/10 hover:text-white',
+                    ]}
+                    aria-current={active ? 'page' : undefined}
+                  >
+                    {label}
+                  </a>
+                );
+              })}
             </div>
           </div>
         );
@@ -200,6 +260,7 @@ const isActive = (href: string) =>
   const sidebar = document.getElementById('admin-sidebar');
   const overlay = document.getElementById('admin-overlay');
   const hamburger = document.getElementById('admin-hamburger');
+  const STORAGE_KEY = 'admin-nav-collapsed';
 
   function openSidebar() {
     sidebar?.classList.add('sidebar-open');
@@ -215,5 +276,42 @@ const isActive = (href: string) =>
   hamburger?.addEventListener('click', openSidebar);
   overlay?.addEventListener('click', closeSidebar);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSidebar(); });
+
+  function loadCollapsed() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}'); }
+    catch { return {}; }
+  }
+  function saveCollapsed(map) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
+  }
+
+  const collapsedMap = loadCollapsed();
+
+  document.querySelectorAll('.admin-nav-group').forEach((group) => {
+    const id = group.dataset.groupId ?? '';
+    const toggle = group.querySelector('[data-group-toggle]');
+    const panel = group.querySelector('[data-group-panel]');
+    const chevron = group.querySelector('.admin-nav-chevron');
+    if (!toggle || !panel) return;
+
+    const hasActive = group.querySelector('[aria-current="page"]');
+    let open = group.dataset.open === '1';
+    if (!hasActive && id in collapsedMap) open = !collapsedMap[id];
+
+    function applyOpen(isOpen) {
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      panel.hidden = !isOpen;
+      if (chevron) chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(-90deg)';
+      group.dataset.open = isOpen ? '1' : '0';
+    }
+    applyOpen(open);
+
+    toggle.addEventListener('click', () => {
+      open = !open;
+      applyOpen(open);
+      collapsedMap[id] = !open;
+      saveCollapsed(collapsedMap);
+    });
+  });
 </script>
 </html>

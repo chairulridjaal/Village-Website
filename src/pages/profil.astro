@@ -61,7 +61,10 @@ if (statCats.length === 0) {
   ];
 }
 
-const totalPenduduk = totalPendudukFromStats(statCats) || Number(stUmum.penduduk) || 0;
+const fromDusunRows = totalPendudukFromStats(statCats);
+const totalPenduduk = fromDusunRows || Number(stUmum.penduduk) || 0;
+const dusunCat = statCats.find((c) => c.layout === 'dusun');
+const jumlahDusun = Number(stUmum.dusun) || dusunCat?.rows.length || 4;
 const mapLat = Number(s.map_lat) || -7.009933224557312;
 const mapLng = Number(s.map_lng) || 106.58103748650889;
 const mapZoom = Number(s.map_zoom) || 15;
@@ -114,7 +117,7 @@ const kabupaten = s.kabupaten || 'Sukabumi';
     {[
       { icon: 'users', label: 'Penduduk', value: fmt(totalPenduduk || Number(stUmum.penduduk) || 0), sub: 'Jiwa' },
       { icon: 'layers', label: 'Wilayah', value: stUmum.luas ?? '-', sub: 'Hektar' },
-      { icon: 'home', label: 'Dusun', value: String(stUmum.dusun ?? dusunData.length), sub: 'Wilayah' },
+      { icon: 'home', label: 'Dusun', value: String(jumlahDusun), sub: 'Wilayah' },
       { icon: 'map-pin', label: 'RW / RT', value: `${stUmum.rw ?? '-'} / ${stUmum.rt ?? '-'}`, sub: 'Administratif' },
     ].map(tile => (
       <div class="card-surface p-5">

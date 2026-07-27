@@ -1,65 +1,112 @@
----
+﻿---
 import AdminLayout from '../../../components/AdminLayout.astro';
 import { getAllSections } from '../../../lib/db/page-section';
-
 import { getEnv } from '@lib/env';
-const env = getEnv();
-// 'potensi' section: halaman /potensi kini berupa kartu-kartu terancang, tidak
-// membaca section ini — disembunyikan agar admin tidak mengedit konten yang tak tampil.
-const sections = (env ? await getAllSections(env.DB) : []).filter(s => s.slug !== 'potensi');
 
-const sectionLabels: Record<string, string> = {
-  'beranda-hero':                'Beranda: Hero',
-  'beranda-sekilas':             'Beranda: Sekilas Desa',
-  'profil-umum':                 'Profil: Umum',
-  'profil-geografis':            'Profil: Geografis',
-  'profil-sejarah':              'Profil: Sejarah',
-  'potensi':                     'Potensi Desa',
-  'pemerintahan-visi-misi':      'Pemerintahan: Visi & Misi',
-  'pemerintahan-ruang-lingkup':  'Pemerintahan: Ruang Lingkup',
-  'pemerintahan-tugas-fungsi':   'Pemerintahan: Tugas & Fungsi',
+const env = getEnv();
+const sections = (env ? await getAllSections(env.DB) : []).filter((s) => s.slug !== 'potensi');
+
+type Meta = { label: string; page: string; desc: string; publicPath: string };
+
+const META: Record<string, Meta> = {
+  'beranda-hero': { label: 'Teks hero beranda', page: 'Beranda', desc: 'Kalimat utama di bagian atas halaman depan.', publicPath: '/' },
+  'beranda-sekilas': { label: 'Sekilas desa', page: 'Beranda', desc: 'Paragraf pengenalan singkat di beranda.', publicPath: '/' },
+  'profil-umum': { label: 'Profil umum', page: 'Profil', desc: 'Gambaran umum desa di halaman Profil.', publicPath: '/profil' },
+  'profil-geografis': { label: 'Kondisi geografis', page: 'Profil', desc: 'Teks wilayah, batas, dan kondisi alam.', publicPath: '/profil#geografis' },
+  'profil-sejarah': { label: 'Sejarah desa', page: 'Profil', desc: 'Cerita sejarah dan perkembangan desa.', publicPath: '/profil#sejarah' },
+  'pemerintahan-visi-misi': { label: 'Visi & misi', page: 'Pemerintahan', desc: 'Visi dan misi pemerintah desa.', publicPath: '/pemerintahan' },
+  'pemerintahan-ruang-lingkup': { label: 'Ruang lingkup', page: 'Pemerintahan', desc: 'Ruang lingkup kerja pemerintahan desa.', publicPath: '/pemerintahan' },
+  'pemerintahan-tugas-fungsi': { label: 'Tugas & fungsi', page: 'Pemerintahan', desc: 'Uraian tugas dan fungsi perangkat.', publicPath: '/pemerintahan' },
 };
+
+function plainPreview(html: string, max = 110): string {
+  const t = html.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+  if (!t) return 'Belum ada isi. Klik untuk menulis.';
+  return t.length > max ? t.slice(0, max) + '…' : t;
+}
+
+function fmtDate(iso: string): string {
+  try {
+    return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  } catch {
+    return iso;
+  }
+}
+
+const pageOrder = ['Beranda', 'Profil', 'Pemerintahan'];
+const byPage = new Map<string, typeof sections>();
+for (const s of sections) {
+  const page = META[s.slug]?.page ?? 'Lainnya';
+  if (!byPage.has(page)) byPage.set(page, []);
+  byPage.get(page)!.push(s);
+}
+const orderedPages = [
+  ...pageOrder.filter((p) => byPage.has(p)),
+  ...[...byPage.keys()].filter((p) => !pageOrder.includes(p)),
+];
 ---
 
 <AdminLayout title="Konten Halaman" breadcrumb="Konten Halaman">
 
-  <div class="flex items-center justify-between mb-6">
-    <h2 class="font-heading font-bold text-xl" style="color:var(--color-primary);">Konten Halaman</h2>
+  <div class="mb-8">
+    <h2 class="font-heading font-bold text-2xl" style="color:var(--color-primary);">Konten Halaman</h2>
+    <p class="text-sm text-text-muted mt-1.5 max-w-2xl leading-relaxed">
+      Sunting teks yang tampil di situs publik. Pilih bagian, edit, lalu lihat pratinjau sebelum menyimpan.
+    </p>
   </div>
 
-  <div class="bg-white rounded-xl border border-border overflow-hidden" style="box-shadow:var(--shadow-sm);">
-    {sections.length === 0 ? (
-      <div class="p-8 text-center text-text-muted">
-        <p>Belum ada konten. Jalankan migrasi database terlebih dahulu.</p>
-      </div>
-    ) : (
-      <table class="w-full text-sm">
-        <thead style="background:#F8FAFC;">
-          <tr class="border-b border-border">
-            <th class="text-left px-4 py-3 font-heading font-semibold">Bagian</th>
-            <th class="text-left px-4 py-3 font-heading font-semibold hidden md:table-cell">Terakhir Diubah</th>
-            <th class="px-4 py-3 font-heading font-semibold">Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sections.map((s) => (
-            <tr class="border-b border-border last:border-0 hover:bg-sand/30 transition-colors">
-              <td class="px-4 py-3 font-medium">{sectionLabels[s.slug] ?? s.slug}</td>
-              <td class="px-4 py-3 text-text-muted hidden md:table-cell">
-                {new Date(s.updated_at).toLocaleDateString('id-ID')}
-              </td>
-              <td class="px-4 py-3 text-center">
-                <a href={`/admin/konten/${s.slug}`}
-                  class="inline-block px-3 py-1.5 rounded-md font-heading font-medium text-xs border transition-colors hover:bg-primary hover:text-white focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
-                  style="border-color:var(--color-primary); color:var(--color-primary);">
-                  Sunting
-                </a>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    )}
-  </div>
+  {sections.length === 0 ? (
+    <div class="bg-white rounded-xl border border-border p-10 text-center text-text-muted" style="box-shadow:var(--shadow-sm);">
+      <p class="font-heading font-semibold text-ink mb-1">Belum ada konten</p>
+      <p class="text-sm">Jalankan migrasi database terlebih dahulu.</p>
+    </div>
+  ) : (
+    <div class="space-y-8">
+      {orderedPages.map((page) => (
+        <section>
+          <div class="flex items-center gap-2 mb-3">
+            <h3 class="font-heading font-bold text-base text-ink">{page}</h3>
+            <span class="text-xs text-text-muted bg-sand/60 px-2 py-0.5 rounded-full">
+              {(byPage.get(page) ?? []).length} bagian
+            </span>
+          </div>
+          <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            {(byPage.get(page) ?? []).map((s) => {
+              const meta = META[s.slug];
+              const label = meta?.label ?? s.title ?? s.slug;
+              const desc = meta?.desc ?? '';
+              const publicPath = meta?.publicPath ?? '/';
+              const preview = plainPreview(s.content_html || s.title || '');
+              return (
+                <article
+                  class="group bg-white rounded-xl border border-border p-5 flex flex-col transition-all hover:border-accent hover:shadow-md"
+                  style="box-shadow:var(--shadow-sm);"
+                >
+                  <h4 class="font-heading font-bold text-primary text-base leading-snug mb-2">{label}</h4>
+                  {desc && <p class="text-xs text-text-muted mb-3 leading-relaxed">{desc}</p>}
+                  <p class="text-sm text-ink/80 leading-relaxed flex-1 mb-4" style="min-height:3.5rem;">
+                    {preview}
+                  </p>
+                  <div class="flex items-center justify-between gap-2 pt-3 border-t border-border">
+                    <span class="text-[11px] text-text-muted">Diubah {fmtDate(s.updated_at)}</span>
+                    <div class="flex items-center gap-2">
+                      <a href={publicPath} target="_blank" rel="noopener" class="text-xs font-heading font-medium text-text-muted hover:text-accent">Lihat ↗</a>
+                      <a
+                        href={`/admin/konten/${s.slug}`}
+                        class="inline-flex items-center px-3 py-1.5 rounded-lg font-heading font-semibold text-xs text-white transition-opacity hover:opacity-90"
+                        style="background:var(--color-cta); min-height:36px;"
+                      >
+                        Sunting
+                      </a>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      ))}
+    </div>
+  )}
 
 </AdminLayout>

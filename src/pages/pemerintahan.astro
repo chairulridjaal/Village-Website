@@ -3,15 +3,17 @@ import Layout from '../components/Layout.astro';
 import { getSection } from '../lib/db/page-section';
 import { getPerangkatDesa } from '../lib/db/perangkat-desa';
 import { getPengaturan } from '../lib/db/pengaturan';
+import { getStatistikFull, parseDusunValue } from '../lib/db/statistik';
 import { getEnv } from '@lib/env';
 
 const env = getEnv();
-const [visiMisi, ruangLingkup, tugasFungsi, perangkat, s] = await Promise.all([
+const [visiMisi, ruangLingkup, tugasFungsi, perangkat, s, statCats] = await Promise.all([
   env ? getSection('pemerintahan-visi-misi', env.DB) : null,
   env ? getSection('pemerintahan-ruang-lingkup', env.DB) : null,
   env ? getSection('pemerintahan-tugas-fungsi', env.DB) : null,
   env ? getPerangkatDesa(env.DB) : [],
   env ? getPengaturan(env.DB) : {},
+  env ? getStatistikFull(env.DB, true).catch(() => []) : Promise.resolve([]),
 ]);
 
 const tiers = {
@@ -21,11 +23,32 @@ const tiers = {
 };
 
 const fmt = (n: number) => n.toLocaleString('id-ID');
-const stUmum = JSON.parse(s.stat_umum ?? '{}');
-const stDusun: { label: string; rw: string; jmlRw: number; l: number; p: number; kk: number }[] = JSON.parse(s.stat_dusun ?? '[]');
-const wilayahData = stDusun.map(d => ({ dusun: d.label, rw: d.rw, jmlRw: d.jmlRw, jiwa: d.l + d.p, kk: d.kk }));
-const totalJiwa = wilayahData.reduce((sum, d) => sum + d.jiwa, 0);
-const totalKK = wilayahData.reduce((sum, d) => sum + d.kk, 0);
+const stUmum = JSON.parse(s.stat_umum ?? '{}') as Record<string, unknown>;
+
+// Prefer stat_baris (layout dusun); fallback legacy pengaturan.stat_dusun
+const dusunCat = statCats.find((c) => c.layout === 'dusun');
+let wilayahData: { dusun: string; rw: string; jmlRw: number; jiwa: number; kk: number }[] = [];
+if (dusunCat && dusunCat.rows.length > 0) {
+  wilayahData = dusunCat.rows.map((r) => {
+    const d = parseDusunValue(r.value_json);
+    return { dusun: r.label, rw: d.rw, jmlRw: d.jmlRw, jiwa: d.l + d.p, kk: d.kk };
+  });
+} else {
+  const stDusun: { label: string; rw?: string; jmlRw?: number; l: number; p: number; kk: number }[] =
+    JSON.parse(s.stat_dusun ?? '[]');
+  wilayahData = stDusun.map((d) => ({
+    dusun: d.label, rw: d.rw ?? '', jmlRw: d.jmlRw ?? 0, jiwa: d.l + d.p, kk: d.kk,
+  }));
+}
+
+const sumJiwa = wilayahData.reduce((sum, d) => sum + d.jiwa, 0);
+const sumKK = wilayahData.reduce((sum, d) => sum + d.kk, 0);
+// Total resmi dari Prodeskel (stat_umum) — baris dusun bisa masih 0 sambil diisi admin
+const totalJiwa = sumJiwa > 0 ? sumJiwa : Number(stUmum.penduduk) || 0;
+const totalKK = sumKK > 0 ? sumKK : Number(stUmum.kk) || 0;
+const jumlahDusun = Number(stUmum.dusun) || Math.max(wilayahData.length, 4);
+const jumlahRw = Number(stUmum.rw) || 10;
+const jumlahRt = Number(stUmum.rt) || 50;
 ---
 
 <Layout
@@ -200,9 +223,9 @@ const totalKK = wilayahData.reduce((sum, d) => sum + d.kk, 0);
     <p class="text-muted mt-2 max-w-3xl leading-relaxed" set:html={ruangLingkup?.content_html ?? 'Bagian ini menjelaskan cakupan wilayah administratif Desa Citarik, jumlah dusun/RW/RT, serta lingkup kewenangan dan layanan yang diselenggarakan pemerintah desa bagi masyarakat.'} />
     <div class="grid sm:grid-cols-4 gap-4 mt-4">
       {[
-        { icon: 'layers', label: 'Dusun', value: String(wilayahData.length) },
-        { icon: 'grid-3x3', label: 'RW', value: String(stUmum.rw ?? '-') },
-        { icon: 'grid-2x2', label: 'RT', value: String(stUmum.rt ?? '-') },
+        { icon: 'layers', label: 'Dusun', value: String(jumlahDusun) },
+        { icon: 'grid-3x3', label: 'RW', value: String(jumlahRw) },
+        { icon: 'grid-2x2', label: 'RT', value: String(jumlahRt) },
         { icon: 'users', label: 'Kepala Keluarga', value: fmt(totalKK) },
       ].map(item => (
         <div class="card-surface p-5">
@@ -228,26 +251,31 @@ const totalKK = wilayahData.reduce((sum, d) => sum + d.kk, 0);
         <tbody>
           {wilayahData.map(d => (
             <tr class="border-t border-border bg-white">
-              <td class="px-4 py-3 font-heading font-medium text-ink">Dusun {d.dusun}</td>
-              <td class="px-4 py-3 text-muted">{d.rw}</td>
-              <td class="px-4 py-3 text-right tabular-nums text-muted">{d.jmlRw}</td>
-              <td class="px-4 py-3 text-right tabular-nums text-ink">{fmt(d.jiwa)}</td>
-              <td class="px-4 py-3 text-right tabular-nums text-ink">{fmt(d.kk)}</td>
+              <td class="px-4 py-3 font-heading font-medium text-ink">{d.dusun.startsWith('Dusun') ? d.dusun : `Dusun ${d.dusun}`}</td>
+              <td class="px-4 py-3 text-muted">{d.rw || '—'}</td>
+              <td class="px-4 py-3 text-right tabular-nums text-muted">{d.jmlRw || '—'}</td>
+              <td class="px-4 py-3 text-right tabular-nums text-ink">{d.jiwa ? fmt(d.jiwa) : '—'}</td>
+              <td class="px-4 py-3 text-right tabular-nums text-ink">{d.kk ? fmt(d.kk) : '—'}</td>
             </tr>
           ))}
         </tbody>
         <tfoot>
           <tr class="border-t-2 border-border bg-sand/60">
-            <td class="px-4 py-3 font-heading font-bold text-primary">Total</td>
-            <td class="px-4 py-3 text-muted">{stUmum.rw ?? '-'} RW</td>
-            <td class="px-4 py-3 text-right tabular-nums font-heading font-bold text-primary">{stUmum.rw ?? '-'}</td>
+            <td class="px-4 py-3 font-heading font-bold text-primary">Total desa</td>
+            <td class="px-4 py-3 text-muted">{jumlahRw} RW</td>
+            <td class="px-4 py-3 text-right tabular-nums font-heading font-bold text-primary">{jumlahRw}</td>
             <td class="px-4 py-3 text-right tabular-nums font-heading font-bold text-primary">{fmt(totalJiwa)}</td>
             <td class="px-4 py-3 text-right tabular-nums font-heading font-bold text-primary">{fmt(totalKK)}</td>
           </tr>
         </tfoot>
       </table>
     </div>
-    <p class="text-xs text-muted mt-2">Total {stUmum.rt ?? '-'} RT tersebar di {stUmum.rw ?? '-'} RW pada {wilayahData.length} dusun tersebut.</p>
+    <p class="text-xs text-muted mt-2">
+      {jumlahRt} RT di {jumlahRw} RW pada {jumlahDusun} dusun (Prodeskel 2025).
+      {sumJiwa === 0 && (
+        <> Rincian jiwa/KK per dusun belum diisi — lengkapi di <a href="/admin/statistik-desa" class="text-accent underline">Statistik Desa</a> (panel admin).</>
+      )}
+    </p>
   </section>
 
   <!-- Tugas & Fungsi -->

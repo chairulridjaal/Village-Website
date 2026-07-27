@@ -56,9 +56,20 @@ INSERT OR IGNORE INTO stat_kategori (id, key, label, layout, urutan, aktif) VALU
   (4, 'pencaharian', 'Mata Pencaharian', 'simple', 40, 1);
 
 -- Seed baris from Prodeskel defaults (same as 0005/0006). Only if empty.
+-- 4 dusun (Prodeskel): rincian L/P/KK per dusun belum ada di sumber → 0, admin isi nanti.
+-- Total penduduk tetap di stat_umum (13.187 jiwa / 4.220 KK).
 INSERT INTO stat_baris (kategori_id, label, value_json, urutan)
-SELECT 1, 'Keseluruhan (Prodeskel 2025)', '{"l":6750,"p":6437,"kk":4220,"rw":"","jmlRw":0}', 0
+SELECT 1, 'Dusun I', '{"l":0,"p":0,"kk":0,"rw":"","jmlRw":0}', 1
 WHERE NOT EXISTS (SELECT 1 FROM stat_baris WHERE kategori_id = 1);
+INSERT INTO stat_baris (kategori_id, label, value_json, urutan)
+SELECT 1, 'Dusun II', '{"l":0,"p":0,"kk":0,"rw":"","jmlRw":0}', 2
+WHERE (SELECT COUNT(*) FROM stat_baris WHERE kategori_id = 1) = 1;
+INSERT INTO stat_baris (kategori_id, label, value_json, urutan)
+SELECT 1, 'Dusun III', '{"l":0,"p":0,"kk":0,"rw":"","jmlRw":0}', 3
+WHERE (SELECT COUNT(*) FROM stat_baris WHERE kategori_id = 1) = 2;
+INSERT INTO stat_baris (kategori_id, label, value_json, urutan)
+SELECT 1, 'Dusun IV', '{"l":0,"p":0,"kk":0,"rw":"","jmlRw":0}', 4
+WHERE (SELECT COUNT(*) FROM stat_baris WHERE kategori_id = 1) = 3;
 
 INSERT INTO stat_baris (kategori_id, label, value_json, urutan)
 SELECT 2, '0-1 tahun', '{"value":1909}', 0 WHERE NOT EXISTS (SELECT 1 FROM stat_baris WHERE kategori_id = 2);
