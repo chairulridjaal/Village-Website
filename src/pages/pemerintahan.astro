@@ -27,25 +27,31 @@ const stUmum = JSON.parse(s.stat_umum ?? '{}') as Record<string, unknown>;
 
 // Prefer stat_baris (layout dusun); fallback legacy pengaturan.stat_dusun
 const dusunCat = statCats.find((c) => c.layout === 'dusun');
-let wilayahData: { dusun: string; rw: string; jmlRw: number; jiwa: number; kk: number }[] = [];
+let wilayahData: { dusun: string; jmlRw: number; jmlRt: number; jiwa: number; kk: number }[] = [];
 if (dusunCat && dusunCat.rows.length > 0) {
   wilayahData = dusunCat.rows.map((r) => {
     const d = parseDusunValue(r.value_json);
-    return { dusun: r.label, rw: d.rw, jmlRw: d.jmlRw, jiwa: d.l + d.p, kk: d.kk };
+    return { dusun: r.label, jmlRw: d.jmlRw, jmlRt: d.jmlRt, jiwa: d.jiwa, kk: d.kk };
   });
 } else {
-  const stDusun: { label: string; rw?: string; jmlRw?: number; l: number; p: number; kk: number }[] =
+  const stDusun: { label: string; jmlRw?: number; jmlRt?: number; jiwa?: number; l?: number; p?: number; kk?: number }[] =
     JSON.parse(s.stat_dusun ?? '[]');
   wilayahData = stDusun.map((d) => ({
-    dusun: d.label, rw: d.rw ?? '', jmlRw: d.jmlRw ?? 0, jiwa: d.l + d.p, kk: d.kk,
+    dusun: d.label,
+    jmlRw: d.jmlRw ?? 0,
+    jmlRt: d.jmlRt ?? 0,
+    jiwa: d.jiwa ?? ((d.l ?? 0) + (d.p ?? 0)),
+    kk: d.kk ?? 0,
   }));
 }
-
+const sumRw = wilayahData.reduce((s, d) => s + d.jmlRw, 0);
+const sumRt = wilayahData.reduce((s, d) => s + d.jmlRt, 0);
 const sumJiwa = wilayahData.reduce((sum, d) => sum + d.jiwa, 0);
 const sumKK = wilayahData.reduce((sum, d) => sum + d.kk, 0);
-// Total resmi dari Prodeskel (stat_umum) — baris dusun bisa masih 0 sambil diisi admin
-const totalJiwa = sumJiwa > 0 ? sumJiwa : Number(stUmum.penduduk) || 0;
-const totalKK = sumKK > 0 ? sumKK : Number(stUmum.kk) || 0;
+const showKkCol = sumKK > 0;
+// Footer: Prodeskel 2025 total if set; else sum of dusun rows (Laporan 2017–18 = 13.808)
+const totalJiwa = Number(stUmum.penduduk) || sumJiwa || 0;
+const totalKK = Number(stUmum.kk) || sumKK || 0;
 const jumlahDusun = Number(stUmum.dusun) || Math.max(wilayahData.length, 4);
 const jumlahRw = Number(stUmum.rw) || 10;
 const jumlahRt = Number(stUmum.rt) || 50;
@@ -242,39 +248,56 @@ const jumlahRt = Number(stUmum.rt) || 50;
         <thead>
           <tr class="bg-sand text-left">
             <th class="px-4 py-3 font-heading font-semibold text-ink">Dusun</th>
-            <th class="px-4 py-3 font-heading font-semibold text-ink">RW</th>
-            <th class="px-4 py-3 font-heading font-semibold text-ink text-right">Jumlah RW</th>
+            <th class="px-4 py-3 font-heading font-semibold text-ink text-right">RW</th>
+            <th class="px-4 py-3 font-heading font-semibold text-ink text-right">RT</th>
             <th class="px-4 py-3 font-heading font-semibold text-ink text-right">Penduduk (Jiwa)</th>
-            <th class="px-4 py-3 font-heading font-semibold text-ink text-right">KK</th>
+            {showKkCol && (
+              <th class="px-4 py-3 font-heading font-semibold text-ink text-right">KK</th>
+            )}
           </tr>
         </thead>
         <tbody>
           {wilayahData.map(d => (
             <tr class="border-t border-border bg-white">
               <td class="px-4 py-3 font-heading font-medium text-ink">{d.dusun.startsWith('Dusun') ? d.dusun : `Dusun ${d.dusun}`}</td>
-              <td class="px-4 py-3 text-muted">{d.rw || '—'}</td>
               <td class="px-4 py-3 text-right tabular-nums text-muted">{d.jmlRw || '—'}</td>
+              <td class="px-4 py-3 text-right tabular-nums text-muted">{d.jmlRt || '—'}</td>
               <td class="px-4 py-3 text-right tabular-nums text-ink">{d.jiwa ? fmt(d.jiwa) : '—'}</td>
-              <td class="px-4 py-3 text-right tabular-nums text-ink">{d.kk ? fmt(d.kk) : '—'}</td>
+              {showKkCol && (
+                <td class="px-4 py-3 text-right tabular-nums text-ink">{d.kk ? fmt(d.kk) : '—'}</td>
+              )}
             </tr>
           ))}
         </tbody>
         <tfoot>
           <tr class="border-t-2 border-border bg-sand/60">
-            <td class="px-4 py-3 font-heading font-bold text-primary">Total desa</td>
-            <td class="px-4 py-3 text-muted">{jumlahRw} RW</td>
-            <td class="px-4 py-3 text-right tabular-nums font-heading font-bold text-primary">{jumlahRw}</td>
-            <td class="px-4 py-3 text-right tabular-nums font-heading font-bold text-primary">{fmt(totalJiwa)}</td>
-            <td class="px-4 py-3 text-right tabular-nums font-heading font-bold text-primary">{fmt(totalKK)}</td>
+            <td class="px-4 py-3 font-heading font-bold text-primary">Jumlah (per dusun)</td>
+            <td class="px-4 py-3 text-right tabular-nums font-heading font-bold text-primary">{sumRw || jumlahRw}</td>
+            <td class="px-4 py-3 text-right tabular-nums font-heading font-bold text-primary">{sumRt || jumlahRt}</td>
+            <td class="px-4 py-3 text-right tabular-nums font-heading font-bold text-primary">{sumJiwa ? fmt(sumJiwa) : '—'}</td>
+            {showKkCol && (
+              <td class="px-4 py-3 text-right tabular-nums font-heading font-bold text-primary">{sumKK ? fmt(sumKK) : '—'}</td>
+            )}
           </tr>
+          {Number(stUmum.penduduk) > 0 && sumJiwa > 0 && Number(stUmum.penduduk) !== sumJiwa && (
+            <tr class="border-t border-border bg-white">
+              <td class="px-4 py-3 font-heading font-semibold text-ink" colspan="3">Total Prodeskel 2025</td>
+              <td class="px-4 py-3 text-right tabular-nums font-heading font-bold text-primary">{fmt(totalJiwa)}</td>
+              {showKkCol && (
+                <td class="px-4 py-3 text-right tabular-nums font-heading font-bold text-primary">{fmt(totalKK)}</td>
+              )}
+            </tr>
+          )}
         </tfoot>
       </table>
     </div>
-    <p class="text-xs text-muted mt-2">
-      {jumlahRt} RT di {jumlahRw} RW pada {jumlahDusun} dusun (Prodeskel 2025).
-      {sumJiwa === 0 && (
-        <> Rincian jiwa/KK per dusun belum diisi — lengkapi di <a href="/admin/statistik-desa" class="text-accent underline">Statistik Desa</a> (panel admin).</>
+    <p class="text-xs text-muted mt-2 leading-relaxed">
+      Sumber RW/RT &amp; jiwa per dusun: <strong>Laporan Tahunan Desa Citarik 2017–2018</strong>
+      {sumJiwa > 0 && <> (jumlah baris {fmt(sumJiwa)} jiwa)</>}.
+      {Number(stUmum.penduduk) > 0 && (
+        <> Total desa terbaru Prodeskel Maret 2025: <strong>{fmt(totalJiwa)} jiwa</strong>{totalKK ? <> · {fmt(totalKK)} KK</> : null}.</>
       )}
+      {!showKkCol && <> Kolom KK disembunyikan karena belum ada data per dusun — bisa ditambah di Statistik Desa kapan saja.</>}
     </p>
   </section>
 

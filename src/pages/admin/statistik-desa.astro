@@ -32,8 +32,9 @@ const inputStyle = 'border-color:var(--color-border); min-height:40px;';
     </div>
   )}
 
-  <p class="text-sm text-text-muted mb-6 max-w-2xl">
-    Buat kategori baru (mis. Agama, Status Kawin) lalu tambah baris di dalamnya. Tampil di halaman Profil.
+  <p class="text-sm text-text-muted mb-6 max-w-2xl leading-relaxed">
+    Buat kategori baru (mis. Agama), tambah/hapus baris, atau nonaktifkan kategori — semuanya dari sini, tanpa coding.
+    Kategori kosong (semua angka 0) tidak ditampilkan di situs publik.
   </p>
 
   <div class="bg-white rounded-xl border border-border p-6 mb-8" style="box-shadow:var(--shadow-sm);">
@@ -125,11 +126,12 @@ const inputStyle = 'border-color:var(--color-border); min-height:40px;';
                     <input type="number" name="value" value={simple} class={inputCls} style={inputStyle} />
                   ) : (
                     <>
-                      <input name="rw" value={dusun.rw} placeholder="RW" class={inputCls} style={inputStyle} />
-                      <input type="number" name="jmlRw" value={dusun.jmlRw} placeholder="Jml RW" class={inputCls} style={inputStyle} />
-                      <input type="number" name="l" value={dusun.l} placeholder="L" class={inputCls} style={inputStyle} />
-                      <input type="number" name="p" value={dusun.p} placeholder="P" class={inputCls} style={inputStyle} />
-                      <input type="number" name="kk" value={dusun.kk} placeholder="KK" class={inputCls} style={inputStyle} />
+                      <input type="number" name="jmlRw" value={dusun.jmlRw || ''} placeholder="RW" class={inputCls} style={inputStyle} title="Jumlah RW" />
+                      <input type="number" name="jmlRt" value={dusun.jmlRt || ''} placeholder="RT" class={inputCls} style={inputStyle} title="Jumlah RT" />
+                      <input type="number" name="jiwa" value={dusun.jiwa || ''} placeholder="Jiwa" class={inputCls} style={inputStyle} title="Jumlah jiwa" />
+                      <input type="number" name="l" value={dusun.l || ''} placeholder="L (opsional)" class={inputCls} style={inputStyle} />
+                      <input type="number" name="p" value={dusun.p || ''} placeholder="P (opsional)" class={inputCls} style={inputStyle} />
+                      <input type="number" name="kk" value={dusun.kk || ''} placeholder="KK (opsional)" class={inputCls} style={inputStyle} />
                     </>
                   )}
                   <input type="number" name="urutan" value={row.urutan} class={inputCls} style={inputStyle} />
@@ -157,8 +159,9 @@ const inputStyle = 'border-color:var(--color-border); min-height:40px;';
             </div>
           ) : (
             <>
-              <input type="number" name="l" placeholder="L" class={inputCls} style={inputStyle} />
-              <input type="number" name="p" placeholder="P" class={inputCls} style={inputStyle} />
+              <input type="number" name="jmlRw" placeholder="RW" class={inputCls} style={inputStyle} />
+              <input type="number" name="jmlRt" placeholder="RT" class={inputCls} style={inputStyle} />
+              <input type="number" name="jiwa" placeholder="Jiwa" class={inputCls} style={inputStyle} />
               <input type="number" name="kk" placeholder="KK" class={inputCls} style={inputStyle} />
             </>
           )}

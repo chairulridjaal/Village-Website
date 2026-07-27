@@ -32,7 +32,24 @@ Kecamatan: Palabuhanratu · Kabupaten Sukabumi
 - Dusun **III** · Jalan Raya Citarik Km. 06 Palabuhanratu  
 - **Kp. Legok Loa RT 001 RW 014**  
 - Luas (PPT, **dipakai di website**): **526,38 Ha** · ketinggian 0–5 m dpl  
-- Catatan: isian Prodeskel 52.638 Ha dianggap salah format; tidak dipakai. 
+- Catatan: isian Prodeskel 52.638 Ha dianggap salah format; tidak dipakai.
+
+## Pembagian dusun (RW / RT)
+
+Sumber: **Laporan Tahunan Desa Citarik Tahun 2017–2018**  
+(nama dusun: PPT Profil Desa; total 10 RW / 50 RT selaras Prodeskel 2025)
+
+| Dusun | Nama (PPT) | RW | RT | Jiwa (2017–18) | Kepala Dusun (PEMDES Juni 2025) |
+|-------|------------|---:|---:|---------------:|----------------------------------|
+| I | Cipicung | 3 | 14 | 3.336 | E. Lupi Yanti Yani Dia Dara, S.Pd |
+| II | Cisaat | 2 | 12 | 3.579 | Surahman |
+| III | Tegallega | 3 | 14 | 4.189 | Budiman |
+| IV | Ciawun | 2 | 10 | 2.704 | Misbah |
+| **Total** | | **10** | **50** | **13.808** | |
+
+> Jiwa & RW/RT per dusun: **Laporan Tahunan Desa Citarik 2017–2018**.  
+> Total desa Prodeskel Maret 2025: **13.187 jiwa · 4.220 KK** (lebih baru; beda periode).  
+> **KK / L / P per dusun** belum ada di sumber — bisa diisi kapan saja di Admin → Statistik Desa.
 
 ## Koordinat Kantor Desa (GPS lapangan)
 

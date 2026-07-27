@@ -43,12 +43,17 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
       if (!label) throw new Error('Label baris wajib');
       let valueJson = '{}';
       if (layout === 'dusun') {
+        const jiwa = Number(fd.get('jiwa')) || 0;
+        const l = Number(fd.get('l')) || 0;
+        const p = Number(fd.get('p')) || 0;
         valueJson = JSON.stringify({
-          l: Number(fd.get('l')) || 0,
-          p: Number(fd.get('p')) || 0,
+          jiwa: jiwa || l + p,
+          l,
+          p,
           kk: Number(fd.get('kk')) || 0,
           rw: ((fd.get('rw') as string) ?? '').trim(),
           jmlRw: Number(fd.get('jmlRw')) || 0,
+          jmlRt: Number(fd.get('jmlRt')) || 0,
         });
       } else {
         valueJson = JSON.stringify({ value: Number(fd.get('value')) || 0 });
@@ -59,12 +64,17 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
       const label = ((fd.get('label') as string) ?? '').trim();
       let valueJson = '{}';
       if (layout === 'dusun') {
+        const jiwa = Number(fd.get('jiwa')) || 0;
+        const l = Number(fd.get('l')) || 0;
+        const p = Number(fd.get('p')) || 0;
         valueJson = JSON.stringify({
-          l: Number(fd.get('l')) || 0,
-          p: Number(fd.get('p')) || 0,
+          jiwa: jiwa || l + p,
+          l,
+          p,
           kk: Number(fd.get('kk')) || 0,
           rw: ((fd.get('rw') as string) ?? '').trim(),
           jmlRw: Number(fd.get('jmlRw')) || 0,
+          jmlRt: Number(fd.get('jmlRt')) || 0,
         });
       } else {
         valueJson = JSON.stringify({ value: Number(fd.get('value')) || 0 });

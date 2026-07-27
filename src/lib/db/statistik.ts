@@ -35,19 +35,24 @@ export function parseSimpleValue(json: string): number {
 }
 
 export function parseDusunValue(json: string): {
-  l: number; p: number; kk: number; rw: string; jmlRw: number;
+  jiwa: number; l: number; p: number; kk: number; rw: string; jmlRw: number; jmlRt: number;
 } {
   try {
     const v = JSON.parse(json || '{}') as Record<string, unknown>;
+    const l = Number(v.l) || 0;
+    const p = Number(v.p) || 0;
+    const jiwaExplicit = Number(v.jiwa) || 0;
     return {
-      l: Number(v.l) || 0,
-      p: Number(v.p) || 0,
+      l,
+      p,
       kk: Number(v.kk) || 0,
       rw: String(v.rw ?? ''),
       jmlRw: Number(v.jmlRw) || 0,
+      jmlRt: Number(v.jmlRt) || 0,
+      jiwa: jiwaExplicit || l + p,
     };
   } catch {
-    return { l: 0, p: 0, kk: 0, rw: '', jmlRw: 0 };
+    return { jiwa: 0, l: 0, p: 0, kk: 0, rw: '', jmlRw: 0, jmlRt: 0 };
   }
 }
 
@@ -84,14 +89,25 @@ export async function getStatistikFull(db: D1Database, aktifOnly = true): Promis
   return out;
 }
 
-/** Total penduduk: sum L+P from first dusun-layout category, else 0. */
+/** Total penduduk from dusun rows (jiwa or L+P). */
 export function totalPendudukFromStats(cats: StatKategoriWithRows[]): number {
   const dusun = cats.find((c) => c.layout === 'dusun');
   if (!dusun) return 0;
-  return dusun.rows.reduce((sum, row) => {
-    const d = parseDusunValue(row.value_json);
-    return sum + d.l + d.p;
-  }, 0);
+  return dusun.rows.reduce((sum, row) => sum + parseDusunValue(row.value_json).jiwa, 0);
+}
+
+/** Drop empty simple categories (all values 0) so public pages stay clean. Admin can re-add anytime. */
+export function filterPublicStatCats(cats: StatKategoriWithRows[]): StatKategoriWithRows[] {
+  return cats.filter((c) => {
+    if (!c.rows.length) return false;
+    if (c.layout === 'dusun') {
+      return c.rows.some((r) => {
+        const d = parseDusunValue(r.value_json);
+        return d.jiwa > 0 || d.jmlRw > 0 || d.jmlRt > 0 || d.kk > 0 || d.l > 0 || d.p > 0;
+      });
+    }
+    return c.rows.some((r) => parseSimpleValue(r.value_json) > 0);
+  });
 }
 
 export async function createKategori(
