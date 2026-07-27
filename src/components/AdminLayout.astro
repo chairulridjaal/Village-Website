@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { hasPerm, isMaster, type PermFlag } from '../lib/auth/permissions';
 
 interface Props {
   title: string;
@@ -9,20 +10,60 @@ interface Props {
 
 const { title, breadcrumb, currentPath = Astro.url.pathname } = Astro.props;
 
-const menuItems = [
-  { href: '/admin/dasbor',    label: 'Dasbor',          icon: 'grid' },
-  { href: '/admin/konten',    label: 'Konten Halaman',  icon: 'file-text' },
-  { href: '/admin/pelayanan', label: 'Pelayanan',       icon: 'file-check' },
-  { href: '/admin/umkm',      label: 'UMKM',            icon: 'shopping-bag' },
-  { href: '/admin/peta',      label: 'Peta',            icon: 'map' },
-  { href: '/admin/berita',    label: 'Berita',          icon: 'newspaper' },
-  { href: '/admin/media',     label: 'Media',           icon: 'image' },
-  { href: '/admin/perangkat', label: 'Perangkat Desa',  icon: 'users' },
-  { href: '/admin/pengaturan',label: 'Pengaturan',      icon: 'settings' },
-  { href: '/admin/statistik', label: 'Statistik',       icon: 'bar-chart' },
+
+const user = Astro.locals.user;
+
+type MenuItem = { href: string; label: string; perm?: PermFlag | 'master' };
+type MenuGroup = { title: string; items: MenuItem[] };
+
+const menuGroups: MenuGroup[] = [
+  {
+    title: 'Utama',
+    items: [{ href: '/admin/dasbor', label: 'Dasbor' }],
+  },
+  {
+    title: 'Konten',
+    items: [
+      { href: '/admin/konten', label: 'Halaman', perm: 'perm_konten' },
+      { href: '/admin/statistik-desa', label: 'Statistik Desa', perm: 'perm_konten' },
+      { href: '/admin/perangkat', label: 'Perangkat Desa', perm: 'perm_konten' },
+      { href: '/admin/menu', label: 'Menu situs', perm: 'perm_konten' },
+      { href: '/admin/potensi', label: 'Potensi', perm: 'perm_konten' },
+    ],
+  },
+  {
+    title: 'Layanan',
+    items: [{ href: '/admin/pelayanan', label: 'Pelayanan', perm: 'perm_pelayanan' }],
+  },
+  {
+    title: 'Direktori',
+    items: [
+      { href: '/admin/umkm', label: 'UMKM', perm: 'perm_umkm' },
+      { href: '/admin/berita', label: 'Berita', perm: 'perm_berita' },
+      { href: '/admin/peta', label: 'Peta', perm: 'perm_peta' },
+      { href: '/admin/media', label: 'Media', perm: 'perm_media' },
+    ],
+  },
+  {
+    title: 'Sistem',
+    items: [
+      { href: '/admin/pengaturan', label: 'Pengaturan', perm: 'perm_pengaturan' },
+      { href: '/admin/akun', label: 'Akun admin', perm: 'master' },
+      { href: '/admin/statistik', label: 'Kunjungan & Backup' },
+    ],
+  },
 ];
 
-const isActive = (href: string) => currentPath.startsWith(href);
+function canSee(item: MenuItem): boolean {
+  if (!item.perm) return true;
+  if (item.perm === 'master') return isMaster(user);
+  return hasPerm(user, item.perm);
+}
+
+const isActive = (href: string) =>
+  href === '/admin/dasbor'
+    ? currentPath === href
+    : currentPath.startsWith(href);
 ---
 
 <!DOCTYPE html>
@@ -56,21 +97,32 @@ const isActive = (href: string) => currentPath.startsWith(href);
     </a>
 
     <!-- Menu -->
-    <nav aria-label="Menu admin" class="flex flex-col p-3 gap-0.5 flex-1 overflow-y-auto">
-      {menuItems.map(({ href, label }) => (
-        <a
-          href={href}
-          class:list={[
-            'flex items-center gap-3 px-3 py-2.5 rounded-md font-heading font-medium text-sm transition-colors duration-150 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent',
-            isActive(href)
-              ? 'bg-accent text-white'
-              : 'text-white/75 hover:bg-white/10 hover:text-white',
-          ]}
-          aria-current={isActive(href) ? 'page' : undefined}
-        >
-          {label}
-        </a>
-      ))}
+    <nav aria-label="Menu admin" class="flex flex-col p-3 gap-3 flex-1 overflow-y-auto">
+      {menuGroups.map((group) => {
+        const items = group.items.filter(canSee);
+        if (items.length === 0) return null;
+        return (
+          <div>
+            <p class="px-3 mb-1 text-[10px] font-heading font-semibold uppercase tracking-wider text-white/40">{group.title}</p>
+            <div class="flex flex-col gap-0.5">
+              {items.map(({ href, label }) => (
+                <a
+                  href={href}
+                  class:list={[
+                    'flex items-center gap-3 px-3 py-2.5 rounded-md font-heading font-medium text-sm transition-colors duration-150 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent',
+                    isActive(href)
+                      ? 'bg-accent text-white'
+                      : 'text-white/75 hover:bg-white/10 hover:text-white',
+                  ]}
+                  aria-current={isActive(href) ? 'page' : undefined}
+                >
+                  {label}
+                </a>
+              ))}
+            </div>
+          </div>
+        );
+      })}
     </nav>
 
     <!-- Keluar -->

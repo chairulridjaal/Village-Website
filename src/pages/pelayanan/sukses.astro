@@ -1,7 +1,13 @@
----
+﻿---
 import Layout from '../../components/Layout.astro';
+import { getPengaturan } from '../../lib/db/pengaturan';
+import { waPelayananLink } from '../../lib/wa';
+import { getEnv } from '@lib/env';
 
 const nomor = Astro.url.searchParams.get('nomor') ?? '';
+const env = getEnv();
+const s = env ? await getPengaturan(env.DB) : {};
+const waHref = waPelayananLink(s.wa_pelayanan, nomor);
 ---
 
 <Layout title="Pengajuan Terkirim | Desa Citarik" description="Pengajuan pelayanan desa berhasil dikirim.">
@@ -20,8 +26,23 @@ const nomor = Astro.url.searchParams.get('nomor') ?? '';
     </p>
   )}
   <p class="text-sm text-muted mt-4 leading-relaxed">
-    Petugas dapat menghubungi WhatsApp Anda saat surat diterima atau ditolak. Anda juga bisa cek status kapan saja dengan nomor ini + WA.
+    Disarankan chat petugas lewat WhatsApp agar proses lebih cepat. Anda juga bisa cek status kapan saja dengan nomor ini + WA.
   </p>
+
+  {waHref ? (
+    <a href={waHref} target="_blank" rel="noopener noreferrer"
+      class="mt-6 w-full inline-flex items-center justify-center gap-2 rounded-xl font-heading font-bold text-white text-base py-4 px-6"
+      style="background:#25D366;min-height:52px;box-shadow:0 4px 14px rgba(37,211,102,.35);">
+      <i data-lucide="message-circle" class="w-5 h-5"></i>
+      Chat petugas via WhatsApp
+    </a>
+  ) : (
+    <p class="mt-6 text-sm text-muted border border-border rounded-xl p-4 bg-white">
+      Nomor WhatsApp petugas belum diset. Silakan hubungi kantor desa lewat halaman
+      <a href="/kontak" class="text-accent font-semibold hover:underline">Kontak</a>.
+    </p>
+  )}
+
   <div class="flex flex-wrap gap-3 justify-center mt-8">
     {nomor && (
       <a href={`/pelayanan/status?nomor=${encodeURIComponent(nomor)}`} class="btn btn-primary">

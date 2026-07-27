@@ -1,4 +1,7 @@
 ---
+import { listNav } from '../lib/db/nav';
+import { getEnv } from '@lib/env';
+
 interface Props {
   transparent?: boolean;
   currentPath?: string;
@@ -6,17 +9,11 @@ interface Props {
 
 const { transparent = false, currentPath = '/' } = Astro.props;
 
-const navItems = [
-  { href: '/', label: 'Beranda' },
-  { href: '/profil', label: 'Profil' },
-  { href: '/pemerintahan', label: 'Pemerintahan' },
-  { href: '/potensi', label: 'Potensi' },
-  { href: '/pelayanan', label: 'Pelayanan' },
-  { href: '/umkm', label: 'UMKM' },
-  { href: '/peta', label: 'Peta' },
-  { href: '/berita', label: 'Berita' },
-];
-const isKontak = currentPath === '/kontak';
+const env = getEnv();
+const headerItems = await listNav('header', env?.DB, true);
+const navItems = headerItems.filter((i) => i.style !== 'cta');
+const ctaItem = headerItems.find((i) => i.style === 'cta') ?? { href: '/kontak', label: 'Kontak' };
+const isKontak = currentPath === ctaItem.href || currentPath === '/kontak';
 
 const isActive = (href: string) =>
   href === '/' ? currentPath === '/' : currentPath.startsWith(href);
@@ -56,11 +53,11 @@ const isActive = (href: string) =>
         </a>
       ))}
       <a
-        href="/kontak"
+        href={ctaItem.href}
         aria-current={isKontak ? 'page' : undefined}
         class="ml-2 nav-kontak inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md font-semibold transition-colors duration-150 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent focus-visible:outline-offset-1"
       >
-        Kontak
+        {ctaItem.label}
       </a>
     </nav>
 

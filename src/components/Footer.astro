@@ -1,9 +1,13 @@
 ---
 import { getPengaturan } from '../lib/db/pengaturan';
+import { listNav } from '../lib/db/nav';
 import { getEnv } from '@lib/env';
 
 const env = getEnv();
 const s = env ? await getPengaturan(env.DB) : {};
+const footerLinks = await listNav('footer', env?.DB, true);
+const tagline = s.footer_tagline
+  || 'Situs resmi Pemerintah Desa Citarik, Kecamatan Palabuhanratu, Kabupaten Sukabumi.';
 
 const sosial = [
   { key: 'sosial_whatsapp', label: 'WhatsApp resmi desa', hover: 'hover:bg-cta',
@@ -29,7 +33,7 @@ const sosial = [
         <span class="font-heading font-bold text-white">Desa Citarik</span>
       </div>
       <p class="text-sm text-white/70 leading-relaxed max-w-xs">
-        Situs resmi Pemerintah Desa Citarik, Kecamatan Palabuhanratu, Kabupaten Sukabumi.
+        {tagline}
       </p>
     </div>
 
@@ -37,12 +41,9 @@ const sosial = [
     <div>
       <h3 class="font-heading font-semibold text-white mb-4 text-sm tracking-wide uppercase">Jelajahi</h3>
       <ul class="space-y-2.5 text-sm">
-        <li><a href="/profil" class="text-white/75 hover:text-white transition-colors duration-150">Profil Desa</a></li>
-        <li><a href="/potensi" class="text-white/75 hover:text-white transition-colors duration-150">Potensi</a></li>
-        <li><a href="/pelayanan" class="text-white/75 hover:text-white transition-colors duration-150">Pelayanan</a></li>
-        <li><a href="/umkm" class="text-white/75 hover:text-white transition-colors duration-150">Direktori UMKM</a></li>
-        <li><a href="/peta" class="text-white/75 hover:text-white transition-colors duration-150">Peta Desa</a></li>
-        <li><a href="/berita" class="text-white/75 hover:text-white transition-colors duration-150">Berita</a></li>
+        {footerLinks.map((item) => (
+          <li><a href={item.href} class="text-white/75 hover:text-white transition-colors duration-150">{item.label}</a></li>
+        ))}
       </ul>
     </div>
 

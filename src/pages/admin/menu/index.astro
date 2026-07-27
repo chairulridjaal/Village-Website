@@ -1,0 +1,102 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import { listNav } from '../../../lib/db/nav';
+import { getEnv } from '@lib/env';
+
+const env = getEnv();
+const header = env ? await listNav('header', env.DB, false) : [];
+const footer = env ? await listNav('footer', env.DB, false) : [];
+const saved = Astro.url.searchParams.get('saved');
+const error = Astro.url.searchParams.get('error');
+
+const inputCls = 'w-full rounded-lg border px-3 py-2 text-sm focus:outline-none';
+const inputStyle = 'border-color:var(--color-border); min-height:40px;';
+
+function section(title: string, location: string, items: typeof header) {
+  return { title, location, items };
+}
+const sections = [section('Menu atas (header)', 'header', header), section('Footer — Jelajahi', 'footer', footer)];
+---
+
+<AdminLayout title="Menu Situs" breadcrumb="Menu situs">
+
+  {saved && (
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5;color:#065F46;border:1px solid #6EE7B7;">
+      Menu disimpan.
+    </div>
+  )}
+  {error && (
+    <div role="alert" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#FEE2E2;color:#991B1B;border:1px solid #FECACA;">
+      {error}
+    </div>
+  )}
+
+  <p class="text-sm text-text-muted mb-6">Atur tautan navigasi tanpa menyentuh kode. Minimal satu item header harus aktif.</p>
+
+  {sections.map((sec) => (
+    <div class="bg-white rounded-xl border border-border p-6 mb-8" style="box-shadow:var(--shadow-sm);">
+      <h2 class="font-heading font-bold text-lg mb-4" style="color:var(--color-primary);">{sec.title}</h2>
+
+      <div class="space-y-3 mb-6">
+        {sec.items.map((item) => (
+          <form method="POST" action="/api/admin/menu" class="grid sm:grid-cols-6 gap-2 items-end border border-border rounded-lg p-3">
+            <input type="hidden" name="_action" value="update" />
+            <input type="hidden" name="id" value={item.id} />
+            <div class="sm:col-span-2">
+              <label class="block text-xs mb-1">Label</label>
+              <input name="label" value={item.label} class={inputCls} style={inputStyle} />
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-xs mb-1">URL</label>
+              <input name="href" value={item.href} class={inputCls} style={inputStyle} />
+            </div>
+            <div>
+              <label class="block text-xs mb-1">Urutan</label>
+              <input type="number" name="urutan" value={item.urutan} class={inputCls} style={inputStyle} />
+            </div>
+            <div>
+              <label class="block text-xs mb-1">Gaya</label>
+              <select name="style" class={inputCls} style={inputStyle}>
+                <option value="link" selected={item.style === 'link'}>Link</option>
+                <option value="cta" selected={item.style === 'cta'}>Tombol</option>
+              </select>
+            </div>
+            <label class="flex items-center gap-1 text-sm sm:col-span-2">
+              <input type="checkbox" name="aktif" value="1" checked={!!item.aktif} /> Aktif
+            </label>
+            <button type="submit" class="px-3 py-2 rounded-md text-xs font-heading border" style="border-color:var(--color-border);">Simpan</button>
+          </form>
+        ))}
+      </div>
+
+      <form method="POST" action="/api/admin/menu" class="grid sm:grid-cols-4 gap-2 items-end border-t border-border pt-4">
+        <input type="hidden" name="_action" value="create" />
+        <input type="hidden" name="location" value={sec.location} />
+        <div>
+          <label class="block text-xs mb-1">Label baru</label>
+          <input name="label" required class={inputCls} style={inputStyle} />
+        </div>
+        <div>
+          <label class="block text-xs mb-1">URL</label>
+          <input name="href" required placeholder="/halaman" class={inputCls} style={inputStyle} />
+        </div>
+        <div>
+          <label class="block text-xs mb-1">Urutan</label>
+          <input type="number" name="urutan" value="100" class={inputCls} style={inputStyle} />
+        </div>
+        <button type="submit" class="px-3 py-2 rounded-lg text-xs font-heading font-semibold text-white" style="background:var(--color-primary);">+ Tambah</button>
+      </form>
+
+      <div class="mt-3 flex flex-wrap gap-2">
+        {sec.items.map((item) => (
+          <form method="POST" action="/api/admin/menu" onsubmit="return confirm('Hapus tautan ini?')">
+            <input type="hidden" name="_action" value="delete" />
+            <input type="hidden" name="id" value={item.id} />
+            <button type="submit" class="text-[11px] text-red-600 hover:underline">Hapus: {item.label}</button>
+          </form>
+        ))}
+      </div>
+    </div>
+  ))}
+
+</AdminLayout>

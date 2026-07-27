@@ -1,4 +1,4 @@
----
+﻿---
 import Layout from '../components/Layout.astro';
 import { getPengaturan } from '../lib/db/pengaturan';
 import { getEnv } from '@lib/env';
@@ -18,7 +18,7 @@ const kanal = [
 
 <Layout
   title="Kontak & Info | Desa Citarik"
-  description="Alamat, telepon, email, dan kanal resmi Pemerintah Desa Citarik, Kecamatan Simpenan, Kabupaten Sukabumi."
+  description="Alamat, telepon, email, dan kanal resmi Pemerintah Desa Citarik, Kecamatan Palabuhanratu, Kabupaten Sukabumi."
 >
 
 <div class="container-page py-10 md:py-12">
@@ -62,7 +62,7 @@ const kanal = [
     </div>
 
     <div class="relative rounded-xl overflow-hidden border border-border shadow-sm min-h-[20rem]">
-      <div id="kontak-map" class="w-full h-full absolute inset-0"></div>
+      <div id="kontak-map" data-lat={s.map_lat ?? '-7.009933224557312'} data-lng={s.map_lng ?? '106.58103748650889'} data-zoom={s.map_zoom ?? '15'} class="w-full h-full absolute inset-0"></div>
       <a href="/peta"
          class="absolute bottom-4 right-4 btn btn-primary z-10 shadow-md">
         <i data-lucide="map" class="w-5 h-5"></i> Buka Peta Desa
@@ -77,9 +77,9 @@ const kanal = [
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script is:inline>
   document.addEventListener('DOMContentLoaded', function() {
-    var map = L.map('kontak-map', { scrollWheelZoom: false }).setView([-7.009933224557312, 106.58103748650889], 15);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
-    L.marker([-7.009933224557312, 106.58103748650889]).addTo(map).bindPopup('<b>Kantor Desa Citarik</b><br>Kp. Legok Loa · Kec. Palabuhanratu');
+    var map = L.map('kontak-map', { scrollWheelZoom: false }).setView([Number(document.getElementById('kontak-map').dataset.lat)||-7.009933224557312, Number(document.getElementById('kontak-map').dataset.lng)||106.58103748650889], Number(document.getElementById('kontak-map').dataset.zoom)||15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'Â© OpenStreetMap' }).addTo(map);
+    L.marker([Number(document.getElementById('kontak-map').dataset.lat)||-7.009933224557312, Number(document.getElementById('kontak-map').dataset.lng)||106.58103748650889]).addTo(map).bindPopup('<b>Kantor Desa Citarik</b><br>Kp. Legok Loa Â· Kec. Palabuhanratu');
     if (typeof window.refreshIcons === 'function') window.refreshIcons();
   });
 </script>

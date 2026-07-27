@@ -3,6 +3,8 @@ import '../styles/global.css';
 import Nav from './Nav.astro';
 import Footer from './Footer.astro';
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, GOOGLE_SITE_VERIFICATION } from '@lib/site';
+import { getPengaturan } from '../lib/db/pengaturan';
+import { getEnv } from '@lib/env';
 
 interface Props {
   title: string;
@@ -26,22 +28,28 @@ const canonicalUrl = new URL(Astro.url.pathname, site).href;
 const ogImageUrl = new URL(ogImage ?? '/images/pantai_Citarik.png', site).href;
 const currentPath = Astro.url.pathname;
 
+const env = getEnv();
+const s = env ? await getPengaturan(env.DB).catch(() => ({} as Record<string, string>)) : {};
+const kecamatan = s.kecamatan || 'Palabuhanratu';
+const kabupaten = s.kabupaten || 'Sukabumi';
+const email = s.kontak_email || 'desacitarik@gmail.com';
+const street = s.kontak_alamat || 'Kantor Desa Citarik, Kecamatan Palabuhanratu, Kabupaten Sukabumi';
+
 // Data organisasi untuk mesin pencari (schema.org)
 const orgJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'GovernmentOrganization',
   name: `Pemerintah ${SITE_NAME}`,
-  alternateName: ['Desa Citarik', 'Desa Citarik Sukabumi', 'Desa Citarik Simpenan'],
+  alternateName: ['Desa Citarik', `Desa Citarik ${kabupaten}`, `Desa Citarik ${kecamatan}`],
   url: SITE_URL,
-  email: 'desacitarik@gmail.com',
+  email,
   logo: new URL('/favicon.svg', site).href,
-  areaServed: 'Desa Citarik, Kecamatan Simpenan, Kabupaten Sukabumi, Jawa Barat',
+  areaServed: `Desa Citarik, Kecamatan ${kecamatan}, Kabupaten ${kabupaten}, Jawa Barat`,
   address: {
     '@type': 'PostalAddress',
-    streetAddress: 'Jl. Raya Bojongkopo KM.02',
-    addressLocality: 'Simpenan',
+    streetAddress: street,
+    addressLocality: kecamatan,
     addressRegion: 'Jawa Barat',
-    postalCode: '43361',
     addressCountry: 'ID',
   },
 };
