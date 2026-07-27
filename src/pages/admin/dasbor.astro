@@ -14,9 +14,16 @@ if (env) {
 }
 
 const user = Astro.locals.user?.username ?? 'Pengelola';
+const forbidden = Astro.url.searchParams.get('error') === 'forbidden';
 ---
 
 <AdminLayout title="Dasbor" breadcrumb="Dasbor">
+
+  {forbidden && (
+    <div role="alert" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#FEE2E2;color:#991B1B;border:1px solid #FECACA;">
+      Anda tidak punya izin untuk membuka halaman itu.
+    </div>
+  )}
 
   <h2 class="font-heading font-bold text-2xl mb-1" style="color:var(--color-primary);">Selamat datang, {user}!</h2>
   <p class="text-text-muted mb-8">Kelola konten Web Desa Citarik dari sini.</p>

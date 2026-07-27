@@ -9,7 +9,7 @@ if (sessionId) {
   if (env) {
     const { validateSession } = await import('../../lib/auth/session');
     const user = await validateSession(sessionId, env.SESSION_KV);
-    if (user) return Astro.redirect('/admin/dasbor');
+    if (user?.username) return Astro.redirect('/admin/dasbor');
   }
 }
 

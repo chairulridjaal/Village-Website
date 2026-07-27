@@ -18,6 +18,6 @@ declare module "cloudflare:workers" {
 
 declare namespace App {
   interface Locals {
-    user?: { username: string };
+    user?: import('./lib/auth/permissions').SessionUser;
   }
 }

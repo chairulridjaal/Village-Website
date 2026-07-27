@@ -1,3 +1,5 @@
+﻿import type { SessionUser } from './permissions';
+
 const SESSION_TTL_SECONDS = 60 * 60 * 8; // 8 hours
 
 // ── PBKDF2 helpers ──────────────────────────────────────────────────────────
@@ -38,18 +40,35 @@ export function generateSessionId(): string {
     .map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-export async function createSession(sessionId: string, username: string, kv: KVNamespace): Promise<void> {
-  await kv.put(`session:${sessionId}`, JSON.stringify({ username }), {
+export async function createSession(
+  sessionId: string,
+  user: SessionUser,
+  kv: KVNamespace
+): Promise<void> {
+  await kv.put(`session:${sessionId}`, JSON.stringify(user), {
     expirationTtl: SESSION_TTL_SECONDS,
   });
 }
 
-export async function validateSession(sessionId: string, kv: KVNamespace): Promise<string | null> {
+export async function validateSession(
+  sessionId: string,
+  kv: KVNamespace
+): Promise<SessionUser | null> {
   const raw = await kv.get(`session:${sessionId}`);
   if (!raw) return null;
   try {
-    const data = JSON.parse(raw) as { username: string };
-    return data.username;
+    const data = JSON.parse(raw) as Partial<SessionUser> & { username?: string };
+    // Legacy sessions only stored { username } — force re-login.
+    if (typeof data.userId !== 'number' || !data.username || !Array.isArray(data.perms)) {
+      await kv.delete(`session:${sessionId}`);
+      return null;
+    }
+    return {
+      userId: data.userId,
+      username: data.username,
+      is_master: Boolean(data.is_master),
+      perms: data.perms,
+    };
   } catch {
     return null;
   }

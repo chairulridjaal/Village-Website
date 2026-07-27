@@ -1,8 +1,9 @@
-import { getEnv } from '@lib/env';
+﻿import { getEnv } from '@lib/env';
 import type { APIRoute } from 'astro';
 import { verifyPassword, createSession, generateSessionId, SESSION_COOKIE, SESSION_TTL } from '../../../lib/auth/session';
+import { ADMIN_USER_SELECT, sessionFromRow, type AdminUserRow } from '../../../lib/auth/permissions';
 
-export const POST: APIRoute = async ({ request, locals, redirect, cookies }) => {
+export const POST: APIRoute = async ({ request, redirect, cookies }) => {
   const formData = await request.formData();
   const username = (formData.get('username') as string)?.trim();
   const password = formData.get('password') as string;
@@ -24,9 +25,6 @@ export const POST: APIRoute = async ({ request, locals, redirect, cookies }) => 
     return redirect('/admin/login?error=1');
   }
 
-  // ── Rate limiting: max 5 failed attempts per IP in a 15-minute window ──
-  // Skip when IP is unknown (direct origin hit bypassing Cloudflare), since a
-  // shared 'unknown' key would let one attacker lock out all users.
   const ip = request.headers.get('CF-Connecting-IP');
   const rlKey = ip ? `ratelimit:login:${ip}` : null;
   const attempts = rlKey ? parseInt((await env.SESSION_KV.get(rlKey)) ?? '0', 10) : 0;
@@ -34,20 +32,20 @@ export const POST: APIRoute = async ({ request, locals, redirect, cookies }) => 
     return redirect('/admin/login?error=locked');
   }
 
-  const row = await env.DB.prepare('SELECT password_hash FROM admin_user WHERE username = ?')
-    .bind(username).first<{ password_hash: string }>();
+  const row = await env.DB.prepare(
+    `SELECT ${ADMIN_USER_SELECT} FROM admin_user WHERE username = ?`
+  ).bind(username).first<AdminUserRow>();
 
-  if (!row || !(await verifyPassword(password, row.password_hash))) {
-    // Re-putting refreshes the TTL, so repeated tries extend the lockout window.
+  if (!row || Number(row.aktif) !== 1 || !(await verifyPassword(password, row.password_hash))) {
     if (rlKey) await env.SESSION_KV.put(rlKey, String(attempts + 1), { expirationTtl: 900 });
     return redirect('/admin/login?error=1');
   }
 
-  // Successful login clears the failure counter for this IP.
   if (rlKey) await env.SESSION_KV.delete(rlKey);
 
+  const sessionUser = sessionFromRow(row);
   const sessionId = generateSessionId();
-  await createSession(sessionId, username, env.SESSION_KV);
+  await createSession(sessionId, sessionUser, env.SESSION_KV);
 
   cookies.set(SESSION_COOKIE, sessionId, {
     httpOnly: true,

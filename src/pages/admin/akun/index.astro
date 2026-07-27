@@ -1,0 +1,125 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import { isMaster, PERM_FLAGS } from '../../../lib/auth/permissions';
+import { listAdmins } from '../../../lib/db/admin-user';
+import { getEnv } from '@lib/env';
+
+if (!isMaster(Astro.locals.user)) return Astro.redirect('/admin/dasbor?error=forbidden');
+
+const env = getEnv();
+const admins = env ? await listAdmins(env.DB) : [];
+const saved = Astro.url.searchParams.get('saved');
+const error = Astro.url.searchParams.get('error');
+
+const permLabels: Record<string, string> = {
+  perm_konten: 'Konten & Statistik',
+  perm_pelayanan: 'Pelayanan',
+  perm_umkm: 'UMKM',
+  perm_berita: 'Berita',
+  perm_peta: 'Peta',
+  perm_media: 'Media',
+  perm_pengaturan: 'Pengaturan situs',
+};
+
+const inputCls = 'w-full rounded-lg border px-3 py-2 text-sm focus:outline-none';
+const inputStyle = 'border-color:var(--color-border); min-height:40px;';
+---
+
+<AdminLayout title="Akun Admin" breadcrumb="Akun Admin">
+
+  {saved && (
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5;color:#065F46;border:1px solid #6EE7B7;">
+      Perubahan akun disimpan.
+    </div>
+  )}
+  {error && (
+    <div role="alert" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#FEE2E2;color:#991B1B;border:1px solid #FECACA;">
+      {error}
+    </div>
+  )}
+
+  <p class="text-sm text-text-muted mb-6 max-w-2xl">
+    Hanya master yang bisa menambah admin, mengatur izin, dan mengganti kata sandi. Jangan nonaktifkan master terakhir.
+  </p>
+
+  <div class="grid lg:grid-cols-2 gap-6 mb-10">
+    <div class="bg-white rounded-xl border border-border p-6" style="box-shadow:var(--shadow-sm);">
+      <h2 class="font-heading font-bold text-lg mb-4" style="color:var(--color-primary);">Tambah admin</h2>
+      <form method="POST" action="/api/admin/akun" class="space-y-3">
+        <div>
+          <label class="block text-sm font-heading font-medium mb-1" for="username">Nama pengguna</label>
+          <input id="username" name="username" required class={inputCls} style={inputStyle} />
+        </div>
+        <div>
+          <label class="block text-sm font-heading font-medium mb-1" for="password">Kata sandi (min. 8)</label>
+          <input id="password" name="password" type="password" required minlength="8" class={inputCls} style={inputStyle} />
+        </div>
+        <label class="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="is_master" value="1" /> Jadikan master
+        </label>
+        <fieldset class="border border-border rounded-lg p-3">
+          <legend class="text-xs font-heading px-1">Izin (abaikan jika master)</legend>
+          <div class="grid sm:grid-cols-2 gap-2">
+            {PERM_FLAGS.map((f) => (
+              <label class="flex items-center gap-2 text-sm">
+                <input type="checkbox" name={f} value="1" checked={f !== 'perm_pengaturan'} />
+                {permLabels[f]}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <button type="submit" class="w-full rounded-lg font-heading font-semibold text-white py-2.5" style="background:var(--color-cta);min-height:44px;">
+          Buat akun
+        </button>
+      </form>
+    </div>
+
+    <div class="space-y-4">
+      {admins.map((a) => (
+        <div class="bg-white rounded-xl border border-border p-5" style="box-shadow:var(--shadow-sm);">
+          <div class="flex items-center justify-between gap-2 mb-3">
+            <div>
+              <p class="font-heading font-bold" style="color:var(--color-primary);">{a.username}</p>
+              <p class="text-xs text-text-muted">
+                {a.is_master ? 'Master' : 'Admin'} · {a.aktif ? 'Aktif' : 'Nonaktif'}
+              </p>
+            </div>
+          </div>
+          <form method="POST" action={`/api/admin/akun/${a.id}`} class="space-y-2">
+            <input type="hidden" name="_action" value="flags" />
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" name="is_master" value="1" checked={!!a.is_master} /> Master
+            </label>
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" name="aktif" value="1" checked={!!a.aktif} /> Aktif
+            </label>
+            <div class="grid sm:grid-cols-2 gap-1 text-sm">
+              {PERM_FLAGS.map((f) => {
+                const checked = Number(a[f as keyof typeof a]) === 1;
+                return (
+                <label class="flex items-center gap-2">
+                  <input type="checkbox" name={f} value="1" checked={checked} />
+                  {permLabels[f]}
+                </label>
+              );})}
+            </div>
+            <button type="submit" class="px-3 py-1.5 rounded-md text-xs font-heading border" style="border-color:var(--color-border);">
+              Simpan izin
+            </button>
+          </form>
+          <form method="POST" action={`/api/admin/akun/${a.id}`} class="mt-3 flex gap-2 items-end">
+            <input type="hidden" name="_action" value="password" />
+            <div class="flex-1">
+              <label class="block text-xs text-text-muted mb-1">Reset kata sandi</label>
+              <input type="password" name="password" minlength="8" placeholder="Kata sandi baru" class={inputCls} style={inputStyle} required />
+            </div>
+            <button type="submit" class="px-3 py-2 rounded-md text-xs font-heading text-white" style="background:var(--color-primary);min-height:40px;">
+              Reset
+            </button>
+          </form>
+        </div>
+      ))}
+    </div>
+  </div>
+
+</AdminLayout>

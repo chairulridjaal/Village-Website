@@ -1,12 +1,12 @@
-import { getEnv } from '@lib/env';
+﻿import { getEnv } from '@lib/env';
 import type { APIRoute } from 'astro';
 import { hashPassword, createSession, generateSessionId, SESSION_COOKIE, SESSION_TTL } from '../../../lib/auth/session';
+import { ADMIN_USER_SELECT, sessionFromRow, type AdminUserRow } from '../../../lib/auth/permissions';
 
-export const POST: APIRoute = async ({ request, locals, redirect, cookies }) => {
+export const POST: APIRoute = async ({ request, redirect, cookies }) => {
   const env = getEnv();
   if (!env) return redirect('/admin/login');
 
-  // Only allow when no admin user exists
   const existing = await env.DB.prepare('SELECT id FROM admin_user LIMIT 1').first();
   if (existing) return redirect('/admin/login');
 
@@ -19,11 +19,22 @@ export const POST: APIRoute = async ({ request, locals, redirect, cookies }) => 
   }
 
   const hash = await hashPassword(password);
-  await env.DB.prepare('INSERT INTO admin_user (username, password_hash) VALUES (?, ?)')
-    .bind(username, hash).run();
+  await env.DB.prepare(`
+    INSERT INTO admin_user (
+      username, password_hash, is_master, aktif,
+      perm_konten, perm_pelayanan, perm_umkm, perm_berita,
+      perm_peta, perm_media, perm_pengaturan
+    ) VALUES (?, ?, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+  `).bind(username, hash).run();
+
+  const row = await env.DB.prepare(
+    `SELECT ${ADMIN_USER_SELECT} FROM admin_user WHERE username = ?`
+  ).bind(username).first<AdminUserRow>();
+
+  if (!row) return redirect('/admin/setup?error=Gagal+membuat+akun.');
 
   const sessionId = generateSessionId();
-  await createSession(sessionId, username, env.SESSION_KV);
+  await createSession(sessionId, sessionFromRow(row), env.SESSION_KV);
   cookies.set(SESSION_COOKIE, sessionId, {
     httpOnly: true, secure: true, sameSite: 'lax', path: '/', maxAge: SESSION_TTL,
   });
