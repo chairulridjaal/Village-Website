@@ -2,7 +2,7 @@ export interface TitikPeta {
   id: number;
   lat: number;
   lng: number;
-  jenis: 'wisata' | 'umkm' | 'potensi';
+  jenis: 'umkm' | 'potensi';
   linked_slug: string;
   label: string | null;
 }

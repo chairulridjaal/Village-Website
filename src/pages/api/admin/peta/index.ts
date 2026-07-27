@@ -8,11 +8,11 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
   const fd = await request.formData();
   const lat = parseFloat(fd.get('lat') as string);
   const lng = parseFloat(fd.get('lng') as string);
-  const jenis = fd.get('jenis') as 'wisata' | 'umkm' | 'potensi';
+  const jenis = fd.get('jenis') as 'umkm' | 'potensi';
   const linked_slug = (fd.get('linked_slug') as string)?.trim();
   const label = (fd.get('label') as string)?.trim() || null;
 
-  if (!env || isNaN(lat) || isNaN(lng) || !jenis || !linked_slug) {
+  if (!env || isNaN(lat) || isNaN(lng) || !jenis || !linked_slug || !['umkm', 'potensi'].includes(jenis)) {
     return redirect('/admin/peta?error=1');
   }
 

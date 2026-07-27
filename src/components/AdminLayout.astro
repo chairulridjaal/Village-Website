@@ -12,7 +12,7 @@ const { title, breadcrumb, currentPath = Astro.url.pathname } = Astro.props;
 const menuItems = [
   { href: '/admin/dasbor',    label: 'Dasbor',          icon: 'grid' },
   { href: '/admin/konten',    label: 'Konten Halaman',  icon: 'file-text' },
-  { href: '/admin/wisata',    label: 'Wisata',          icon: 'compass' },
+  { href: '/admin/pelayanan', label: 'Pelayanan',       icon: 'file-check' },
   { href: '/admin/umkm',      label: 'UMKM',            icon: 'shopping-bag' },
   { href: '/admin/peta',      label: 'Peta',            icon: 'map' },
   { href: '/admin/berita',    label: 'Berita',          icon: 'newspaper' },
@@ -48,7 +48,7 @@ const isActive = (href: string) => currentPath.startsWith(href);
   >
     <!-- Logo -->
     <a href="/admin/dasbor" class="flex items-center gap-3 px-5 py-5 border-b border-white/10 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent">
-      <span class="w-9 h-9 rounded-full bg-accent grid place-items-center font-heading font-bold text-sm text-white shrink-0" aria-hidden="true">DL</span>
+      <span class="w-9 h-9 rounded-full bg-accent grid place-items-center font-heading font-bold text-sm text-white shrink-0" aria-hidden="true">DC</span>
       <div class="leading-tight">
         <span class="block font-heading font-bold text-white text-sm">Panel Admin</span>
         <span class="block text-white/60 text-xs">Desa Citarik</span>

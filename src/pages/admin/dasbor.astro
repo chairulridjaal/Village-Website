@@ -3,14 +3,14 @@ import AdminLayout from '../../components/AdminLayout.astro';
 
 import { getEnv } from '@lib/env';
 const env = getEnv();
-let stats = { wisata: 0, umkm: 0, berita: 0 };
+let stats = { umkm: 0, berita: 0, pengajuan: 0 };
 if (env) {
-  const [w, u, b] = await Promise.all([
-    env.DB.prepare("SELECT COUNT(*) as c FROM wisata WHERE status='published'").first<{c:number}>(),
+  const [u, b, p] = await Promise.all([
     env.DB.prepare("SELECT COUNT(*) as c FROM umkm WHERE status='published'").first<{c:number}>(),
     env.DB.prepare("SELECT COUNT(*) as c FROM berita WHERE status='published'").first<{c:number}>(),
+    env.DB.prepare("SELECT COUNT(*) as c FROM pengajuan_pelayanan WHERE status='menunggu'").first<{c:number}>(),
   ]);
-  stats = { wisata: w?.c ?? 0, umkm: u?.c ?? 0, berita: b?.c ?? 0 };
+  stats = { umkm: u?.c ?? 0, berita: b?.c ?? 0, pengajuan: p?.c ?? 0 };
 }
 
 const user = Astro.locals.user?.username ?? 'Pengelola';
@@ -21,10 +21,9 @@ const user = Astro.locals.user?.username ?? 'Pengelola';
   <h2 class="font-heading font-bold text-2xl mb-1" style="color:var(--color-primary);">Selamat datang, {user}!</h2>
   <p class="text-text-muted mb-8">Kelola konten Web Desa Citarik dari sini.</p>
 
-  <!-- Stats -->
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
     {[
-      { label: 'Wisata Terbit', value: stats.wisata, href: '/admin/wisata' },
+      { label: 'Pengajuan menunggu', value: stats.pengajuan, href: '/admin/pelayanan?status=menunggu' },
       { label: 'UMKM Terbit',  value: stats.umkm,   href: '/admin/umkm' },
       { label: 'Berita Terbit', value: stats.berita, href: '/admin/berita' },
     ].map(({ label, value, href }) => (
@@ -35,13 +34,12 @@ const user = Astro.locals.user?.username ?? 'Pengelola';
     ))}
   </div>
 
-  <!-- Quick actions -->
   <h3 class="font-heading font-semibold text-lg mb-4" style="color:var(--color-primary);">Aksi Cepat</h3>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
     {[
-      { label: 'Tulis Berita Baru', href: '/admin/berita/new', color: 'var(--color-cta)' },
-      { label: 'Tambah UMKM',       href: '/admin/umkm/new',   color: 'var(--color-primary)' },
-      { label: 'Tambah Wisata',     href: '/admin/wisata/new', color: 'var(--color-primary)' },
+      { label: 'Lihat Pengajuan', href: '/admin/pelayanan', color: 'var(--color-cta)' },
+      { label: 'Tambah Jenis Surat', href: '/admin/pelayanan/jenis/new', color: 'var(--color-primary)' },
+      { label: 'Tulis Berita Baru', href: '/admin/berita/new', color: 'var(--color-primary)' },
       { label: 'Edit Konten Halaman', href: '/admin/konten',   color: 'var(--color-accent)' },
     ].map(({ label, href, color }) => (
       <a href={href}

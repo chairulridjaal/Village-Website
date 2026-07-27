@@ -1,4 +1,4 @@
-import { toSlug } from './wisata';
+import { toSlug } from './slug';
 
 export interface Umkm {
   id: number;

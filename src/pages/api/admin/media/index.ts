@@ -26,7 +26,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   const { id, displayKey, thumbKey } = await saveMedia(display, thumb, alt, env.DB, env.MEDIA_BUCKET);
 
-  const validOwnerTypes = ['berita', 'wisata', 'umkm'];
+  const validOwnerTypes = ['berita', 'umkm'];
   if (ownerType && ownerIdRaw) {
     const ownerId = Number(ownerIdRaw);
     if (!validOwnerTypes.includes(ownerType) || !Number.isFinite(ownerId)) {

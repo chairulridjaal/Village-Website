@@ -13,9 +13,9 @@ export const GET: APIRoute = async () => {
     { loc: `${base}/potensi`, priority: '0.8', changefreq: 'monthly' },
     { loc: `${base}/potensi/pertanian`, priority: '0.7', changefreq: 'monthly' },
     { loc: `${base}/potensi/perikanan`, priority: '0.7', changefreq: 'monthly' },
-    { loc: `${base}/potensi/pariwisata`, priority: '0.7', changefreq: 'monthly' },
     { loc: `${base}/potensi/sdm`, priority: '0.7', changefreq: 'monthly' },
-    { loc: `${base}/wisata`, priority: '0.9', changefreq: 'weekly' },
+    { loc: `${base}/pelayanan`, priority: '0.85', changefreq: 'weekly' },
+    { loc: `${base}/pelayanan/status`, priority: '0.6', changefreq: 'monthly' },
     { loc: `${base}/umkm`, priority: '0.9', changefreq: 'weekly' },
     { loc: `${base}/berita`, priority: '0.9', changefreq: 'daily' },
     { loc: `${base}/peta`, priority: '0.7', changefreq: 'monthly' },
@@ -25,18 +25,6 @@ export const GET: APIRoute = async () => {
   const dynamicUrls: Array<{ loc: string; priority: string; changefreq: string; lastmod?: string }> = [];
 
   if (env?.DB) {
-    const wisataRows = await env.DB.prepare(
-      "SELECT slug, updated_at FROM wisata WHERE status='published'"
-    ).all<{ slug: string; updated_at: string }>();
-    for (const w of wisataRows.results ?? []) {
-      dynamicUrls.push({
-        loc: `${base}/wisata/${w.slug}`,
-        priority: '0.7',
-        changefreq: 'monthly',
-        lastmod: w.updated_at?.split('T')[0],
-      });
-    }
-
     const umkmRows = await env.DB.prepare(
       "SELECT slug, updated_at FROM umkm WHERE status='published'"
     ).all<{ slug: string; updated_at: string }>();
