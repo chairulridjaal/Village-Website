@@ -1,0 +1,182 @@
+---
+import AdminLayout from '../../components/AdminLayout.astro';
+import { getEnv } from '@lib/env';
+import { getPengaturan } from '../../lib/db/pengaturan';
+import {
+  getStatistikFull,
+  parseDusunValue,
+  parseSimpleValue,
+} from '../../lib/db/statistik';
+
+const env = getEnv();
+const cats = env ? await getStatistikFull(env.DB, false) : [];
+const s = env ? await getPengaturan(env.DB) : {};
+const stUmum = JSON.parse(s.stat_umum ?? '{}') as Record<string, unknown>;
+const saved = Astro.url.searchParams.get('saved');
+const error = Astro.url.searchParams.get('error');
+
+const inputCls = 'w-full rounded-lg border px-3 py-2 text-sm focus:outline-none';
+const inputStyle = 'border-color:var(--color-border); min-height:40px;';
+---
+
+<AdminLayout title="Statistik Desa" breadcrumb="Statistik Desa">
+
+  {saved && (
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5;color:#065F46;border:1px solid #6EE7B7;">
+      Statistik disimpan. Perubahan langsung tampil di situs.
+    </div>
+  )}
+  {error && (
+    <div role="alert" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#FEE2E2;color:#991B1B;border:1px solid #FECACA;">
+      {error}
+    </div>
+  )}
+
+  <p class="text-sm text-text-muted mb-6 max-w-2xl">
+    Buat kategori baru (mis. Agama, Status Kawin) lalu tambah baris di dalamnya. Tampil di halaman Profil.
+  </p>
+
+  <div class="bg-white rounded-xl border border-border p-6 mb-8" style="box-shadow:var(--shadow-sm);">
+    <h2 class="font-heading font-bold text-lg mb-3" style="color:var(--color-primary);">Ringkasan wilayah</h2>
+    <form method="POST" action="/api/admin/statistik" class="grid sm:grid-cols-3 gap-3">
+      <input type="hidden" name="_action" value="stat_umum" />
+      <div>
+        <label class="block text-xs mb-1">Luas (ha)</label>
+        <input name="luas" value={String(stUmum.luas ?? '')} class={inputCls} style={inputStyle} />
+      </div>
+      <div>
+        <label class="block text-xs mb-1">Jumlah RW</label>
+        <input type="number" name="rw" value={String(stUmum.rw ?? '')} class={inputCls} style={inputStyle} />
+      </div>
+      <div>
+        <label class="block text-xs mb-1">Jumlah RT</label>
+        <input type="number" name="rt" value={String(stUmum.rt ?? '')} class={inputCls} style={inputStyle} />
+      </div>
+      <div class="sm:col-span-3">
+        <button type="submit" class="px-4 py-2 rounded-lg text-sm font-heading font-semibold text-white" style="background:var(--color-cta);">Simpan ringkasan</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="bg-white rounded-xl border border-border p-6 mb-8" style="box-shadow:var(--shadow-sm);">
+    <h2 class="font-heading font-bold text-lg mb-3" style="color:var(--color-primary);">Tambah kategori</h2>
+    <form method="POST" action="/api/admin/statistik" class="flex flex-wrap gap-3 items-end">
+      <input type="hidden" name="_action" value="create_kategori" />
+      <div class="flex-1 min-w-[12rem]">
+        <label class="block text-xs mb-1">Nama kategori</label>
+        <input name="label" required placeholder="cth. Golongan Umur" class={inputCls} style={inputStyle} />
+      </div>
+      <div>
+        <label class="block text-xs mb-1">Jenis baris</label>
+        <select name="layout" class={inputCls} style={inputStyle}>
+          <option value="simple">Label + angka</option>
+          <option value="dusun">Per dusun (L/P/KK)</option>
+        </select>
+      </div>
+      <button type="submit" class="px-4 py-2 rounded-lg text-sm font-heading font-semibold text-white" style="background:var(--color-primary);min-height:40px;">+ Kategori</button>
+    </form>
+  </div>
+
+  <div class="space-y-6">
+    {cats.map((c) => (
+      <div class="bg-white rounded-xl border border-border p-6" style="box-shadow:var(--shadow-sm);">
+        <form method="POST" action="/api/admin/statistik" class="flex flex-wrap gap-2 items-end mb-4">
+          <input type="hidden" name="_action" value="update_kategori" />
+          <input type="hidden" name="id" value={c.id} />
+          <div class="flex-1 min-w-[10rem]">
+            <label class="block text-xs mb-1">Nama</label>
+            <input name="label" value={c.label} class={inputCls} style={inputStyle} />
+          </div>
+          <div>
+            <label class="block text-xs mb-1">Layout</label>
+            <select name="layout" class={inputCls} style={inputStyle}>
+              <option value="simple" selected={c.layout === 'simple'}>Simple</option>
+              <option value="dusun" selected={c.layout === 'dusun'}>Dusun</option>
+            </select>
+          </div>
+          <div class="w-20">
+            <label class="block text-xs mb-1">Urutan</label>
+            <input type="number" name="urutan" value={c.urutan} class={inputCls} style={inputStyle} />
+          </div>
+          <label class="flex items-center gap-1 text-sm pb-2">
+            <input type="checkbox" name="aktif" value="1" checked={!!c.aktif} /> Aktif
+          </label>
+          <button type="submit" class="px-3 py-2 rounded-md text-xs font-heading border" style="border-color:var(--color-border);">Simpan</button>
+        </form>
+        <form method="POST" action="/api/admin/statistik" class="mb-4" onsubmit="return confirm('Hapus kategori dan semua barisnya?')">
+          <input type="hidden" name="_action" value="delete_kategori" />
+          <input type="hidden" name="id" value={c.id} />
+          <button type="submit" class="text-xs text-red-600 hover:underline">Hapus kategori</button>
+        </form>
+
+        <h3 class="font-heading font-semibold text-sm mb-2">Baris</h3>
+        <div class="space-y-2 mb-4">
+          {c.rows.map((row) => {
+            const simple = parseSimpleValue(row.value_json);
+            const dusun = parseDusunValue(row.value_json);
+            return (
+              <form method="POST" action="/api/admin/statistik" class="grid gap-2 border border-border rounded-lg p-3">
+                <input type="hidden" name="_action" value="update_baris" />
+                <input type="hidden" name="id" value={row.id} />
+                <input type="hidden" name="layout" value={c.layout} />
+                <div class="grid sm:grid-cols-4 gap-2">
+                  <input name="label" value={row.label} class={inputCls} style={inputStyle} />
+                  {c.layout === 'simple' ? (
+                    <input type="number" name="value" value={simple} class={inputCls} style={inputStyle} />
+                  ) : (
+                    <>
+                      <input name="rw" value={dusun.rw} placeholder="RW" class={inputCls} style={inputStyle} />
+                      <input type="number" name="jmlRw" value={dusun.jmlRw} placeholder="Jml RW" class={inputCls} style={inputStyle} />
+                      <input type="number" name="l" value={dusun.l} placeholder="L" class={inputCls} style={inputStyle} />
+                      <input type="number" name="p" value={dusun.p} placeholder="P" class={inputCls} style={inputStyle} />
+                      <input type="number" name="kk" value={dusun.kk} placeholder="KK" class={inputCls} style={inputStyle} />
+                    </>
+                  )}
+                  <input type="number" name="urutan" value={row.urutan} class={inputCls} style={inputStyle} />
+                </div>
+                <div class="flex gap-2">
+                  <button type="submit" class="px-3 py-1.5 rounded text-xs font-heading border" style="border-color:var(--color-border);">Simpan baris</button>
+                </div>
+              </form>
+            );
+          })}
+        </div>
+
+        <form method="POST" action="/api/admin/statistik" class="border-t border-border pt-3 grid sm:grid-cols-4 gap-2 items-end">
+          <input type="hidden" name="_action" value="create_baris" />
+          <input type="hidden" name="kategori_id" value={c.id} />
+          <input type="hidden" name="layout" value={c.layout} />
+          <div class="sm:col-span-2">
+            <label class="block text-xs mb-1">Label baru</label>
+            <input name="label" required class={inputCls} style={inputStyle} />
+          </div>
+          {c.layout === 'simple' ? (
+            <div>
+              <label class="block text-xs mb-1">Nilai</label>
+              <input type="number" name="value" value="0" class={inputCls} style={inputStyle} />
+            </div>
+          ) : (
+            <>
+              <input type="number" name="l" placeholder="L" class={inputCls} style={inputStyle} />
+              <input type="number" name="p" placeholder="P" class={inputCls} style={inputStyle} />
+              <input type="number" name="kk" placeholder="KK" class={inputCls} style={inputStyle} />
+            </>
+          )}
+          <button type="submit" class="px-3 py-2 rounded-lg text-xs font-heading font-semibold text-white" style="background:var(--color-accent);">+ Baris</button>
+        </form>
+
+        {/* delete baris forms */}
+        <div class="mt-2 flex flex-wrap gap-2">
+          {c.rows.map((row) => (
+            <form method="POST" action="/api/admin/statistik" onsubmit="return confirm('Hapus baris ini?')">
+              <input type="hidden" name="_action" value="delete_baris" />
+              <input type="hidden" name="id" value={row.id} />
+              <button type="submit" class="text-[11px] text-red-600 hover:underline">Hapus: {row.label}</button>
+            </form>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+
+</AdminLayout>

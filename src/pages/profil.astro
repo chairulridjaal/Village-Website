@@ -2,33 +2,71 @@
 import Layout from '../components/Layout.astro';
 import { getSection } from '../lib/db/page-section';
 import { getPengaturan } from '../lib/db/pengaturan';
+import {
+  getStatistikFull,
+  parseDusunValue,
+  parseSimpleValue,
+  totalPendudukFromStats,
+  type StatKategoriWithRows,
+} from '../lib/db/statistik';
 import { getEnv } from '@lib/env';
 
 const env = getEnv();
-const [umum, geografis, sejarah, s] = await Promise.all([
+const [umum, geografis, sejarah, s, statCatsRaw] = await Promise.all([
   env ? getSection('profil-umum', env.DB) : null,
   env ? getSection('profil-geografis', env.DB) : null,
   env ? getSection('profil-sejarah', env.DB) : null,
   env ? getPengaturan(env.DB) : {},
+  env ? getStatistikFull(env.DB, true).catch(() => [] as StatKategoriWithRows[]) : Promise.resolve([] as StatKategoriWithRows[]),
 ]);
 
 const fmt = (n: number) => n.toLocaleString('id-ID');
 const barPct = (v: number, max: number) => Math.max(4, Math.round((v / max) * 100));
 
 const stUmum = JSON.parse(s.stat_umum ?? '{}');
-const dusunData: { label: string; l: number; p: number; kk: number }[] = JSON.parse(s.stat_dusun ?? '[]');
-const dusunMax = Math.max(1, ...dusunData.flatMap(d => [d.l, d.p]));
 
-const totalPenduduk = dusunData.reduce((sum, d) => sum + d.l + d.p, 0);
+// Prefer new tables; fall back to legacy pengaturan JSON if empty.
+let statCats = statCatsRaw;
+if (statCats.length === 0) {
+  const dusunData: { label: string; l: number; p: number; kk: number }[] = JSON.parse(s.stat_dusun ?? '[]');
+  const umurData: { label: string; value: number }[] = JSON.parse(s.stat_umur ?? '[]');
+  const pendidikanData: { label: string; value: number }[] = JSON.parse(s.stat_pendidikan ?? '[]');
+  const pencaharianData: { label: string; value: number }[] = JSON.parse(s.stat_pencaharian ?? '[]');
+  const now = '';
+  statCats = [
+    {
+      id: 1, key: 'dusun', label: 'Penduduk per Dusun', layout: 'dusun', urutan: 10, aktif: 1, created_at: now, updated_at: now,
+      rows: dusunData.map((d, i) => ({
+        id: i, kategori_id: 1, label: d.label, value_json: JSON.stringify(d), urutan: i, created_at: now, updated_at: now,
+      })),
+    },
+    {
+      id: 2, key: 'umur', label: 'Golongan Umur', layout: 'simple', urutan: 20, aktif: 1, created_at: now, updated_at: now,
+      rows: umurData.map((d, i) => ({
+        id: i, kategori_id: 2, label: d.label, value_json: JSON.stringify({ value: d.value }), urutan: i, created_at: now, updated_at: now,
+      })),
+    },
+    {
+      id: 3, key: 'pendidikan', label: 'Tingkat Pendidikan', layout: 'simple', urutan: 30, aktif: 1, created_at: now, updated_at: now,
+      rows: pendidikanData.map((d, i) => ({
+        id: i, kategori_id: 3, label: d.label, value_json: JSON.stringify({ value: d.value }), urutan: i, created_at: now, updated_at: now,
+      })),
+    },
+    {
+      id: 4, key: 'pencaharian', label: 'Mata Pencaharian', layout: 'simple', urutan: 40, aktif: 1, created_at: now, updated_at: now,
+      rows: pencaharianData.map((d, i) => ({
+        id: i, kategori_id: 4, label: d.label, value_json: JSON.stringify({ value: d.value }), urutan: i, created_at: now, updated_at: now,
+      })),
+    },
+  ];
+}
 
-const umurData: { label: string; value: number }[] = JSON.parse(s.stat_umur ?? '[]');
-const umurMax = Math.max(1, ...umurData.map(d => d.value));
-
-const pendidikanData: { label: string; value: number }[] = JSON.parse(s.stat_pendidikan ?? '[]');
-const pendidikanMax = Math.max(1, ...pendidikanData.map(d => d.value));
-
-const pencaharianData: { label: string; value: number }[] = JSON.parse(s.stat_pencaharian ?? '[]');
-const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
+const totalPenduduk = totalPendudukFromStats(statCats) || Number(stUmum.penduduk) || 0;
+const mapLat = Number(s.map_lat) || -7.009933224557312;
+const mapLng = Number(s.map_lng) || 106.58103748650889;
+const mapZoom = Number(s.map_zoom) || 15;
+const kecamatan = s.kecamatan || 'Palabuhanratu';
+const kabupaten = s.kabupaten || 'Sukabumi';
 ---
 
 <Layout
@@ -97,10 +135,10 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
     <div class="prose max-w-none mt-4 text-muted leading-relaxed" set:html={umum?.content_html ?? ''} />
     <div class="grid sm:grid-cols-2 gap-4 mt-6">
       {[
-        { label: 'Kecamatan', value: 'Palabuhanratu' },
-        { label: 'Kabupaten', value: 'Sukabumi' },
+        { label: 'Kecamatan', value: kecamatan },
+        { label: 'Kabupaten', value: kabupaten },
         { label: 'Provinsi', value: 'Jawa Barat' },
-        { label: 'Kode desa', value: '3202110005' },
+        { label: 'Kode desa', value: String(stUmum.kode_desa ?? '3202110005') },
       ].map(row => (
         <div class="flex justify-between py-3 border-b border-border">
           <span class="font-heading font-semibold text-ink">{row.label}</span>
@@ -140,126 +178,91 @@ const pencaharianMax = Math.max(1, ...pencaharianData.map(d => d.value));
     </p>
 
     <div class="mt-6 space-y-10">
-
-      <!-- Penduduk per dusun -->
-      <div>
-        <h3 class="font-heading font-bold text-lg text-primary mb-1">Penduduk (L/P &amp; KK)</h3>
-        <div class="flex items-center gap-4 mb-3 text-sm text-muted">
-          <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm inline-block" style="background:var(--color-accent);"></span>Laki-laki</span>
-          <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm inline-block" style="background:var(--color-cta);"></span>Perempuan</span>
-        </div>
-        <div class="space-y-4">
-          {dusunData.map(d => (
+      {statCats.map((cat) => {
+        if (cat.layout === 'dusun') {
+          const rows = cat.rows.map((r) => ({ label: r.label, ...parseDusunValue(r.value_json) }));
+          const dusunMax = Math.max(1, ...rows.flatMap((d) => [d.l, d.p]));
+          return (
             <div>
-              <div class="flex items-baseline justify-between mb-1">
-                <span class="font-heading font-semibold text-sm text-ink">{d.label}</span>
-                <span class="text-xs text-muted">{fmt(d.l + d.p)} jiwa · {fmt(d.kk)} KK</span>
+              <h3 class="font-heading font-bold text-lg text-primary mb-1">{cat.label}</h3>
+              <div class="flex items-center gap-4 mb-3 text-sm text-muted">
+                <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm inline-block" style="background:var(--color-accent);"></span>Laki-laki</span>
+                <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm inline-block" style="background:var(--color-cta);"></span>Perempuan</span>
               </div>
-              <div class="flex items-center gap-2 mb-1">
-                <div class="flex-1 h-5 rounded-md" style="background:var(--color-line);">
-                  <div class="h-full" style={`width:${barPct(d.l, dusunMax)}%; background:var(--color-accent); border-radius:0 4px 4px 0;`}></div>
+              <div class="space-y-4">
+                {rows.map((d) => (
+                  <div>
+                    <div class="flex items-baseline justify-between mb-1">
+                      <span class="font-heading font-semibold text-sm text-ink">{d.label}</span>
+                      <span class="text-xs text-muted">{fmt(d.l + d.p)} jiwa · {fmt(d.kk)} KK</span>
+                    </div>
+                    <div class="flex items-center gap-2 mb-1">
+                      <div class="flex-1 h-5 rounded-md" style="background:var(--color-line);">
+                        <div class="h-full" style={`width:${barPct(d.l, dusunMax)}%; background:var(--color-accent); border-radius:0 4px 4px 0;`}></div>
+                      </div>
+                      <span class="w-14 shrink-0 text-right text-xs font-heading font-semibold text-ink tabular-nums">{fmt(d.l)}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <div class="flex-1 h-5 rounded-md" style="background:var(--color-line);">
+                        <div class="h-full" style={`width:${barPct(d.p, dusunMax)}%; background:var(--color-cta); border-radius:0 4px 4px 0;`}></div>
+                      </div>
+                      <span class="w-14 shrink-0 text-right text-xs font-heading font-semibold text-ink tabular-nums">{fmt(d.p)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        }
+        const rows = cat.rows.map((r) => ({ label: r.label, value: parseSimpleValue(r.value_json) }));
+        const max = Math.max(1, ...rows.map((d) => d.value));
+        return (
+          <div>
+            <h3 class="font-heading font-bold text-lg text-primary mb-3">{cat.label}</h3>
+            <div class="space-y-2">
+              {rows.map((d) => (
+                <div class="flex items-center gap-3">
+                  <span class="w-40 shrink-0 text-sm text-ink">{d.label}</span>
+                  <div class="flex-1 h-5 rounded-md" style="background:var(--color-line);">
+                    <div class="h-full" style={`width:${barPct(d.value, max)}%; background:var(--color-accent); border-radius:0 4px 4px 0;`}></div>
+                  </div>
+                  <span class="w-14 shrink-0 text-right text-sm font-heading font-semibold text-primary tabular-nums">{fmt(d.value)}</span>
                 </div>
-                <span class="w-14 shrink-0 text-right text-xs font-heading font-semibold text-ink tabular-nums">{fmt(d.l)}</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <div class="flex-1 h-5 rounded-md" style="background:var(--color-line);">
-                  <div class="h-full" style={`width:${barPct(d.p, dusunMax)}%; background:var(--color-cta); border-radius:0 4px 4px 0;`}></div>
-                </div>
-                <span class="w-14 shrink-0 text-right text-xs font-heading font-semibold text-ink tabular-nums">{fmt(d.p)}</span>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
+        );
+      })}
 
-      <!-- Golongan umur -->
-      <div>
-        <h3 class="font-heading font-bold text-lg text-primary mb-3">Golongan Umur</h3>
-        <div class="space-y-2">
-          {umurData.map(d => (
-            <div class="flex items-center gap-3">
-              <span class="w-28 shrink-0 text-sm text-ink">{d.label}</span>
-              <div class="flex-1 h-5 rounded-md" style="background:var(--color-line);">
-                <div class="h-full" style={`width:${barPct(d.value, umurMax)}%; background:var(--color-accent); border-radius:0 4px 4px 0;`}></div>
-              </div>
-              <span class="w-14 shrink-0 text-right text-sm font-heading font-semibold text-primary tabular-nums">{fmt(d.value)}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <!-- Tingkat pendidikan -->
-      <div>
-        <h3 class="font-heading font-bold text-lg text-primary mb-3">Tingkat Pendidikan</h3>
-        <div class="space-y-2">
-          {pendidikanData.map(d => (
-            <div class="flex items-center gap-3">
-              <span class="w-40 shrink-0 text-sm text-ink">{d.label}</span>
-              <div class="flex-1 h-5 rounded-md" style="background:var(--color-line);">
-                <div class="h-full" style={`width:${barPct(d.value, pendidikanMax)}%; background:var(--color-accent); border-radius:0 4px 4px 0;`}></div>
-              </div>
-              <span class="w-14 shrink-0 text-right text-sm font-heading font-semibold text-primary tabular-nums">{fmt(d.value)}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <!-- Mata pencaharian -->
-      <div>
-        <h3 class="font-heading font-bold text-lg text-primary mb-3">Mata Pencaharian</h3>
-        <div class="space-y-2">
-          {pencaharianData.map(d => (
-            <div class="flex items-center gap-3">
-              <span class="w-52 shrink-0 text-sm text-ink">{d.label}</span>
-              <div class="flex-1 h-5 rounded-md" style="background:var(--color-line);">
-                <div class="h-full" style={`width:${barPct(d.value, pencaharianMax)}%; background:var(--color-accent); border-radius:0 4px 4px 0;`}></div>
-              </div>
-              <span class="w-14 shrink-0 text-right text-sm font-heading font-semibold text-primary tabular-nums">{fmt(d.value)}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <!-- Tabel data (aksesibilitas) -->
       <details class="border border-border rounded-xl p-4">
         <summary class="font-heading font-semibold text-sm text-primary cursor-pointer">Lihat semua data dalam bentuk tabel</summary>
         <div class="mt-4 grid sm:grid-cols-2 gap-6 text-sm">
-          <table class="w-full">
-            <caption class="text-left font-heading font-semibold mb-1">Penduduk L/P &amp; KK</caption>
-            <thead><tr class="text-muted text-xs"><th class="text-left font-normal py-1">Wilayah</th><th class="text-right font-normal">L</th><th class="text-right font-normal">P</th><th class="text-right font-normal">KK</th></tr></thead>
-            <tbody>
-              {dusunData.map(d => (
-                <tr class="border-t border-border"><td class="py-1">{d.label}</td><td class="text-right tabular-nums">{fmt(d.l)}</td><td class="text-right tabular-nums">{fmt(d.p)}</td><td class="text-right tabular-nums">{fmt(d.kk)}</td></tr>
-              ))}
-            </tbody>
-          </table>
-          <table class="w-full">
-            <caption class="text-left font-heading font-semibold mb-1">Golongan Umur</caption>
-            <tbody>
-              {umurData.map(d => (
-                <tr class="border-t border-border"><td class="py-1">{d.label}</td><td class="text-right tabular-nums">{fmt(d.value)}</td></tr>
-              ))}
-            </tbody>
-          </table>
-          <table class="w-full">
-            <caption class="text-left font-heading font-semibold mb-1">Tingkat Pendidikan</caption>
-            <tbody>
-              {pendidikanData.map(d => (
-                <tr class="border-t border-border"><td class="py-1">{d.label}</td><td class="text-right tabular-nums">{fmt(d.value)}</td></tr>
-              ))}
-            </tbody>
-          </table>
-          <table class="w-full">
-            <caption class="text-left font-heading font-semibold mb-1">Mata Pencaharian</caption>
-            <tbody>
-              {pencaharianData.map(d => (
-                <tr class="border-t border-border"><td class="py-1">{d.label}</td><td class="text-right tabular-nums">{fmt(d.value)}</td></tr>
-              ))}
-            </tbody>
-          </table>
+          {statCats.map((cat) => (
+            <table class="w-full">
+              <caption class="text-left font-heading font-semibold mb-1">{cat.label}</caption>
+              {cat.layout === 'dusun' ? (
+                <>
+                  <thead><tr class="text-muted text-xs"><th class="text-left font-normal py-1">Wilayah</th><th class="text-right font-normal">L</th><th class="text-right font-normal">P</th><th class="text-right font-normal">KK</th></tr></thead>
+                  <tbody>
+                    {cat.rows.map((r) => {
+                      const d = parseDusunValue(r.value_json);
+                      return (
+                        <tr class="border-t border-border"><td class="py-1">{r.label}</td><td class="text-right tabular-nums">{fmt(d.l)}</td><td class="text-right tabular-nums">{fmt(d.p)}</td><td class="text-right tabular-nums">{fmt(d.kk)}</td></tr>
+                      );
+                    })}
+                  </tbody>
+                </>
+              ) : (
+                <tbody>
+                  {cat.rows.map((r) => (
+                    <tr class="border-t border-border"><td class="py-1">{r.label}</td><td class="text-right tabular-nums">{fmt(parseSimpleValue(r.value_json))}</td></tr>
+                  ))}
+                </tbody>
+              )}
+            </table>
+          ))}
         </div>
       </details>
-
     </div>
   </section>
 

@@ -7,12 +7,6 @@ const env = getEnv();
 const s = env ? await getPengaturan(env.DB) : {};
 const saved = Astro.url.searchParams.get('saved');
 
-const stUmum = JSON.parse(s.stat_umum ?? '{}');
-const dusun = JSON.parse(s.stat_dusun ?? '[]');
-const umur = JSON.parse(s.stat_umur ?? '[]');
-const pendidikan = JSON.parse(s.stat_pendidikan ?? '[]');
-const pencaharian = JSON.parse(s.stat_pencaharian ?? '[]');
-
 const inputCls = 'w-full rounded-lg border px-3 py-2 text-sm focus:outline-none';
 const inputStyle = 'border-color:var(--color-border); min-height:40px;';
 ---
@@ -66,104 +60,51 @@ const inputStyle = 'border-color:var(--color-border); min-height:40px;';
             ))}
           </div>
         </fieldset>
+        <div>
+          <label for="wa_pelayanan" class="block font-heading font-medium text-sm mb-1.5">WhatsApp Pelayanan (nomor petugas surat)</label>
+          <input type="text" id="wa_pelayanan" name="wa_pelayanan" value={s.wa_pelayanan ?? ''} placeholder="0812… atau 62812…" class={inputCls} style={inputStyle} />
+          <p class="text-xs text-text-muted mt-1">Dipakai tombol chat setelah warga mengajukan surat. Boleh beda dari WhatsApp umum desa.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label for="map_lat" class="block font-heading font-medium text-sm mb-1.5">Latitude peta</label>
+            <input type="text" id="map_lat" name="map_lat" value={s.map_lat ?? ''} class={inputCls} style={inputStyle} />
+          </div>
+          <div>
+            <label for="map_lng" class="block font-heading font-medium text-sm mb-1.5">Longitude peta</label>
+            <input type="text" id="map_lng" name="map_lng" value={s.map_lng ?? ''} class={inputCls} style={inputStyle} />
+          </div>
+          <div>
+            <label for="map_zoom" class="block font-heading font-medium text-sm mb-1.5">Zoom peta</label>
+            <input type="number" id="map_zoom" name="map_zoom" value={s.map_zoom ?? '15'} class={inputCls} style={inputStyle} />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="kecamatan" class="block font-heading font-medium text-sm mb-1.5">Kecamatan</label>
+            <input type="text" id="kecamatan" name="kecamatan" value={s.kecamatan ?? ''} class={inputCls} style={inputStyle} />
+          </div>
+          <div>
+            <label for="kabupaten" class="block font-heading font-medium text-sm mb-1.5">Kabupaten</label>
+            <input type="text" id="kabupaten" name="kabupaten" value={s.kabupaten ?? ''} class={inputCls} style={inputStyle} />
+          </div>
+        </div>
+        <div>
+          <label for="footer_tagline" class="block font-heading font-medium text-sm mb-1.5">Tagline footer</label>
+          <input type="text" id="footer_tagline" name="footer_tagline" value={s.footer_tagline ?? ''} class={inputCls} style={inputStyle} />
+        </div>
         <button type="submit" class="px-5 py-2 rounded-lg font-heading font-semibold text-white text-sm cursor-pointer" style="background:var(--color-cta); min-height:44px;">
           Simpan Kontak
         </button>
       </form>
     </div>
 
-    <!-- Statistik Desa -->
     <div class="bg-white rounded-xl border border-border p-6" style="box-shadow:var(--shadow-sm);">
       <h2 class="font-heading font-bold text-xl mb-1" style="color:var(--color-primary);">Statistik Desa</h2>
-      <p class="text-xs text-text-muted mb-4">Tampil di halaman Profil, Pemerintahan, dan Beranda. Total penduduk/KK dihitung otomatis dari data per dusun.</p>
-      <form method="POST" action="/api/admin/pengaturan" class="space-y-6">
-        <input type="hidden" name="_form" value="statistik" />
-
-        <div class="grid grid-cols-3 gap-4">
-          <div>
-            <label for="luas" class="block font-heading font-medium text-sm mb-1.5">Luas Wilayah (ha)</label>
-            <input type="text" id="luas" name="luas" value={stUmum.luas ?? ''} class={inputCls} style={inputStyle} />
-          </div>
-          <div>
-            <label for="rw" class="block font-heading font-medium text-sm mb-1.5">Jumlah RW</label>
-            <input type="number" id="rw" name="rw" value={stUmum.rw ?? ''} class={inputCls} style={inputStyle} />
-          </div>
-          <div>
-            <label for="rt" class="block font-heading font-medium text-sm mb-1.5">Jumlah RT</label>
-            <input type="number" id="rt" name="rt" value={stUmum.rt ?? ''} class={inputCls} style={inputStyle} />
-          </div>
-        </div>
-
-        <div>
-          <h3 class="font-heading font-semibold text-sm mb-2">Penduduk per Dusun</h3>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="text-left text-text-muted text-xs">
-                  <th class="pb-1 pr-2">Nama Dusun</th>
-                  <th class="pb-1 pr-2">RW</th>
-                  <th class="pb-1 pr-2">Jml RW</th>
-                  <th class="pb-1 pr-2">Laki-laki</th>
-                  <th class="pb-1 pr-2">Perempuan</th>
-                  <th class="pb-1">KK</th>
-                </tr>
-              </thead>
-              <tbody>
-                {dusun.map((d: any) => (
-                  <tr>
-                    <td class="pr-2 py-1"><input type="text" name="dusun_label" value={d.label} class={inputCls} style={inputStyle} /></td>
-                    <td class="pr-2 py-1"><input type="text" name="dusun_rw" value={d.rw} class={inputCls} style={inputStyle} /></td>
-                    <td class="pr-2 py-1 w-20"><input type="number" name="dusun_jmlRw" value={d.jmlRw} class={inputCls} style={inputStyle} /></td>
-                    <td class="pr-2 py-1"><input type="number" name="dusun_l" value={d.l} class={inputCls} style={inputStyle} /></td>
-                    <td class="pr-2 py-1"><input type="number" name="dusun_p" value={d.p} class={inputCls} style={inputStyle} /></td>
-                    <td class="py-1"><input type="number" name="dusun_kk" value={d.kk} class={inputCls} style={inputStyle} /></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div>
-          <h3 class="font-heading font-semibold text-sm mb-2">Golongan Umur</h3>
-          <div class="space-y-2">
-            {umur.map((u: any) => (
-              <div class="grid grid-cols-3 gap-2">
-                <input type="text" name="umur_label" value={u.label} class={`${inputCls} col-span-2`} style={inputStyle} />
-                <input type="number" name="umur_value" value={u.value} class={inputCls} style={inputStyle} />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <h3 class="font-heading font-semibold text-sm mb-2">Tingkat Pendidikan</h3>
-          <div class="space-y-2">
-            {pendidikan.map((p: any) => (
-              <div class="grid grid-cols-3 gap-2">
-                <input type="text" name="pendidikan_label" value={p.label} class={`${inputCls} col-span-2`} style={inputStyle} />
-                <input type="number" name="pendidikan_value" value={p.value} class={inputCls} style={inputStyle} />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <h3 class="font-heading font-semibold text-sm mb-2">Mata Pencaharian</h3>
-          <div class="space-y-2">
-            {pencaharian.map((p: any) => (
-              <div class="grid grid-cols-3 gap-2">
-                <input type="text" name="pencaharian_label" value={p.label} class={`${inputCls} col-span-2`} style={inputStyle} />
-                <input type="number" name="pencaharian_value" value={p.value} class={inputCls} style={inputStyle} />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <button type="submit" class="px-5 py-2 rounded-lg font-heading font-semibold text-white text-sm cursor-pointer" style="background:var(--color-cta); min-height:44px;">
-          Simpan Statistik
-        </button>
-      </form>
+      <p class="text-sm text-text-muted mb-3">Statistik kependudukan (kategori &amp; baris) dipindah ke menu khusus agar bisa menambah kategori baru.</p>
+      <a href="/admin/statistik-desa" class="inline-block px-4 py-2 rounded-lg font-heading font-semibold text-white text-sm" style="background:var(--color-primary);">
+        Buka Statistik Desa →
+      </a>
     </div>
 
   </div>

@@ -3,7 +3,12 @@ import type { APIRoute } from 'astro';
 import { setPengaturan } from '../../../lib/db/pengaturan';
 import { purgeCache } from '../../../lib/cache/purge';
 
-const KONTAK_KEYS = ['kontak_alamat', 'kontak_telepon', 'kontak_email', 'kontak_jam', 'sosial_whatsapp', 'sosial_facebook', 'sosial_instagram'];
+const KONTAK_KEYS = [
+  'kontak_alamat', 'kontak_telepon', 'kontak_email', 'kontak_jam',
+  'sosial_whatsapp', 'sosial_facebook', 'sosial_instagram',
+  'wa_pelayanan', 'map_lat', 'map_lng', 'map_zoom',
+  'kecamatan', 'kabupaten', 'footer_tagline',
+];
 
 function zipRows(fd: FormData, prefix: string, numericFields: string[]): Record<string, unknown>[] {
   const labels = fd.getAll(`${prefix}_label`) as string[];
