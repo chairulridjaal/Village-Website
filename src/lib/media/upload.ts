@@ -37,6 +37,41 @@ export async function getMediaUrl(key: string, bucket: R2Bucket): Promise<string
   return `/api/media/${encodeURIComponent(key)}`;
 }
 
+const LAMPIRAN_MAX = 5 * 1024 * 1024;
+const LAMPIRAN_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'application/pdf',
+]);
+
+export async function saveLampiranBlob(
+  file: File,
+  pengajuanId: number,
+  bucket: R2Bucket
+): Promise<{ r2_key: string; filename: string; content_type: string; size_bytes: number } | { error: string }> {
+  if (!(file instanceof File) || file.size <= 0) return { error: 'empty' };
+  if (file.size > LAMPIRAN_MAX) return { error: 'size' };
+  const type = file.type || 'application/octet-stream';
+  if (!LAMPIRAN_TYPES.has(type)) return { error: 'type' };
+
+  const safeName = file.name.replace(/[^\w.\-()+ ]+/g, '_').slice(0, 120) || 'lampiran';
+  const ts = Date.now();
+  const rand = Math.random().toString(36).slice(2, 8);
+  const ext =
+    type === 'application/pdf' ? 'pdf' :
+    type === 'image/png' ? 'png' :
+    type === 'image/webp' ? 'webp' : 'jpg';
+  const r2_key = `media/lampiran/${pengajuanId}/${ts}-${rand}.${ext}`;
+
+  await bucket.put(r2_key, await file.arrayBuffer(), {
+    httpMetadata: { contentType: type },
+    customMetadata: { filename: safeName },
+  });
+
+  return { r2_key, filename: safeName, content_type: type, size_bytes: file.size };
+}
+
 export async function deleteMedia(
   mediaId: number,
   db: D1Database,

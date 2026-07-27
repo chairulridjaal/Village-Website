@@ -1,0 +1,99 @@
+---
+import { buildSuratHtml, getPengajuanById } from '../../../../lib/db/pelayanan';
+import { getEnv } from '@lib/env';
+
+const { id } = Astro.params as { id: string };
+const env = getEnv();
+const p = env ? await getPengajuanById(Number(id), env.DB) : null;
+if (!p || p.status !== 'diterima') return Astro.redirect('/admin/pelayanan');
+
+const html = buildSuratHtml(p);
+---
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cetak {p.nomor} — {p.jenis_nama}</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 12pt;
+      line-height: 1.5;
+      color: #111;
+      margin: 0;
+      background: #e5e7eb;
+    }
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1rem;
+      background: #0A3650;
+      color: #fff;
+      font-family: system-ui, sans-serif;
+      font-size: 14px;
+    }
+    .toolbar a, .toolbar button {
+      font-family: system-ui, sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+    }
+    .btn-print { background: #F97316; color: #fff; }
+    .btn-back { background: rgba(255,255,255,0.15); color: #fff; }
+    .sheet {
+      max-width: 210mm;
+      min-height: 297mm;
+      margin: 1.5rem auto;
+      padding: 20mm 18mm;
+      background: #fff;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    }
+    .sheet p { margin: 0.5rem 0; }
+    .sheet table { border-collapse: collapse; }
+    @media print {
+      body { background: #fff; }
+      .toolbar { display: none !important; }
+      .sheet {
+        margin: 0;
+        box-shadow: none;
+        max-width: none;
+        min-height: auto;
+        padding: 12mm 15mm;
+      }
+      @page { size: A4; margin: 12mm; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <span>{p.nomor} · {p.jenis_nama}</span>
+    <div style="display:flex;gap:0.5rem;">
+      <a class="btn-back" href={`/admin/pelayanan/${p.id}`}>Kembali</a>
+      <button type="button" class="btn-print" onclick="window.print()">Cetak / simpan PDF</button>
+    </div>
+  </div>
+  <div class="sheet" set:html={html} />
+  <script is:inline>
+    // Optional: auto-open print dialog when ?auto=1
+    if (new URLSearchParams(location.search).get('auto') === '1') {
+      window.addEventListener('load', () => setTimeout(() => window.print(), 300));
+    }
+  </script>
+</body>
+</html>

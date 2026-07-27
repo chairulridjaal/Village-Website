@@ -1,0 +1,218 @@
+---
+import type { FormField, JenisPelayanan } from '../lib/db/pelayanan';
+import { DEFAULT_FIELDS, DEFAULT_TEMPLATE } from '../lib/pelayanan/fields-form';
+
+interface Props {
+  action: string;
+  jenis?: JenisPelayanan | null;
+  fields?: FormField[];
+}
+
+const { action, jenis = null, fields: fieldsProp } = Astro.props;
+const fields = fieldsProp ?? (jenis ? JSON.parse(jenis.fields_json || '[]') as FormField[] : DEFAULT_FIELDS);
+const template = jenis?.template_html || DEFAULT_TEMPLATE;
+const nama = jenis?.nama ?? '';
+const deskripsi = jenis?.deskripsi ?? '';
+const syarat = jenis?.syarat ?? '';
+const aktif = jenis ? !!jenis.aktif : true;
+const urutan = jenis?.urutan ?? 0;
+const lampiranWajib = jenis ? !!jenis.lampiran_wajib : false;
+const lampiranInfo = jenis?.lampiran_info ?? '';
+---
+
+<form method="POST" action={action} class="space-y-6 max-w-3xl" id="jenis-form">
+  <div class="bg-white rounded-xl border border-border p-5 space-y-4" style="box-shadow:var(--shadow-sm);">
+    <h3 class="font-heading font-semibold text-primary">Informasi dasar</h3>
+    <div>
+      <label for="nama" class="block font-heading font-medium text-sm mb-1.5">Nama jenis surat <span class="text-cta">*</span></label>
+      <input type="text" id="nama" name="nama" required value={nama}
+        class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+        style="border-color:var(--color-border);min-height:44px;"
+        placeholder="cth. Surat Keterangan Domisili" />
+    </div>
+    <div>
+      <label for="deskripsi" class="block font-heading font-medium text-sm mb-1.5">Deskripsi singkat</label>
+      <textarea id="deskripsi" name="deskripsi" rows="2"
+        class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+        style="border-color:var(--color-border);">{deskripsi}</textarea>
+    </div>
+    <div>
+      <label for="syarat" class="block font-heading font-medium text-sm mb-1.5">Syarat (ditampilkan ke warga)</label>
+      <textarea id="syarat" name="syarat" rows="3"
+        class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+        style="border-color:var(--color-border);">{syarat}</textarea>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label for="urutan" class="block font-heading font-medium text-sm mb-1.5">Urutan tampil</label>
+        <input type="number" id="urutan" name="urutan" value={urutan}
+          class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+          style="border-color:var(--color-border);min-height:44px;" />
+      </div>
+      <div class="flex items-end pb-2">
+        <label class="inline-flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" name="aktif" value="1" checked={aktif} class="w-4 h-4" />
+          <span class="font-heading font-medium text-sm">Aktif di katalog publik</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-xl border border-border p-5 space-y-4" style="box-shadow:var(--shadow-sm);">
+    <h3 class="font-heading font-semibold text-primary">Lampiran unggah</h3>
+    <p class="text-xs text-text-muted leading-relaxed">
+      Jika dicentang, form warga menampilkan unggah file dan <strong>wajib</strong> minimal 1 file.
+      Jika tidak dicentang, field lampiran tidak muncul sama sekali.
+    </p>
+    <label class="inline-flex items-center gap-2 cursor-pointer">
+      <input type="checkbox" name="lampiran_wajib" value="1" checked={lampiranWajib} class="w-4 h-4" id="lampiran-wajib-check" />
+      <span class="font-heading font-medium text-sm">Wajib lampiran (tampilkan di form warga)</span>
+    </label>
+    <div>
+      <label for="lampiran_info" class="block font-heading font-medium text-sm mb-1.5">Petunjuk lampiran (untuk warga)</label>
+      <textarea id="lampiran_info" name="lampiran_info" rows="2"
+        class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+        style="border-color:var(--color-border);"
+        placeholder="cth. Unggah fotokopi KTP dan KK (PDF/JPG, maks. 3 file).">{lampiranInfo}</textarea>
+      <p class="text-xs text-text-muted mt-1">Ditampilkan di bawah field unggah. Kosong = teks default sistem.</p>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-xl border border-border p-5 space-y-4" style="box-shadow:var(--shadow-sm);">
+    <div class="flex items-center justify-between gap-2">
+      <h3 class="font-heading font-semibold text-primary">Field formulir warga</h3>
+      <button type="button" id="add-field"
+        class="text-sm font-heading font-semibold px-3 py-1.5 rounded-md border cursor-pointer"
+        style="border-color:var(--color-accent);color:var(--color-accent);">
+        + Field
+      </button>
+    </div>
+    <p class="text-xs text-text-muted">Key dipakai di template sebagai <code class="bg-sand px-1 rounded">{'{{key}}'}</code>. Kosongkan key untuk diisi otomatis dari label.</p>
+    <div id="fields-list" class="space-y-3">
+      {fields.map((f) => (
+        <div class="field-row grid grid-cols-1 sm:grid-cols-12 gap-2 p-3 rounded-lg border border-border bg-sand/20">
+          <div class="sm:col-span-3">
+            <label class="text-xs text-text-muted">Key</label>
+            <input name="field_key" value={f.key}
+              class="w-full rounded border px-2 py-2 text-sm" style="border-color:var(--color-border);" />
+          </div>
+          <div class="sm:col-span-4">
+            <label class="text-xs text-text-muted">Label</label>
+            <input name="field_label" value={f.label} required
+              class="w-full rounded border px-2 py-2 text-sm" style="border-color:var(--color-border);" />
+          </div>
+          <div class="sm:col-span-2">
+            <label class="text-xs text-text-muted">Tipe</label>
+            <select name="field_type" class="w-full rounded border px-2 py-2 text-sm" style="border-color:var(--color-border);">
+              {['text', 'textarea', 'date', 'number', 'select'].map(t => (
+                <option value={t} selected={f.type === t}>{t}</option>
+              ))}
+            </select>
+          </div>
+          <div class="sm:col-span-2">
+            <label class="text-xs text-text-muted">Opsi (select, pisah |)</label>
+            <input name="field_options" value={(f.options ?? []).join('|')}
+              class="w-full rounded border px-2 py-2 text-sm" style="border-color:var(--color-border);"
+              placeholder="A|B|C" />
+          </div>
+          <div class="sm:col-span-1 flex items-end gap-2 pb-1">
+            <label class="text-xs flex items-center gap-1">
+              <input type="hidden" name="field_required" value={f.required ? '1' : '0'} class="req-hidden" />
+              <input type="checkbox" class="req-check" checked={!!f.required} />
+              Wajib
+            </label>
+            <button type="button" class="remove-field text-xs text-red-600 cursor-pointer" title="Hapus">✕</button>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div class="bg-white rounded-xl border border-border p-5 space-y-3" style="box-shadow:var(--shadow-sm);">
+    <h3 class="font-heading font-semibold text-primary">Template surat (HTML)</h3>
+    <p class="text-xs text-text-muted leading-relaxed">
+      Variabel: <code class="bg-sand px-1 rounded">{'{{nama}}'}</code>,
+      <code class="bg-sand px-1 rounded">{'{{nik}}'}</code>,
+      <code class="bg-sand px-1 rounded">{'{{nomor_surat}}'}</code>,
+      <code class="bg-sand px-1 rounded">{'{{tanggal}}'}</code>,
+      <code class="bg-sand px-1 rounded">{'{{jenis_surat}}'}</code>,
+      plus key field Anda. Setelah diterima, admin mencetak / menyimpan PDF dari pratinjau.
+    </p>
+    <textarea id="template_html" name="template_html" rows="16" required
+      class="w-full rounded-lg border px-3 py-3 text-sm font-mono focus:outline-none"
+      style="border-color:var(--color-border);">{template}</textarea>
+  </div>
+
+  <div class="flex justify-end gap-3 sticky bottom-0 bg-white border-t border-border -mx-4 md:-mx-6 px-4 md:px-6 py-3"
+    style="box-shadow:0 -2px 8px rgba(0,0,0,.06);">
+    <a href="/admin/pelayanan/jenis"
+      class="px-4 py-2 rounded-lg font-heading font-medium text-sm border"
+      style="border-color:var(--color-border);min-height:44px;display:flex;align-items:center;">
+      Batal
+    </a>
+    <button type="submit"
+      class="px-5 py-2 rounded-lg font-heading font-semibold text-white text-sm cursor-pointer"
+      style="background:var(--color-cta);min-height:44px;">
+      Simpan
+    </button>
+  </div>
+</form>
+
+<template id="field-row-tpl">
+  <div class="field-row grid grid-cols-1 sm:grid-cols-12 gap-2 p-3 rounded-lg border border-border bg-sand/20">
+    <div class="sm:col-span-3">
+      <label class="text-xs text-text-muted">Key</label>
+      <input name="field_key" class="w-full rounded border px-2 py-2 text-sm" style="border-color:var(--color-border);" />
+    </div>
+    <div class="sm:col-span-4">
+      <label class="text-xs text-text-muted">Label</label>
+      <input name="field_label" required class="w-full rounded border px-2 py-2 text-sm" style="border-color:var(--color-border);" />
+    </div>
+    <div class="sm:col-span-2">
+      <label class="text-xs text-text-muted">Tipe</label>
+      <select name="field_type" class="w-full rounded border px-2 py-2 text-sm" style="border-color:var(--color-border);">
+        <option value="text">text</option>
+        <option value="textarea">textarea</option>
+        <option value="date">date</option>
+        <option value="number">number</option>
+        <option value="select">select</option>
+      </select>
+    </div>
+    <div class="sm:col-span-2">
+      <label class="text-xs text-text-muted">Opsi (select, pisah |)</label>
+      <input name="field_options" class="w-full rounded border px-2 py-2 text-sm" style="border-color:var(--color-border);" placeholder="A|B|C" />
+    </div>
+    <div class="sm:col-span-1 flex items-end gap-2 pb-1">
+      <label class="text-xs flex items-center gap-1">
+        <input type="hidden" name="field_required" value="1" class="req-hidden" />
+        <input type="checkbox" class="req-check" checked />
+        Wajib
+      </label>
+      <button type="button" class="remove-field text-xs text-red-600 cursor-pointer" title="Hapus">✕</button>
+    </div>
+  </div>
+</template>
+
+<script>
+  const list = document.getElementById('fields-list');
+  const tpl = document.getElementById('field-row-tpl') as HTMLTemplateElement | null;
+
+  function wireRow(row: Element) {
+    const check = row.querySelector('.req-check') as HTMLInputElement | null;
+    const hidden = row.querySelector('.req-hidden') as HTMLInputElement | null;
+    check?.addEventListener('change', () => {
+      if (hidden) hidden.value = check.checked ? '1' : '0';
+    });
+    row.querySelector('.remove-field')?.addEventListener('click', () => row.remove());
+  }
+
+  list?.querySelectorAll('.field-row').forEach(wireRow);
+
+  document.getElementById('add-field')?.addEventListener('click', () => {
+    if (!tpl || !list) return;
+    const node = tpl.content.cloneNode(true) as DocumentFragment;
+    const row = node.querySelector('.field-row');
+    if (row) wireRow(row);
+    list.appendChild(node);
+  });
+</script>

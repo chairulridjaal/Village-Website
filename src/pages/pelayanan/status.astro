@@ -1,0 +1,181 @@
+---
+import Layout from '../../components/Layout.astro';
+import {
+  formatFileSize,
+  formatTanggalId,
+  getPengajuanForStatusCheck,
+  listLampiran,
+  normalizeWa,
+} from '../../lib/db/pelayanan';
+import { getEnv } from '@lib/env';
+
+const env = getEnv();
+const qNomor = (Astro.url.searchParams.get('nomor') ?? '').trim();
+const qWa = (Astro.url.searchParams.get('wa') ?? '').trim();
+const submitted = Astro.url.searchParams.has('nomor') || Astro.url.searchParams.has('wa');
+
+let result: Awaited<ReturnType<typeof getPengajuanForStatusCheck>> = null;
+let lampiran: Awaited<ReturnType<typeof listLampiran>> = [];
+let notFound = false;
+
+if (submitted && env && qNomor && qWa) {
+  result = await getPengajuanForStatusCheck(qNomor, qWa, env.DB);
+  if (result) {
+    lampiran = await listLampiran(result.id, env.DB);
+  } else {
+    notFound = true;
+  }
+} else if (submitted) {
+  notFound = true;
+}
+
+const statusStyle: Record<string, string> = {
+  menunggu: 'background:#FEF3C7;color:#92400E',
+  diterima: 'background:#D1FAE5;color:#065F46',
+  ditolak: 'background:#FEE2E2;color:#991B1B',
+};
+
+const statusLabel: Record<string, string> = {
+  menunggu: 'Menunggu diproses',
+  diterima: 'Diterima — surat siap',
+  ditolak: 'Ditolak',
+};
+
+const waParam = qWa ? normalizeWa(qWa) : '';
+---
+
+<Layout
+  title="Cek Status Pengajuan | Desa Citarik"
+  description="Cek status pengajuan surat Desa Citarik dengan nomor pengajuan dan WhatsApp."
+>
+
+<div class="container-page pt-6 pb-2">
+  <nav aria-label="Breadcrumb" class="breadcrumb breadcrumb--dark text-sm">
+    <a href="/">Beranda</a>
+    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+    <a href="/pelayanan">Pelayanan</a>
+    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+    <span class="text-ink font-medium">Cek status</span>
+  </nav>
+  <h1 class="text-3xl sm:text-4xl font-heading font-extrabold text-primary mt-2">Cek status pengajuan</h1>
+  <p class="text-muted text-lg mt-2 max-w-2xl leading-relaxed">
+    Masukkan nomor pengajuan dan nomor WhatsApp yang dipakai saat mengajukan.
+  </p>
+</div>
+
+<div class="container-page py-8 pb-14 max-w-xl">
+  <form method="GET" action="/pelayanan/status" class="card-surface p-6 space-y-4">
+    <div>
+      <label for="nomor" class="block font-heading font-medium text-sm mb-1.5">Nomor pengajuan</label>
+      <input
+        id="nomor"
+        name="nomor"
+        required
+        value={qNomor}
+        placeholder="PLV-2026-0001"
+        class="w-full rounded-lg border px-4 py-3 text-base font-mono focus:outline-none focus:ring-4 focus:ring-accent/20"
+        style="border-color:var(--color-border);min-height:44px;"
+      />
+    </div>
+    <div>
+      <label for="wa" class="block font-heading font-medium text-sm mb-1.5">Nomor WhatsApp</label>
+      <input
+        id="wa"
+        name="wa"
+        type="tel"
+        required
+        value={qWa}
+        placeholder="08xxxxxxxxxx"
+        class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-accent/20"
+        style="border-color:var(--color-border);min-height:44px;"
+      />
+    </div>
+    <button type="submit" class="btn btn-primary w-full">
+      <i data-lucide="search" class="w-4 h-4"></i> Cek status
+    </button>
+  </form>
+
+  {notFound && (
+    <div role="alert" class="mt-6 p-4 rounded-xl text-sm" style="background:#FEE2E2;color:#991B1B;border:1px solid #FECACA;">
+      Pengajuan tidak ditemukan. Pastikan nomor dan WhatsApp sama persis dengan saat mengajukan.
+    </div>
+  )}
+
+  {result && (
+    <div class="mt-6 card-surface p-6 space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <p class="font-heading font-bold text-xl text-ink tabular-nums tracking-wide">{result.nomor}</p>
+        <span
+          class="text-xs font-heading font-semibold px-2.5 py-1 rounded-full"
+          style={statusStyle[result.status] ?? ''}
+        >
+          {statusLabel[result.status] ?? result.status}
+        </span>
+      </div>
+
+      <dl class="text-sm space-y-2">
+        <div class="flex justify-between gap-4 border-b border-border py-2">
+          <dt class="text-muted">Jenis surat</dt>
+          <dd class="font-medium text-right">{result.jenis_nama}</dd>
+        </div>
+        <div class="flex justify-between gap-4 border-b border-border py-2">
+          <dt class="text-muted">Pemohon</dt>
+          <dd class="font-medium text-right">{result.pemohon_nama}</dd>
+        </div>
+        <div class="flex justify-between gap-4 border-b border-border py-2">
+          <dt class="text-muted">Diajukan</dt>
+          <dd class="font-medium text-right">{formatTanggalId(result.created_at)}</dd>
+        </div>
+        {result.decided_at && (
+          <div class="flex justify-between gap-4 border-b border-border py-2">
+            <dt class="text-muted">Diproses</dt>
+            <dd class="font-medium text-right">{formatTanggalId(result.decided_at)}</dd>
+          </div>
+        )}
+      </dl>
+
+      {result.status === 'menunggu' && (
+        <p class="text-sm text-muted leading-relaxed">
+          Pengajuan masih dalam antrean petugas desa. Anda dapat dihubungi via WhatsApp bila sudah diproses.
+        </p>
+      )}
+      {result.status === 'diterima' && (
+        <p class="text-sm leading-relaxed" style="color:#065F46;">
+          Surat telah disetujui. Silakan ambil di Kantor Desa Citarik atau tunggu konfirmasi petugas via WhatsApp.
+        </p>
+      )}
+      {result.status === 'ditolak' && (
+        <div class="p-3 rounded-lg text-sm" style="background:#FEE2E2;color:#991B1B;">
+          <p class="font-heading font-semibold">Alasan penolakan</p>
+          <p class="mt-1">{result.alasan_tolak || 'Tidak ada keterangan.'}</p>
+        </div>
+      )}
+
+      {lampiran.length > 0 && (
+        <div>
+          <p class="font-heading font-semibold text-sm text-primary mb-2">Lampiran yang Anda unggah</p>
+          <ul class="space-y-2">
+            {lampiran.map(l => (
+              <li>
+                <a
+                  href={`/api/pelayanan/lampiran/${l.id}?nomor=${encodeURIComponent(result!.nomor)}&wa=${encodeURIComponent(waParam || qWa)}`}
+                  target="_blank"
+                  rel="noopener"
+                  class="flex items-center gap-2 text-sm text-accent hover:underline"
+                >
+                  <i data-lucide="paperclip" class="w-4 h-4 shrink-0"></i>
+                  <span>{l.filename}</span>
+                  <span class="text-muted text-xs">({formatFileSize(l.size_bytes)})</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <a href="/pelayanan" class="btn btn-secondary w-full text-sm">Kembali ke katalog</a>
+    </div>
+  )}
+</div>
+
+</Layout>

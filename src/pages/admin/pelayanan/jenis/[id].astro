@@ -1,0 +1,30 @@
+---
+import AdminLayout from '../../../../components/AdminLayout.astro';
+import AdminJenisPelayananForm from '../../../../components/AdminJenisPelayananForm.astro';
+import { getJenisById, parseFields } from '../../../../lib/db/pelayanan';
+import { getEnv } from '@lib/env';
+
+const { id } = Astro.params as { id: string };
+const env = getEnv();
+const jenis = env ? await getJenisById(Number(id), env.DB) : null;
+if (!jenis) return Astro.redirect('/admin/pelayanan/jenis');
+const fields = parseFields(jenis.fields_json);
+const saved = Astro.url.searchParams.get('saved');
+---
+
+<AdminLayout title={`Edit: ${jenis.nama}`} breadcrumb="Pelayanan / Jenis / Edit">
+  {saved && (
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5;color:#065F46;border:1px solid #6EE7B7;">
+      Jenis surat disimpan.
+    </div>
+  )}
+  <h2 class="font-heading font-bold text-xl mb-6" style="color:var(--color-primary);">Edit jenis surat</h2>
+  <AdminJenisPelayananForm action={`/api/admin/pelayanan/jenis/${jenis.id}`} jenis={jenis} fields={fields} />
+
+  <form method="POST" action={`/api/admin/pelayanan/jenis/${jenis.id}/delete`} class="max-w-3xl mt-8"
+    onsubmit="return confirm('Nonaktifkan atau hapus jenis ini? Pengajuan lama tetap tersimpan.');">
+    <button type="submit" class="text-sm font-heading font-semibold text-red-600 hover:underline cursor-pointer">
+      Hapus / nonaktifkan jenis surat
+    </button>
+  </form>
+</AdminLayout>

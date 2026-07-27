@@ -1,0 +1,74 @@
+---
+import Layout from '../../components/Layout.astro';
+import { getJenisAktif } from '../../lib/db/pelayanan';
+import { getEnv } from '@lib/env';
+
+const env = getEnv();
+const jenisList = env ? await getJenisAktif(env.DB) : [];
+---
+
+<Layout
+  title="Pelayanan Desa | Desa Citarik"
+  description="Ajukan surat keterangan dan layanan administrasi Desa Citarik secara online."
+>
+
+<div class="container-page pt-6 pb-2">
+  <nav aria-label="Breadcrumb" class="breadcrumb breadcrumb--dark text-sm">
+    <a href="/">Beranda</a>
+    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+    <span class="text-ink font-medium">Pelayanan</span>
+  </nav>
+  <h1 class="text-3xl sm:text-4xl font-heading font-extrabold text-primary mt-2">Pelayanan Desa</h1>
+  <p class="text-muted text-lg mt-2 max-w-2xl leading-relaxed">
+    Pilih jenis surat, isi formulir, dan ajukan secara online. Petugas desa akan memproses pengajuan Anda.
+  </p>
+  <p class="mt-3">
+    <a href="/pelayanan/status" class="inline-flex items-center gap-1.5 text-accent font-heading font-semibold hover:underline">
+      <i data-lucide="search" class="w-4 h-4"></i> Cek status pengajuan
+    </a>
+  </p>
+</div>
+
+<div class="container-page py-8 pb-14">
+  {jenisList.length === 0 ? (
+    <div class="empty-state">
+      <div class="empty-state__icon">
+        <i data-lucide="file-text" class="w-7 h-7"></i>
+      </div>
+      <h2 class="font-heading font-bold text-xl text-ink mt-4">Belum ada jenis pelayanan</h2>
+      <p class="text-muted mt-1">Jenis surat akan ditampilkan setelah diaktifkan oleh pemerintah desa.</p>
+    </div>
+  ) : (
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      {jenisList.map(j => (
+        <article class="group card-surface card-surface-hover overflow-hidden flex flex-col">
+          <a href={`/pelayanan/${j.slug}`} class="block aspect-[16/10] overflow-hidden">
+            <div
+              class="w-full h-full flex items-center justify-center"
+              style="background: linear-gradient(135deg, #0E4A6E, #0E9AA7);"
+            >
+              <i data-lucide="file-check" class="w-12 h-12 text-white/90"></i>
+            </div>
+          </a>
+          <div class="p-5 flex flex-col flex-1">
+            <span class="chip chip-potensi w-max">Surat</span>
+            <h2 class="font-heading font-semibold text-lg text-ink mt-2">
+              <a href={`/pelayanan/${j.slug}`} class="hover:text-primary">{j.nama}</a>
+            </h2>
+            {j.deskripsi && (
+              <p class="text-sm text-muted mt-1.5 flex-1 line-clamp-3 leading-relaxed">{j.deskripsi}</p>
+            )}
+            <a
+              href={`/pelayanan/${j.slug}`}
+              class="mt-4 btn btn-primary w-full text-sm py-2.5"
+            >
+              <i data-lucide="pen-line" class="w-4 h-4"></i> Ajukan sekarang
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+  )}
+</div>
+
+</Layout>

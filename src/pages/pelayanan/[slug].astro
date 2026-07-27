@@ -1,0 +1,159 @@
+---
+import Layout from '../../components/Layout.astro';
+import { getJenisBySlug, parseFields } from '../../lib/db/pelayanan';
+import { getEnv } from '@lib/env';
+
+const { slug } = Astro.params as { slug: string };
+const env = getEnv();
+const jenis = env ? await getJenisBySlug(slug, env.DB) : null;
+if (!jenis || !jenis.aktif) return Astro.redirect('/pelayanan');
+
+const fields = parseFields(jenis.fields_json);
+const error = Astro.url.searchParams.get('error');
+---
+
+<Layout
+  title={`${jenis.nama} | Pelayanan Desa Citarik`}
+  description={jenis.deskripsi || `Ajukan ${jenis.nama} di Desa Citarik.`}
+>
+
+<div class="container-page pt-6 pb-2">
+  <nav aria-label="Breadcrumb" class="breadcrumb breadcrumb--dark text-sm">
+    <a href="/">Beranda</a>
+    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+    <a href="/pelayanan">Pelayanan</a>
+    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+    <span class="text-ink font-medium">{jenis.nama}</span>
+  </nav>
+  <h1 class="text-3xl sm:text-4xl font-heading font-extrabold text-primary mt-2">{jenis.nama}</h1>
+  {jenis.deskripsi && <p class="text-muted text-lg mt-2 max-w-2xl leading-relaxed">{jenis.deskripsi}</p>}
+</div>
+
+<div class="container-page py-8 pb-14">
+  <div class="grid lg:grid-cols-[1fr_1.2fr] gap-8 items-start">
+    <aside class="card-surface p-6 space-y-4">
+      <h2 class="font-heading font-bold text-lg text-primary">Informasi</h2>
+      {jenis.syarat ? (
+        <div>
+          <p class="text-xs font-heading font-semibold text-muted uppercase tracking-wide">Syarat</p>
+          <p class="text-sm text-ink mt-1.5 leading-relaxed whitespace-pre-line">{jenis.syarat}</p>
+        </div>
+      ) : null}
+      <div class="bg-sand/60 border border-border rounded-lg p-4 text-sm text-muted leading-relaxed">
+        <p class="font-heading font-semibold text-ink mb-1">Cara kerja</p>
+        <ol class="list-decimal pl-4 space-y-1">
+          <li>Isi formulir dengan data yang benar.</li>
+          <li>Sertakan nomor WhatsApp aktif{!!jenis.lampiran_wajib ? ' dan unggah lampiran yang diminta' : ''}.</li>
+          <li>Simpan nomor pengajuan, lalu cek status di situs.</li>
+          <li>Petugas dapat menghubungi via WA saat surat siap atau ditolak.</li>
+        </ol>
+        <p class="mt-3">
+          <a href="/pelayanan/status" class="text-accent font-heading font-semibold hover:underline text-sm">
+            Cek status pengajuan →
+          </a>
+        </p>
+      </div>
+    </aside>
+
+    <div class="card-surface p-6">
+      <h2 class="font-heading font-bold text-lg text-primary mb-4">Formulir pengajuan</h2>
+
+      {error && (
+        <div role="alert" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#FEE2E2;color:#991B1B;border:1px solid #FECACA;">
+          {error === 'fields' && 'Lengkapi semua field yang wajib diisi.'}
+          {error === 'wa' && 'Nomor WhatsApp tidak valid. Gunakan format 08… atau 628…'}
+          {error === 'lampiran' && 'Lampiran wajib diunggah untuk jenis surat ini (minimal 1 file).'}
+          {error === 'lampiran_count' && 'Maksimal 3 file lampiran.'}
+          {error === 'server' && 'Pengajuan gagal. Coba lagi sebentar.'}
+          {!['fields', 'wa', 'lampiran', 'lampiran_count', 'server'].includes(error) && 'Pengajuan gagal. Periksa data Anda.'}
+        </div>
+      )}
+
+      <form method="POST" action="/api/pelayanan/ajukan" enctype="multipart/form-data" class="space-y-4">
+        <input type="hidden" name="jenis_slug" value={jenis.slug} />
+
+        {fields.map(f => (
+          <div>
+            <label for={`f-${f.key}`} class="block font-heading font-medium text-sm mb-1.5">
+              {f.label}
+              {f.required && <span class="text-cta"> *</span>}
+            </label>
+            {f.type === 'textarea' ? (
+              <textarea
+                id={`f-${f.key}`}
+                name={`field_${f.key}`}
+                required={!!f.required}
+                rows="3"
+                class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-accent/20"
+                style="border-color:var(--color-border);"
+              ></textarea>
+            ) : f.type === 'select' ? (
+              <select
+                id={`f-${f.key}`}
+                name={`field_${f.key}`}
+                required={!!f.required}
+                class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
+                style="border-color:var(--color-border); min-height:44px;"
+              >
+                <option value="">— Pilih —</option>
+                {(f.options ?? []).map(o => <option value={o}>{o}</option>)}
+              </select>
+            ) : (
+              <input
+                id={`f-${f.key}`}
+                type={f.type === 'number' ? 'number' : f.type === 'date' ? 'date' : 'text'}
+                name={`field_${f.key}`}
+                required={!!f.required}
+                class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-accent/20"
+                style="border-color:var(--color-border); min-height:44px;"
+              />
+            )}
+          </div>
+        ))}
+
+        <div>
+          <label for="pemohon_wa" class="block font-heading font-medium text-sm mb-1.5">
+            Nomor WhatsApp <span class="text-cta">*</span>
+          </label>
+          <input
+            id="pemohon_wa"
+            type="tel"
+            name="pemohon_wa"
+            required
+            placeholder="08xxxxxxxxxx"
+            class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none focus:ring-4 focus:ring-accent/20"
+            style="border-color:var(--color-border); min-height:44px;"
+          />
+          <p class="text-xs text-muted mt-1">Digunakan petugas untuk menghubungi Anda dan untuk cek status di situs.</p>
+        </div>
+
+        {!!jenis.lampiran_wajib && (
+          <div>
+            <label for="lampiran" class="block font-heading font-medium text-sm mb-1.5">
+              Lampiran <span class="text-cta">*</span>
+            </label>
+            <input
+              id="lampiran"
+              type="file"
+              name="lampiran"
+              multiple
+              required
+              accept="image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf"
+              class="w-full text-sm file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:font-heading file:font-semibold file:bg-sand file:text-primary"
+            />
+            <p class="text-xs text-muted mt-1 whitespace-pre-line">
+              {jenis.lampiran_info?.trim()
+                || 'Unggah dokumen pendukung (PDF/JPG/PNG). Maks. 3 file · 5 MB per file.'}
+            </p>
+          </div>
+        )}
+
+        <button type="submit" class="btn btn-cta w-full sm:w-auto mt-2">
+          <i data-lucide="send" class="w-4 h-4"></i> Kirim pengajuan
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+</Layout>

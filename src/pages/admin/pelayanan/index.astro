@@ -1,0 +1,107 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import { countPengajuanByStatus, listPengajuan } from '../../../lib/db/pelayanan';
+import { getEnv } from '@lib/env';
+
+const env = getEnv();
+const statusParam = (Astro.url.searchParams.get('status') ?? 'semua') as
+  | 'semua'
+  | 'menunggu'
+  | 'diterima'
+  | 'ditolak';
+
+const [list, counts] = await Promise.all([
+  env ? listPengajuan(env.DB, statusParam) : [],
+  env ? countPengajuanByStatus(env.DB) : { menunggu: 0, diterima: 0, ditolak: 0 },
+]);
+
+const filters = [
+  { key: 'semua', label: 'Semua' },
+  { key: 'menunggu', label: `Menunggu (${counts.menunggu ?? 0})` },
+  { key: 'diterima', label: `Diterima (${counts.diterima ?? 0})` },
+  { key: 'ditolak', label: `Ditolak (${counts.ditolak ?? 0})` },
+] as const;
+
+const statusStyle: Record<string, string> = {
+  menunggu: 'background:#FEF3C7;color:#92400E',
+  diterima: 'background:#D1FAE5;color:#065F46',
+  ditolak: 'background:#FEE2E2;color:#991B1B',
+};
+---
+
+<AdminLayout title="Pengajuan Pelayanan" breadcrumb="Pelayanan / Pengajuan">
+
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+    <h2 class="font-heading font-bold text-xl" style="color:var(--color-primary);">Pengajuan surat</h2>
+    <a href="/admin/pelayanan/jenis"
+      class="inline-flex items-center justify-center px-4 py-2 rounded-lg font-heading font-medium text-sm border"
+      style="border-color:var(--color-primary);color:var(--color-primary);min-height:44px;">
+      Kelola jenis surat
+    </a>
+  </div>
+
+  <div class="flex flex-wrap gap-2 mb-5">
+    {filters.map(f => (
+      <a
+        href={f.key === 'semua' ? '/admin/pelayanan' : `/admin/pelayanan?status=${f.key}`}
+        class:list={[
+          'px-3.5 py-2 rounded-full text-sm font-heading font-semibold border transition-colors',
+          statusParam === f.key
+            ? 'bg-primary text-white border-primary'
+            : 'border-border text-ink hover:border-accent',
+        ]}
+      >
+        {f.label}
+      </a>
+    ))}
+  </div>
+
+  <div class="bg-white rounded-xl border border-border overflow-hidden" style="box-shadow:var(--shadow-sm);">
+    {list.length === 0 ? (
+      <div class="p-8 text-center text-text-muted">Belum ada pengajuan.</div>
+    ) : (
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead style="background:#F8FAFC;">
+            <tr class="border-b border-border">
+              <th class="text-left px-4 py-3 font-heading font-semibold">Nomor</th>
+              <th class="text-left px-4 py-3 font-heading font-semibold">Pemohon</th>
+              <th class="text-left px-4 py-3 font-heading font-semibold hidden md:table-cell">Jenis</th>
+              <th class="text-left px-4 py-3 font-heading font-semibold">Status</th>
+              <th class="text-left px-4 py-3 font-heading font-semibold hidden sm:table-cell">Tanggal</th>
+              <th class="px-4 py-3 font-heading font-semibold">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {list.map(p => (
+              <tr class="border-b border-border last:border-0 hover:bg-sand/30">
+                <td class="px-4 py-3 font-medium tabular-nums">{p.nomor}</td>
+                <td class="px-4 py-3">
+                  <div class="font-medium">{p.pemohon_nama}</div>
+                  <div class="text-xs text-text-muted">{p.pemohon_wa}</div>
+                </td>
+                <td class="px-4 py-3 hidden md:table-cell">{p.jenis_nama}</td>
+                <td class="px-4 py-3">
+                  <span class="inline-block text-xs font-heading font-semibold px-2 py-1 rounded-full capitalize" style={statusStyle[p.status] ?? ''}>
+                    {p.status}
+                  </span>
+                </td>
+                <td class="px-4 py-3 hidden sm:table-cell text-text-muted">
+                  {new Date(p.created_at).toLocaleDateString('id-ID')}
+                </td>
+                <td class="px-4 py-3 text-center">
+                  <a href={`/admin/pelayanan/${p.id}`}
+                    class="inline-block px-3 py-1.5 rounded-md font-heading font-medium text-xs border"
+                    style="border-color:var(--color-primary);color:var(--color-primary);">
+                    Detail
+                  </a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </div>
+
+</AdminLayout>

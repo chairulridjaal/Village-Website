@@ -1,0 +1,201 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import {
+  buildSuratHtml,
+  formatFileSize,
+  getPengajuanById,
+  listLampiran,
+  parseData,
+  parseFields,
+  waLink,
+} from '../../../lib/db/pelayanan';
+import { getJenisById } from '../../../lib/db/pelayanan';
+import { getEnv } from '@lib/env';
+
+const { id } = Astro.params as { id: string };
+const env = getEnv();
+const p = env ? await getPengajuanById(Number(id), env.DB) : null;
+if (!p) return Astro.redirect('/admin/pelayanan');
+
+const jenis = env ? await getJenisById(p.jenis_id, env.DB) : null;
+const fields = jenis ? parseFields(jenis.fields_json) : [];
+const data = parseData(p.data_json);
+const lampiran = env ? await listLampiran(p.id, env.DB) : [];
+const saved = Astro.url.searchParams.get('saved');
+
+const suratHtml = p.status === 'diterima' ? buildSuratHtml(p) : '';
+
+const waTerima = waLink(
+  p.pemohon_wa,
+  `Assalamu'alaikum, Bapak/Ibu ${p.pemohon_nama}. Pengajuan ${p.jenis_nama} nomor ${p.nomor} telah DITERIMA. Surat sudah dapat diambil / dicetak di Kantor Desa Citarik. Terima kasih.`
+);
+const waTolak = waLink(
+  p.pemohon_wa,
+  `Assalamu'alaikum, Bapak/Ibu ${p.pemohon_nama}. Mohon maaf, pengajuan ${p.jenis_nama} nomor ${p.nomor} DITOLAK.${p.alasan_tolak ? ` Alasan: ${p.alasan_tolak}` : ''} Silakan hubungi Kantor Desa bila ada pertanyaan.`
+);
+
+const statusStyle: Record<string, string> = {
+  menunggu: 'background:#FEF3C7;color:#92400E',
+  diterima: 'background:#D1FAE5;color:#065F46',
+  ditolak: 'background:#FEE2E2;color:#991B1B',
+};
+---
+
+<AdminLayout title={`Pengajuan ${p.nomor}`} breadcrumb="Pelayanan / Detail">
+
+  {saved && (
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5;color:#065F46;border:1px solid #6EE7B7;">
+      Status pengajuan diperbarui.
+    </div>
+  )}
+
+  <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6">
+    <div>
+      <p class="text-sm text-text-muted font-heading">{p.nomor}</p>
+      <h2 class="font-heading font-bold text-xl" style="color:var(--color-primary);">{p.jenis_nama}</h2>
+      <span class="inline-block mt-2 text-xs font-heading font-semibold px-2.5 py-1 rounded-full capitalize" style={statusStyle[p.status] ?? ''}>
+        {p.status}
+      </span>
+    </div>
+    <a href="/admin/pelayanan" class="text-sm font-heading font-medium text-primary hover:underline">← Kembali</a>
+  </div>
+
+  <div class="grid lg:grid-cols-2 gap-6">
+    <div class="bg-white rounded-xl border border-border p-5 space-y-4" style="box-shadow:var(--shadow-sm);">
+      <h3 class="font-heading font-semibold text-primary">Data pemohon</h3>
+      <dl class="space-y-2 text-sm">
+        <div class="flex justify-between gap-4 border-b border-border py-2">
+          <dt class="text-text-muted">Nama</dt>
+          <dd class="font-medium text-right">{p.pemohon_nama}</dd>
+        </div>
+        <div class="flex justify-between gap-4 border-b border-border py-2">
+          <dt class="text-text-muted">NIK</dt>
+          <dd class="font-medium text-right tabular-nums">{p.pemohon_nik || '—'}</dd>
+        </div>
+        <div class="flex justify-between gap-4 border-b border-border py-2">
+          <dt class="text-text-muted">WhatsApp</dt>
+          <dd class="font-medium text-right tabular-nums">{p.pemohon_wa}</dd>
+        </div>
+        <div class="flex justify-between gap-4 border-b border-border py-2">
+          <dt class="text-text-muted">Diajukan</dt>
+          <dd class="font-medium text-right">{new Date(p.created_at).toLocaleString('id-ID')}</dd>
+        </div>
+        {p.decided_at && (
+          <div class="flex justify-between gap-4 border-b border-border py-2">
+            <dt class="text-text-muted">Diputuskan</dt>
+            <dd class="font-medium text-right">{new Date(p.decided_at).toLocaleString('id-ID')}</dd>
+          </div>
+        )}
+      </dl>
+
+      <h3 class="font-heading font-semibold text-primary pt-2">Isi formulir</h3>
+      <dl class="space-y-2 text-sm">
+        {fields.map(f => (
+          <div class="border-b border-border py-2">
+            <dt class="text-text-muted text-xs">{f.label}</dt>
+            <dd class="font-medium mt-0.5 whitespace-pre-wrap">{data[f.key] || '—'}</dd>
+          </div>
+        ))}
+        {fields.length === 0 && (
+          <pre class="text-xs bg-sand/50 p-3 rounded-lg overflow-x-auto">{JSON.stringify(data, null, 2)}</pre>
+        )}
+      </dl>
+
+      {p.status === 'ditolak' && p.alasan_tolak && (
+        <div class="p-3 rounded-lg text-sm" style="background:#FEE2E2;color:#991B1B;">
+          <p class="font-heading font-semibold">Alasan penolakan</p>
+          <p class="mt-1">{p.alasan_tolak}</p>
+        </div>
+      )}
+
+      {lampiran.length > 0 ? (
+        <div class="pt-2">
+          <h3 class="font-heading font-semibold text-primary mb-2">Lampiran</h3>
+          <ul class="space-y-2">
+            {lampiran.map(l => (
+              <li>
+                <a
+                  href={`/api/pelayanan/lampiran/${l.id}`}
+                  target="_blank"
+                  rel="noopener"
+                  class="flex items-center gap-2 text-sm text-accent hover:underline"
+                >
+                  <i data-lucide="paperclip" class="w-4 h-4 shrink-0"></i>
+                  <span>{l.filename}</span>
+                  <span class="text-text-muted text-xs">({formatFileSize(l.size_bytes)})</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <p class="text-xs text-text-muted pt-1">Tidak ada lampiran diunggah.</p>
+      )}
+    </div>
+
+    <div class="space-y-4">
+      {p.status === 'menunggu' && (
+        <div class="bg-white rounded-xl border border-border p-5 space-y-4" style="box-shadow:var(--shadow-sm);">
+          <h3 class="font-heading font-semibold text-primary">Keputusan</h3>
+
+          <form method="POST" action={`/api/admin/pelayanan/pengajuan/${p.id}`} class="space-y-3">
+            <input type="hidden" name="action" value="terima" />
+            <button type="submit" class="w-full rounded-lg font-heading font-semibold text-white py-2.5 cursor-pointer"
+              style="background:var(--color-cta);min-height:44px;">
+              Terima pengajuan
+            </button>
+          </form>
+
+          <form method="POST" action={`/api/admin/pelayanan/pengajuan/${p.id}`} class="space-y-3 border-t border-border pt-4">
+            <input type="hidden" name="action" value="tolak" />
+            <label for="alasan_tolak" class="block font-heading font-medium text-sm">Alasan penolakan <span class="text-cta">*</span></label>
+            <textarea id="alasan_tolak" name="alasan_tolak" required rows="3"
+              class="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none"
+              style="border-color:var(--color-border);"
+              placeholder="Contoh: data NIK tidak sesuai / lampiran kurang"></textarea>
+            <button type="submit" class="w-full rounded-lg font-heading font-semibold py-2.5 border cursor-pointer"
+              style="border-color:#DC2626;color:#DC2626;min-height:44px;">
+              Tolak pengajuan
+            </button>
+          </form>
+        </div>
+      )}
+
+      {p.status === 'diterima' && (
+        <div class="bg-white rounded-xl border border-border p-5 space-y-3" style="box-shadow:var(--shadow-sm);">
+          <h3 class="font-heading font-semibold text-primary">Surat siap</h3>
+          <p class="text-sm text-text-muted">Cetak atau unduh PDF, lalu hubungi pemohon via WhatsApp bila perlu.</p>
+          <a href={`/admin/pelayanan/${p.id}/cetak`} target="_blank" rel="noopener"
+            class="block w-full text-center rounded-lg font-heading font-semibold text-white py-2.5"
+            style="background:var(--color-primary);min-height:44px;line-height:28px;">
+            Cetak / unduh PDF
+          </a>
+          <a href={waTerima} target="_blank" rel="noopener noreferrer"
+            class="block w-full text-center rounded-lg font-heading font-semibold py-2.5 border"
+            style="border-color:#15803D;color:#15803D;min-height:44px;line-height:28px;">
+            Hubungi WA (surat siap)
+          </a>
+        </div>
+      )}
+
+      {p.status === 'ditolak' && (
+        <div class="bg-white rounded-xl border border-border p-5 space-y-3" style="box-shadow:var(--shadow-sm);">
+          <h3 class="font-heading font-semibold text-primary">Hubungi pemohon</h3>
+          <a href={waTolak} target="_blank" rel="noopener noreferrer"
+            class="block w-full text-center rounded-lg font-heading font-semibold py-2.5 border"
+            style="border-color:#15803D;color:#15803D;min-height:44px;line-height:28px;">
+            Hubungi WA (ditolak)
+          </a>
+        </div>
+      )}
+
+      {p.status === 'diterima' && suratHtml && (
+        <div class="bg-white rounded-xl border border-border p-5" style="box-shadow:var(--shadow-sm);">
+          <h3 class="font-heading font-semibold text-primary mb-3">Pratinjau surat</h3>
+          <div class="prose max-w-none text-sm border border-border rounded-lg p-4 bg-sand/20" set:html={suratHtml} />
+        </div>
+      )}
+    </div>
+  </div>
+
+</AdminLayout>

@@ -1,0 +1,36 @@
+---
+import Layout from '../../components/Layout.astro';
+
+const nomor = Astro.url.searchParams.get('nomor') ?? '';
+---
+
+<Layout title="Pengajuan Terkirim | Desa Citarik" description="Pengajuan pelayanan desa berhasil dikirim.">
+
+<div class="container-page py-16 max-w-lg mx-auto text-center">
+  <div class="w-16 h-16 mx-auto rounded-full grid place-items-center mb-5" style="background:#D1FAE5;color:#065F46;">
+    <i data-lucide="check" class="w-8 h-8"></i>
+  </div>
+  <h1 class="text-2xl sm:text-3xl font-heading font-extrabold text-primary">Pengajuan terkirim</h1>
+  <p class="text-muted mt-3 leading-relaxed">
+    Data Anda sudah masuk antrean petugas desa. Simpan nomor pengajuan berikut.
+  </p>
+  {nomor && (
+    <p class="mt-6 font-heading font-bold text-2xl text-ink tracking-wide tabular-nums border border-border rounded-xl py-4 px-6 bg-white">
+      {nomor}
+    </p>
+  )}
+  <p class="text-sm text-muted mt-4 leading-relaxed">
+    Petugas dapat menghubungi WhatsApp Anda saat surat diterima atau ditolak. Anda juga bisa cek status kapan saja dengan nomor ini + WA.
+  </p>
+  <div class="flex flex-wrap gap-3 justify-center mt-8">
+    {nomor && (
+      <a href={`/pelayanan/status?nomor=${encodeURIComponent(nomor)}`} class="btn btn-primary">
+        Cek status
+      </a>
+    )}
+    <a href="/pelayanan" class="btn btn-secondary">Ajukan lagi</a>
+    <a href="/" class="btn btn-secondary">Ke beranda</a>
+  </div>
+</div>
+
+</Layout>
