@@ -1,0 +1,58 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import { getAllPotensi } from '../../../lib/db/potensi';
+import { getEnv } from '@lib/env';
+
+const env = getEnv();
+const list = env ? await getAllPotensi(env.DB) : [];
+const saved = Astro.url.searchParams.get('saved');
+---
+
+<AdminLayout title="Potensi" breadcrumb="Potensi">
+
+  {saved && (
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5;color:#065F46;border:1px solid #6EE7B7;">
+      Potensi disimpan.
+    </div>
+  )}
+
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="font-heading font-bold text-xl" style="color:var(--color-primary);">Potensi Desa</h2>
+      <p class="text-sm text-text-muted mt-1">Tambah halaman potensi baru tanpa mengubah kode.</p>
+    </div>
+    <a href="/admin/potensi/new" class="px-4 py-2 rounded-lg font-heading font-semibold text-white text-sm" style="background:var(--color-cta);min-height:44px;display:inline-flex;align-items:center;">
+      + Tambah potensi
+    </a>
+  </div>
+
+  <div class="bg-white rounded-xl border border-border overflow-hidden" style="box-shadow:var(--shadow-sm);">
+    {list.length === 0 ? (
+      <p class="p-8 text-center text-text-muted">Belum ada potensi.</p>
+    ) : (
+      <table class="w-full text-sm">
+        <thead style="background:#F8FAFC;">
+          <tr class="border-b border-border">
+            <th class="text-left px-4 py-3 font-heading font-semibold">Nama</th>
+            <th class="text-left px-4 py-3 font-heading font-semibold hidden sm:table-cell">Status</th>
+            <th class="text-left px-4 py-3 font-heading font-semibold hidden md:table-cell">Urutan</th>
+            <th class="px-4 py-3 font-heading font-semibold">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          {list.map((p) => (
+            <tr class="border-b border-border last:border-0 hover:bg-sand/30">
+              <td class="px-4 py-3 font-medium">{p.nama}<div class="text-xs text-text-muted">/{p.slug}</div></td>
+              <td class="px-4 py-3 hidden sm:table-cell capitalize">{p.status}</td>
+              <td class="px-4 py-3 hidden md:table-cell">{p.urutan}</td>
+              <td class="px-4 py-3 text-center">
+                <a href={`/admin/potensi/${p.id}`} class="inline-block px-3 py-1.5 rounded-md font-heading font-medium text-xs border" style="border-color:var(--color-primary);color:var(--color-primary);">Sunting</a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+  </div>
+
+</AdminLayout>

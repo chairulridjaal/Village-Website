@@ -11,9 +11,6 @@ export const GET: APIRoute = async () => {
     { loc: `${base}/profil`, priority: '0.8', changefreq: 'monthly' },
     { loc: `${base}/pemerintahan`, priority: '0.7', changefreq: 'monthly' },
     { loc: `${base}/potensi`, priority: '0.8', changefreq: 'monthly' },
-    { loc: `${base}/potensi/pertanian`, priority: '0.7', changefreq: 'monthly' },
-    { loc: `${base}/potensi/perikanan`, priority: '0.7', changefreq: 'monthly' },
-    { loc: `${base}/potensi/sdm`, priority: '0.7', changefreq: 'monthly' },
     { loc: `${base}/pelayanan`, priority: '0.85', changefreq: 'weekly' },
     { loc: `${base}/pelayanan/status`, priority: '0.6', changefreq: 'monthly' },
     { loc: `${base}/umkm`, priority: '0.9', changefreq: 'weekly' },
@@ -46,6 +43,18 @@ export const GET: APIRoute = async () => {
         priority: '0.6',
         changefreq: 'yearly',
         lastmod: b.published_at?.split('T')[0],
+      });
+    }
+
+    const potensiRows = await env.DB.prepare(
+      "SELECT slug, updated_at FROM potensi WHERE status='published'"
+    ).all<{ slug: string; updated_at: string }>().catch(() => ({ results: [] as { slug: string; updated_at: string }[] }));
+    for (const p of potensiRows.results ?? []) {
+      dynamicUrls.push({
+        loc: `${base}/potensi/${p.slug}`,
+        priority: '0.7',
+        changefreq: 'monthly',
+        lastmod: p.updated_at?.split('T')[0],
       });
     }
   }

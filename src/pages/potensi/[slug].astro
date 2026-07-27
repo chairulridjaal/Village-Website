@@ -1,0 +1,61 @@
+﻿---
+import Layout from '../../components/Layout.astro';
+import { getPotensiBySlug, parseStatsJson } from '../../lib/db/potensi';
+import { getEnv } from '@lib/env';
+
+const { slug } = Astro.params as { slug: string };
+const env = getEnv();
+const p = env ? await getPotensiBySlug(slug, env.DB) : null;
+if (!p) return Astro.redirect('/potensi');
+
+const stats = parseStatsJson(p.stats_json);
+---
+
+<Layout
+  title={`${p.nama} | Potensi Desa Citarik`}
+  description={p.ringkasan || `Potensi ${p.nama} Desa Citarik`}
+>
+
+<section class="page-hero">
+  <div class="page-hero__media">
+    <img src="/images/nelayan.png" alt={p.nama} />
+  </div>
+  <div class="page-hero__overlay"></div>
+  <div class="page-hero__content">
+    <div class="container-page">
+      <nav aria-label="Breadcrumb" class="breadcrumb">
+        <a href="/">Beranda</a>
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        <a href="/potensi">Potensi</a>
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        <span class="font-medium text-white">{p.nama}</span>
+      </nav>
+      <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1.5">{p.nama}</h1>
+    </div>
+  </div>
+</section>
+
+<div class="container-page py-10">
+  <div class="max-w-3xl space-y-6">
+    <div class="prose max-w-none text-muted leading-relaxed" set:html={p.deskripsi_html} />
+    {stats.length > 0 && (
+      <div class="grid sm:grid-cols-3 gap-4 mt-6">
+        {stats.map((item) => (
+          <div class="card-surface p-5 text-center">
+            <i data-lucide={item.icon || 'info'} class="w-8 h-8 text-accent mx-auto"></i>
+            <p class="font-heading font-extrabold text-2xl text-primary mt-2">{item.value}</p>
+            <p class="text-sm text-muted mt-0.5">{item.label}</p>
+          </div>
+        ))}
+      </div>
+    )}
+    <div class="mt-6 flex flex-wrap gap-3">
+      <a href="/umkm" class="btn btn-primary">
+        <i data-lucide="store" class="w-5 h-5"></i> Lihat UMKM
+      </a>
+      <a href="/kontak" class="btn btn-secondary">Hubungi Desa</a>
+    </div>
+  </div>
+</div>
+
+</Layout>

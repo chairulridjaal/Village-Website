@@ -1,0 +1,64 @@
+---
+import AdminLayout from '../../../components/AdminLayout.astro';
+import { getPotensiById } from '../../../lib/db/potensi';
+import { getEnv } from '@lib/env';
+
+const { id } = Astro.params as { id: string };
+const env = getEnv();
+const p = env ? await getPotensiById(Number(id), env.DB) : null;
+if (!p) return Astro.redirect('/admin/potensi');
+
+const saved = Astro.url.searchParams.get('saved');
+const inputCls = 'w-full rounded-lg border px-4 py-2.5 text-base focus:outline-none';
+const inputStyle = 'border-color:var(--color-border); min-height:44px;';
+---
+
+<AdminLayout title={`Edit: ${p.nama}`} breadcrumb="Potensi / Edit">
+
+  {saved && (
+    <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5;color:#065F46;border:1px solid #6EE7B7;">
+      Potensi disimpan. <a href={`/potensi/${p.slug}`} target="_blank" class="underline">Lihat di situs ↗</a>
+    </div>
+  )}
+
+  <form method="POST" action={`/api/admin/potensi/${p.id}`} class="max-w-3xl space-y-5">
+    <div>
+      <label class="block font-heading font-medium text-sm mb-1.5" for="nama">Nama *</label>
+      <input id="nama" name="nama" required value={p.nama} class={inputCls} style={inputStyle} />
+    </div>
+    <div>
+      <label class="block font-heading font-medium text-sm mb-1.5" for="ringkasan">Ringkasan</label>
+      <textarea id="ringkasan" name="ringkasan" rows="3" class={inputCls} style={inputStyle}>{p.ringkasan}</textarea>
+    </div>
+    <div>
+      <label class="block font-heading font-medium text-sm mb-1.5" for="deskripsi_html">Isi halaman</label>
+      <textarea id="deskripsi_html" name="deskripsi_html" rows="12" class={inputCls} style={inputStyle}>{p.deskripsi_html}</textarea>
+    </div>
+    <div>
+      <label class="block font-heading font-medium text-sm mb-1.5" for="stats_json">Kartu angka (JSON)</label>
+      <textarea id="stats_json" name="stats_json" rows="4" class={inputCls} style={inputStyle}>{p.stats_json}</textarea>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block font-heading font-medium text-sm mb-1.5" for="urutan">Urutan</label>
+        <input type="number" id="urutan" name="urutan" value={p.urutan} class={inputCls} style={inputStyle} />
+      </div>
+      <div>
+        <label class="block font-heading font-medium text-sm mb-1.5" for="status">Status</label>
+        <select id="status" name="status" class={inputCls} style={inputStyle}>
+          <option value="draft" selected={p.status === 'draft'}>Draf</option>
+          <option value="published" selected={p.status === 'published'}>Terbit</option>
+        </select>
+      </div>
+    </div>
+    <div class="flex gap-3">
+      <a href="/admin/potensi" class="px-4 py-2 rounded-lg border text-sm font-heading" style="border-color:var(--color-border);">Kembali</a>
+      <button type="submit" class="px-5 py-2 rounded-lg font-heading font-semibold text-white text-sm" style="background:var(--color-cta);">Simpan</button>
+    </div>
+  </form>
+
+  <form method="POST" action={`/api/admin/potensi/${p.id}/delete`} class="mt-8" onsubmit="return confirm('Hapus potensi ini?')">
+    <button type="submit" class="text-sm text-red-600 hover:underline">Hapus potensi</button>
+  </form>
+
+</AdminLayout>

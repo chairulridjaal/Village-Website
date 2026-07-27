@@ -1,5 +1,10 @@
----
+﻿---
 import Layout from '../components/Layout.astro';
+import { getPublishedPotensi } from '../lib/db/potensi';
+import { getEnv } from '@lib/env';
+
+const env = getEnv();
+const list = env ? await getPublishedPotensi(env.DB).catch(() => []) : [];
 ---
 
 <Layout
@@ -20,63 +25,32 @@ import Layout from '../components/Layout.astro';
         <span class="font-medium text-white">Potensi Desa</span>
       </nav>
       <h1 class="text-3xl sm:text-4xl font-heading font-extrabold mt-1.5">Potensi Desa Citarik</h1>
-      <p class="text-white/85 mt-1.5 max-w-xl">Sumber daya dan peluang ekonomi yang menanti mitra & pembeli.</p>
+      <p class="text-white/85 mt-1.5 max-w-xl">Sumber daya dan peluang ekonomi yang menanti mitra &amp; pembeli.</p>
     </div>
   </div>
 </section>
 
 <div class="container-page py-10 md:py-12 space-y-5">
-
-  <article class="grid md:grid-cols-2 gap-0 items-stretch card-surface overflow-hidden">
-    <a href="/potensi/perikanan" class="block aspect-[16/11] md:aspect-auto overflow-hidden">
-      <img src="/images/ikan_bakar.png" alt="Perikanan dan nelayan Desa Citarik"
-        class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy" />
-    </a>
-    <div class="p-7">
-      <span class="chip chip-potensi">Perikanan</span>
-      <h2 class="text-2xl font-heading font-extrabold text-primary mt-2.5">
-        <a href="/potensi/perikanan" class="hover:underline">Perikanan</a>
-      </h2>
-      <p class="text-muted leading-relaxed mt-2">Menurut Prodeskel 2025: empang/kolam, alat pancing, serta produksi ikan mas dan nila. Pemasaran melalui pasar, KUD, dan lumbung desa.</p>
-      <a href="/potensi/perikanan" class="inline-flex items-center gap-1.5 mt-4 text-accent font-heading font-semibold hover:text-primary transition-colors">
-        Selengkapnya <i data-lucide="arrow-right" class="w-4 h-4"></i>
+  {list.length === 0 ? (
+    <p class="text-muted text-center py-12">Belum ada potensi yang ditampilkan.</p>
+  ) : list.map((p, i) => (
+    <article class="grid md:grid-cols-2 gap-0 items-stretch card-surface overflow-hidden">
+      <a href={`/potensi/${p.slug}`} class:list={['block aspect-[16/11] md:aspect-auto overflow-hidden', i % 2 === 1 && 'md:order-2']}>
+        <img src="/images/nelayan.png" alt={p.nama}
+          class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy" />
       </a>
-    </div>
-  </article>
-
-  <article class="grid md:grid-cols-2 gap-0 items-stretch card-surface overflow-hidden">
-    <a href="/potensi/pertanian" class="block aspect-[16/11] md:aspect-auto md:order-2 overflow-hidden">
-      <img src="/images/kebun_sayur.png" alt="Pertanian dan perkebunan Desa Citarik"
-        class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy" />
-    </a>
-    <div class="p-7 md:order-1">
-      <span class="chip chip-umkm">Pertanian</span>
-      <h2 class="text-2xl font-heading font-extrabold text-primary mt-2.5">
-        <a href="/potensi/pertanian" class="hover:underline">Pertanian & Perkebunan</a>
-      </h2>
-      <p class="text-muted leading-relaxed mt-2">Prodeskel 2025: 773 keluarga petani, 2.330 Ha tanah sawah, padi sawah 53 Ha (±26 ton/ha), dan budidaya pisang. Peluang kemitraan pertanian terbuka.</p>
-      <a href="/potensi/pertanian" class="inline-flex items-center gap-1.5 mt-4 text-accent font-heading font-semibold hover:text-primary transition-colors">
-        Selengkapnya <i data-lucide="arrow-right" class="w-4 h-4"></i>
-      </a>
-    </div>
-  </article>
-
-  <article class="grid md:grid-cols-2 gap-0 items-stretch card-surface overflow-hidden">
-    <a href="/potensi/sdm" class="block aspect-[16/11] md:aspect-auto overflow-hidden">
-      <img src="/images/nelayan.png" alt="Warga dan organisasi masyarakat Desa Citarik"
-        class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy" />
-    </a>
-    <div class="p-7">
-      <span class="chip chip-kuliner">Sumber Daya Manusia</span>
-      <h2 class="text-2xl font-heading font-extrabold text-primary mt-2.5">
-        <a href="/potensi/sdm" class="hover:underline">Potensi Sumber Daya Manusia</a>
-      </h2>
-      <p class="text-muted leading-relaxed mt-2">8.553 warga usia 18–56 tahun bekerja, 4 dusun, 10 RW, 50 RT, BPD 9 anggota, LPMD, dan BUMDes — fondasi kelembagaan desa (Prodeskel & rekap PEMDES 2025).</p>
-      <a href="/potensi/sdm" class="inline-flex items-center gap-1.5 mt-4 text-accent font-heading font-semibold hover:text-primary transition-colors">
-        Selengkapnya <i data-lucide="arrow-right" class="w-4 h-4"></i>
-      </a>
-    </div>
-  </article>
+      <div class:list={['p-7', i % 2 === 1 && 'md:order-1']}>
+        <span class="chip chip-potensi">Potensi</span>
+        <h2 class="text-2xl font-heading font-extrabold text-primary mt-2.5">
+          <a href={`/potensi/${p.slug}`} class="hover:underline">{p.nama}</a>
+        </h2>
+        <p class="text-muted leading-relaxed mt-2">{p.ringkasan}</p>
+        <a href={`/potensi/${p.slug}`} class="inline-flex items-center gap-1.5 mt-4 text-accent font-heading font-semibold hover:text-primary transition-colors">
+          Selengkapnya <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </article>
+  ))}
 
   <div class="bg-primary text-white rounded-xl p-8 text-center">
     <h2 class="text-2xl font-heading font-extrabold text-white">Tertarik bermitra dengan Desa Citarik?</h2>
@@ -85,7 +59,6 @@ import Layout from '../components/Layout.astro';
       <i data-lucide="phone" class="w-5 h-5"></i> Hubungi Desa
     </a>
   </div>
-
 </div>
 
 </Layout>
