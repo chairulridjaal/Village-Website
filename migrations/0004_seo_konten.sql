@@ -4,10 +4,10 @@
 -- Aman dijalankan berulang (idempotent).
 -- ─────────────────────────────────────────────────────────────
 
--- ── Profil umum: perbaiki kalimat yang memakai em dash ──
+-- ── Profil umum: data Prodeskel Maret 2025 (final override di 0006) ──
 INSERT INTO page_section (slug, title, content_html) VALUES
   ('profil-umum', 'Profil Umum',
-   '<p>Desa Citarik terletak di sebelah selatan Kecamatan Simpenan, Kabupaten Sukabumi, Jawa Barat, berjarak sekitar 2 km dari pusat kecamatan dan 7 km dari pusat Pemerintahan Kabupaten Sukabumi. Sebagai desa pesisir yang berbatasan dengan Samudra Hindia, Citarik dikenal sebagai lumbung padi wilayah Palabuhanratu sekaligus memiliki garis pantai untuk pengembangan wisata bahari.</p><p>Desa Citarik berstatus <strong>Desa Maju</strong> berdasarkan Indeks Desa Membangun (IDM) dan pernah meraih Juara I Program Desa Pesisir Tangguh (PDPT) tingkat Kabupaten tahun 2011-2013 serta menjadi nominator tingkat nasional.</p><ul><li><strong>Alamat:</strong> Jl. Raya Bojongkopo KM.02, Desa Citarik, Kecamatan Simpenan, Kode Pos 43361</li><li><strong>Email:</strong> desacitarik@gmail.com</li></ul>')
+   '<p>Desa Citarik terletak di Kecamatan Palabuhanratu, Kabupaten Sukabumi, Provinsi Jawa Barat (kode desa 3202110005). Berdasarkan isian Prodeskel Maret 2025, desa ini memiliki 4 dusun, 10 RW, dan 50 RT, dengan jumlah penduduk 13.187 jiwa (6.750 laki-laki, 6.437 perempuan) dari 4.220 kepala keluarga.</p><p>Jarak ke ibu kota kecamatan maupun ibu kota kabupaten masing-masing sekitar 6 km (±0,15 jam dengan kendaraan bermotor). Jarak ke ibu kota provinsi sekitar 150 km (±6 jam bermotor).</p><ul><li><strong>Kecamatan:</strong> Palabuhanratu</li><li><strong>Kabupaten:</strong> Sukabumi</li><li><strong>Provinsi:</strong> Jawa Barat</li><li><strong>Kode desa:</strong> 3202110005</li><li><strong>Sumber data:</strong> Profil Desa dan Kelurahan (Prodeskel), Maret 2025</li></ul>')
 ON CONFLICT(slug) DO UPDATE SET title=excluded.title, content_html=excluded.content_html, updated_at=datetime('now');
 
 -- ── Wisata: deskripsi lebih lengkap untuk tiap destinasi (daya tarik, akses, tips) ──

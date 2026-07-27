@@ -5,29 +5,31 @@
 -- ─────────────────────────────────────────────────────────────
 
 -- ── Page sections (UPSERT: perbarui konten, pertahankan cover jika sudah ada) ──
+-- Konten profil/beranda di bawah diselaraskan dengan Prodeskel 2025.
+-- Migrasi 0006 memaksa update ulang bila DB sudah pernah di-seed nilai lama.
 INSERT INTO page_section (slug, title, content_html) VALUES
   ('beranda-hero', 'Selamat Datang di Desa Citarik',
-   '<p>Desa Citarik adalah desa pesisir di Kecamatan Simpenan, Kabupaten Sukabumi, yang berbatasan langsung dengan Samudra Hindia. Kaya akan potensi bahari, pertanian, dan wisata alam, serta menjadi salah satu penyangga kawasan Geopark Ciletuh-Palabuhanratu.</p>')
+   '<p>Desa Citarik berada di Kecamatan Palabuhanratu, Kabupaten Sukabumi, Jawa Barat. Profil resmi desa mengacu pada isian Prodeskel Kemendagri tahun 2025 (kode desa 3202110005).</p>')
 ON CONFLICT(slug) DO UPDATE SET title=excluded.title, content_html=excluded.content_html, updated_at=datetime('now');
 
 INSERT INTO page_section (slug, title, content_html) VALUES
   ('beranda-sekilas', 'Sekilas Desa Citarik',
-   '<p>Berdiri sejak tahun 1976 sebagai hasil pemekaran dari Desa Cidadap, Desa Citarik kini berstatus Desa Maju dengan luas wilayah 3.300 hektar. Desa ini terdiri dari 4 dusun, 12 RW, dan 62 RT, dengan jumlah penduduk 12.494 jiwa (4.355 KK). Mayoritas warga bermata pencaharian di sektor pertanian, perikanan/nelayan, dan perdagangan.</p>')
+   '<p>Desa Citarik, Kecamatan Palabuhanratu, Kabupaten Sukabumi, Provinsi Jawa Barat. Luas wilayah 526,38 hektar, 4 dusun, 10 RW, 50 RT, dan 13.187 jiwa (4.220 KK) menurut Prodeskel Maret 2025.</p>')
 ON CONFLICT(slug) DO UPDATE SET title=excluded.title, content_html=excluded.content_html, updated_at=datetime('now');
 
 INSERT INTO page_section (slug, title, content_html) VALUES
   ('profil-umum', 'Profil Umum',
-   '<p>Desa Citarik terletak di sebelah selatan Kecamatan Simpenan, Kabupaten Sukabumi, Jawa Barat, berjarak sekitar 2 km dari pusat kecamatan dan 7 km dari pusat Pemerintahan Kabupaten Sukabumi. Sebagai desa pesisir yang berbatasan dengan Samudra Hindia, Citarik dikenal sebagai lumbung padi wilayah Palabuhanratu sekaligus memiliki garis pantai untuk pengembangan wisata bahari.</p><p>Desa Citarik berstatus <strong>Desa Maju</strong> berdasarkan Indeks Desa Membangun (IDM) dan pernah meraih Juara I Program Desa Pesisir Tangguh (PDPT) tingkat Kabupaten tahun 2011-2013 serta menjadi nominator tingkat nasional.</p><ul><li><strong>Alamat:</strong> Jl. Raya Bojongkopo KM.02, Desa Citarik, Kecamatan Simpenan, Kode Pos 43361</li><li><strong>Email:</strong> desacitarik@gmail.com</li></ul>')
+   '<p>Desa Citarik terletak di Kecamatan Palabuhanratu, Kabupaten Sukabumi, Provinsi Jawa Barat (kode desa 3202110005). Berdasarkan isian Prodeskel Maret 2025, desa ini memiliki 4 dusun, 10 RW, dan 50 RT, dengan jumlah penduduk 13.187 jiwa (6.750 laki-laki, 6.437 perempuan) dari 4.220 kepala keluarga.</p><p>Jarak ke ibu kota kecamatan maupun ibu kota kabupaten masing-masing sekitar 6 km (±0,15 jam dengan kendaraan bermotor). Jarak ke ibu kota provinsi sekitar 150 km (±6 jam bermotor).</p><ul><li><strong>Kecamatan:</strong> Palabuhanratu</li><li><strong>Kabupaten:</strong> Sukabumi</li><li><strong>Provinsi:</strong> Jawa Barat</li><li><strong>Kode desa:</strong> 3202110005</li><li><strong>Sumber data:</strong> Profil Desa dan Kelurahan (Prodeskel), Maret 2025</li></ul>')
 ON CONFLICT(slug) DO UPDATE SET title=excluded.title, content_html=excluded.content_html, updated_at=datetime('now');
 
 INSERT INTO page_section (slug, title, content_html) VALUES
-  ('profil-geografis', 'Kondisi Geografis & Demografi',
-   '<p>Desa Citarik memiliki luas wilayah <strong>3.300 hektar</strong> dengan iklim kemarau dan penghujan. Wilayahnya terbagi dalam 4 dusun: Bojongkopo, Babakan Astana, Sawah Garung, dan Cimapag.</p><h2>Batas Wilayah</h2><ul><li><strong>Utara:</strong> Desa Cidadap, Kecamatan Simpenan</li><li><strong>Selatan:</strong> Desa Kertajaya &amp; Desa Sangrawayang</li><li><strong>Timur:</strong> Desa Langkap Jaya &amp; Desa Cibuntu</li><li><strong>Barat:</strong> Samudera Hindia</li></ul><h2>Data Kependudukan</h2><p>Jumlah penduduk <strong>12.494 jiwa</strong> (laki-laki 6.341, perempuan 6.153) dari <strong>4.355 kepala keluarga</strong>. Mayoritas penduduk memeluk agama Islam. Mata pencaharian utama warga meliputi nelayan, petani, buruh tani, pedagang, dan wiraswasta.</p>')
+  ('profil-geografis', 'Kondisi Geografis',
+   '<p>Luas wilayah Desa Citarik tercatat <strong>526,38 hektar</strong> (Profil Desa / PPT). Wilayah berada di kaki Gunung Jayanti, dengan topografi dataran rendah hingga tinggi, mayoritas lahan pertanian.</p><h2>Batas Wilayah</h2><ul><li><strong>Utara:</strong> Alam Gunung Jayanti / kehutanan (Kec. Cikidang)</li><li><strong>Selatan:</strong> Desa Cidadap / Sungai Cimandiri (Kec. Simpenan)</li><li><strong>Timur:</strong> Desa Cikadu (Kec. Bantargadung)</li><li><strong>Barat:</strong> Desa Jayanti (Kec. Cikakak)</li></ul><p>Penetapan batas didukung Perda No. 21 Tahun 2012. Suhu harian sekitar 23–30 °C; curah hujan sekitar 2.900 mm/tahun (PPT).</p>')
 ON CONFLICT(slug) DO UPDATE SET title=excluded.title, content_html=excluded.content_html, updated_at=datetime('now');
 
 INSERT INTO page_section (slug, title, content_html) VALUES
   ('profil-sejarah', 'Sejarah Desa',
-   '<p>Desa Citarik terbentuk pada tahun 1976 sebagai hasil pemekaran dari Desa Cidadap, yang saat itu masih menginduk ke Kecamatan Palabuhanratu. Pemekaran diprakarsai para tokoh masyarakat melalui rembug desa untuk meningkatkan pelayanan dan pemerataan pembangunan.</p><p>Nama <strong>Citarik</strong> berasal dari kata Belanda <em>Loge</em> yang berarti kantor atau markas pertahanan. Di pesisir desa terdapat benteng pertahanan peninggalan masa Belanda; keberadaan benteng inilah yang menjadi asal-usul penamaan Desa Citarik. Situs benteng tersebut kini menjadi salah satu daya tarik sejarah desa.</p>')
+   '<p>Menurut dokumen Profil Desa Citarik (PPT), desa ini sudah tercatat sebagai pemerintahan desa sejak <strong>tahun 1912</strong>, dipimpin Kepala Desa (dulu disebut Jaro).</p><p>Sampai tahun 1912 wilayah ini bernama <strong>Desa Cihoe</strong>. Kata <em>hoe</em> merujuk pada rotan—tali temali yang kuat dan mengikat kencang (tarik). Pada periode <strong>1912–1930</strong> desa bernama <strong>Kalideres</strong>. Sejak <strong>1930</strong> nama resmi menjadi <strong>Desa Citarik</strong>, sejalan dengan penamaan batas alam <strong>Kali Citarik</strong> (antara Kalideres dan Tonjong) serta pemaknaan Sunda dari Cihoe dan Kalideres yang dihubungkan dengan arti yang sama.</p><p>Pada <strong>2012</strong>, sesuai <strong>Perda Kabupaten Sukabumi Nomor 21 Tahun 2012</strong> (5 April 2012), Desa Citarik mengalami pemekaran sehingga terbentuk <strong>Desa Jayanti</strong> sebagai desa baru; Desa Citarik tetap sebagai desa induk. Penetapan batas Citarik–Jayanti dituangkan dalam Keputusan Bupati Sukabumi Nomor 141/Kep.1315-Tapem/2013 (30 Desember 2013).</p><p>Pusat pemerintahan desa berada di Dusun III, Jalan Raya Citarik Km. 06 Palabuhanratu, Kp. Legok Loa RT 001 RW 014.</p>')
 ON CONFLICT(slug) DO UPDATE SET title=excluded.title, content_html=excluded.content_html, updated_at=datetime('now');
 
 INSERT INTO page_section (slug, title, content_html) VALUES
@@ -42,7 +44,7 @@ ON CONFLICT(slug) DO UPDATE SET title=excluded.title, content_html=excluded.cont
 
 INSERT INTO page_section (slug, title, content_html) VALUES
   ('pemerintahan-ruang-lingkup', 'Ruang Lingkup Pemerintahan',
-   '<p>Pemerintah Desa Citarik dipimpin oleh Kepala Desa <strong>Papang Suherlan</strong> untuk periode <strong>2025-2027</strong>. Pemerintahan menyelenggarakan wilayah seluas 3.300 hektar yang mencakup <strong>4 dusun, 12 RW, dan 62 RT</strong>, dengan jumlah penduduk 12.494 jiwa dari 4.355 kepala keluarga. Badan Permusyawaratan Desa (BPD) beranggotakan 9 orang yang mewakili keempat kedusunan.</p>')
+   '<p>Pemerintah Desa Citarik dipimpin oleh Kepala Desa <strong>Sumantri</strong> (rekap PEMDES Juni 2025). Kecamatan Palabuhanratu, Kabupaten Sukabumi. Wilayah seluas <strong>526,38 hektar</strong> mencakup <strong>4 dusun, 10 RW, dan 50 RT</strong>, dengan jumlah penduduk 13.187 jiwa dari 4.220 kepala keluarga (Prodeskel 2025). BPD beranggotakan 9 orang.</p>')
 ON CONFLICT(slug) DO UPDATE SET title=excluded.title, content_html=excluded.content_html, updated_at=datetime('now');
 
 INSERT INTO page_section (slug, title, content_html) VALUES
@@ -50,21 +52,21 @@ INSERT INTO page_section (slug, title, content_html) VALUES
    '<p>Pemerintah Desa Citarik bertugas menyelenggarakan pemerintahan desa, melaksanakan pembangunan, pembinaan kemasyarakatan, dan pemberdayaan masyarakat sesuai dengan Undang-Undang Nomor 6 Tahun 2014 tentang Desa.</p>')
 ON CONFLICT(slug) DO UPDATE SET title=excluded.title, content_html=excluded.content_html, updated_at=datetime('now');
 
--- ── Perangkat Desa (data nyata, periode 2025-2027) ──
+-- Perangkat resmi: lihat 0007_perangkat_citarik_hapus_wisata.sql (rekap PEMDES Juni 2025)
 DELETE FROM perangkat_desa;
 INSERT INTO perangkat_desa (nama, jabatan, urutan) VALUES
-  ('Papang Suherlan',                 'Kepala Desa',             1),
-  ('Hadiansyah',                      'Sekretaris Desa',         2),
-  ('Alan Abdul Malik',                'Kepala Seksi Pemerintahan', 3),
-  ('Ruli Agustian, S.M.',             'Kepala Seksi Kesejahteraan', 4),
-  ('Wida Sulastri',                   'Kepala Seksi Pelayanan',  5),
-  ('Dini Dwi Lurian, S.H.',           'Kepala Urusan Keuangan',  6),
-  ('Parastilla Az-zahra, S.I.P.',     'Kepala Urusan Umum & TU', 7),
-  ('Aliefia Suci Nusantari, A.Md.Kom.', 'Kepala Urusan Perencanaan', 8),
-  ('Endang Hardian, S.Kom.',          'Kepala Dusun I',          9),
-  ('Gusandi, S.E.',                   'Kepala Dusun II',        10),
-  ('Isep Hikmatullah',                'Kepala Dusun III',       11),
-  ('Suhenda, S.E.',                   'Kepala Dusun IV',        12);
+  ('Sumantri', 'Kepala Desa', 1),
+  ('Yuspa Hendri, S.T.', 'Sekretaris Desa', 2),
+  ('Iing Kusanedi', 'Kepala Seksi Pemerintahan', 3),
+  ('Alvina Nurfadilah', 'Kepala Seksi Kesejahteraan', 4),
+  ('Wiwi Parwati, S.Ap.', 'Kepala Seksi Pelayanan', 5),
+  ('Andini Kusniawati, S.Ak.', 'Kepala Urusan Tata Usaha dan Umum', 6),
+  ('Rena Restiawati, S.Kom.', 'Kepala Urusan Keuangan', 7),
+  ('Wina Panduliana', 'Kepala Urusan Perencanaan', 8),
+  ('E. Lupi Yanti Yani Dia Dara, S.Pd.', 'Kepala Dusun 1', 9),
+  ('Surahman', 'Kepala Dusun 2', 10),
+  ('Budiman', 'Kepala Dusun 3', 11),
+  ('Misbah', 'Kepala Dusun 4', 12);
 
 -- ── Wisata (ganti placeholder dengan potensi wisata nyata) ──
 DELETE FROM wisata WHERE slug IN ('pantai-Citarik', 'pantai-karang-sari');

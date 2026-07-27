@@ -8,49 +8,37 @@ CREATE TABLE IF NOT EXISTS pengaturan (
   value TEXT NOT NULL DEFAULT ''
 );
 
+-- Nilai awal = Prodeskel Desa Citarik Maret 2025 (lihat profil-desa-citarik.md).
+-- INSERT OR IGNORE: DB yang sudah punya key tidak diubah di sini;
+-- migrasi 0006_profil_prodeskel_2025.sql yang memaksa update.
 INSERT OR IGNORE INTO pengaturan (key, value) VALUES
-  ('kontak_alamat',  'Kantor Desa Citarik, Kecamatan Simpenan, Kabupaten Sukabumi, Jawa Barat'),
+  ('kontak_alamat',  'Kantor Desa Citarik, Kecamatan Palabuhanratu, Kabupaten Sukabumi, Jawa Barat'),
   ('kontak_telepon', '(0266) 000-0000'),
   ('kontak_email',   'desacitarik@gmail.com'),
   ('kontak_jam',     'Senin-Jumat, pukul 08.00-15.00 WIB'),
   ('sosial_whatsapp', ''),
   ('sosial_facebook', ''),
   ('sosial_instagram', ''),
-  ('stat_umum', '{"luas":"3.300","rw":12,"rt":62}'),
+  ('stat_umum', '{"luas":"526,38","rw":10,"rt":50,"penduduk":13187,"laki":6750,"perempuan":6437,"kk":4220,"kepadatan":"25,05","dusun":4,"kecamatan":"Palabuhanratu","kabupaten":"Sukabumi","provinsi":"Jawa Barat","kode_desa":"3202110005","tahun":2025,"luas_sumber":"PPT Profil Desa"}'),
   ('stat_dusun', '[
-    {"label":"Bojongkopo (I)","rw":"RW 01-02","jmlRw":2,"l":1356,"p":1330,"kk":940},
-    {"label":"Sawah Garung (II)","rw":"RW 03-05","jmlRw":3,"l":1367,"p":1365,"kk":970},
-    {"label":"Babakan Astana (III)","rw":"RW 06-08","jmlRw":3,"l":1582,"p":1466,"kk":1075},
-    {"label":"Cimapag (IV)","rw":"RW 09-12","jmlRw":4,"l":2039,"p":1989,"kk":1370}
+    {"label":"Keseluruhan (Prodeskel 2025)","l":6750,"p":6437,"kk":4220}
   ]'),
   ('stat_umur', '[
-    {"label":"0-1 tahun","value":156},
-    {"label":"2-5 tahun","value":815},
-    {"label":"6-15 tahun","value":2250},
-    {"label":"16-30 tahun","value":2844},
-    {"label":"31-40 tahun","value":1743},
-    {"label":"41-50 tahun","value":1716},
-    {"label":"50-60 tahun","value":1490},
-    {"label":"60-65 tahun","value":555},
-    {"label":"66 tahun ke atas","value":925}
+    {"label":"0-1 tahun","value":1909},
+    {"label":"2-5 tahun","value":3676},
+    {"label":"6-15 tahun","value":4111},
+    {"label":"16-30 tahun","value":3594},
+    {"label":"31-40 tahun","value":1757},
+    {"label":"41-50 tahun","value":1900},
+    {"label":"51-60 tahun","value":1351},
+    {"label":"61-65 tahun","value":393},
+    {"label":"66 tahun ke atas","value":457}
   ]'),
   ('stat_pendidikan', '[
-    {"label":"Tamat SD/sederajat","value":4809},
-    {"label":"Tamat SLTP/sederajat","value":1571},
-    {"label":"Tamat SLTA/sederajat","value":1365},
-    {"label":"Sekolah TK","value":972},
-    {"label":"Tidak sekolah/buta huruf","value":291},
-    {"label":"Tidak tamat SD","value":180},
-    {"label":"Sarjana (D1-D3)","value":80},
-    {"label":"Sarjana (S1)","value":200},
-    {"label":"Pascasarjana (S2)","value":4}
+    {"label":"Usia 3-6 thn di TK/play group","value":1068},
+    {"label":"Tamat SMA/sederajat","value":6310}
   ]'),
   ('stat_pencaharian', '[
-    {"label":"Nelayan","value":800},
-    {"label":"Buruh tani","value":700},
-    {"label":"Petani","value":600},
-    {"label":"Pedagang","value":512},
-    {"label":"Swasta","value":350},
-    {"label":"PNS/TNI/Polri","value":85},
-    {"label":"Lainnya (pelajar, ibu rumah tangga, dll.)","value":4915}
+    {"label":"Buruh tani","value":963},
+    {"label":"Buruh harian lepas","value":1570}
   ]');
