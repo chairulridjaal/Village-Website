@@ -10,6 +10,8 @@ interface Props {
   single?: boolean;
   title?: string;
   help?: string;
+  /** Default crop aspect for the editor */
+  cropAspect?: 'free' | '1:1' | '4:3' | '16:9';
 }
 const {
   ownerType,
@@ -19,7 +21,8 @@ const {
   defaultAlt,
   single = false,
   title = 'Foto Sampul & Galeri',
-  help = 'Foto pertama otomatis menjadi sampul. Gunakan "Jadikan Sampul" untuk mengganti.',
+  help = 'Sebelum diunggah, Anda bisa crop/zoom foto. Foto pertama = sampul.',
+  cropAspect = single ? '1:1' : '4:3',
 } = Astro.props;
 const back = Astro.url.pathname;
 const purge = purgePaths.join(',');
@@ -87,7 +90,7 @@ const statusId = `foto-status-${ownerType}-${ownerId}`;
 
   {(!single || mediaList.length === 0) && (
     <label class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg font-heading font-medium text-sm border cursor-pointer hover:bg-sand" style="border-color:var(--color-border); min-height:44px;">
-      + {single ? 'Unggah foto' : 'Tambah Foto'}
+      + {single ? 'Pilih & crop foto' : 'Tambah foto (crop dulu)'}
       <input
         type="file"
         accept="image/*"
@@ -100,6 +103,7 @@ const statusId = `foto-status-${ownerType}-${ownerId}`;
         data-default-alt={defaultAlt}
         data-single={single ? '1' : '0'}
         data-status-id={statusId}
+        data-crop-aspect={cropAspect}
       />
     </label>
   )}
@@ -107,7 +111,8 @@ const statusId = `foto-status-${ownerType}-${ownerId}`;
 </div>
 
 <script>
-  import { uploadImage } from '../scripts/admin-editor';
+  import { openPhotoEditor, type CropAspect } from '../scripts/photo-editor';
+  import { uploadImageBlobs } from '../scripts/admin-editor';
 
   document.querySelectorAll<HTMLInputElement>('input[type=file][data-owner-type]').forEach((input) => {
     const el = input as HTMLInputElement & { _fotoBound?: boolean };
@@ -120,10 +125,22 @@ const statusId = `foto-status-${ownerType}-${ownerId}`;
       const single = input.dataset.single === '1';
       const toUpload = single ? files.slice(0, 1) : files;
       const status = document.getElementById(input.dataset.statusId ?? '') as HTMLParagraphElement | null;
-      if (status) status.textContent = `Mengunggah ${toUpload.length} foto...`;
+      const aspect = (input.dataset.cropAspect as CropAspect) || (single ? '1:1' : '4:3');
       try {
         for (const file of toUpload) {
-          await uploadImage(file, input.dataset.defaultAlt ?? '', {
+          if (status) status.textContent = 'Menyiapkan editor foto…';
+          const edited = await openPhotoEditor(file, {
+            aspect,
+            title: single ? 'Crop foto pejabat (persegi)' : 'Sesuaikan foto',
+            defaultAlt: input.dataset.defaultAlt ?? '',
+            askAlt: true,
+          });
+          if (!edited) {
+            if (status) status.textContent = 'Dibatalkan.';
+            continue;
+          }
+          if (status) status.textContent = 'Mengunggah…';
+          await uploadImageBlobs(edited.display, edited.thumb, edited.alt || input.dataset.defaultAlt || '', {
             owner_type: input.dataset.ownerType ?? '',
             owner_id: input.dataset.ownerId ?? '',
             purge: input.dataset.purge ?? '',
@@ -135,7 +152,7 @@ const statusId = `foto-status-${ownerType}-${ownerId}`;
         location.href = u.toString();
       } catch (err) {
         console.error(err);
-        if (status) status.textContent = 'Upload gagal. Periksa format/ukuran (JPG/PNG, maks ~5 MB) lalu coba lagi.';
+        if (status) status.textContent = 'Upload gagal. Periksa format/ukuran lalu coba lagi.';
       } finally {
         input.value = '';
       }

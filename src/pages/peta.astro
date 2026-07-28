@@ -1,10 +1,16 @@
----
+﻿---
 import Layout from '../components/Layout.astro';
 import { getAllTitikPeta } from '../lib/db/titik-peta';
+import { getPengaturan } from '../lib/db/pengaturan';
 import { getEnv } from '@lib/env';
 
 const env = getEnv();
 const titikList = env ? await getAllTitikPeta(env.DB) : [];
+const s = env ? await getPengaturan(env.DB) : {};
+
+const mapLat = Number(s.map_lat) || -7.009933224557312;
+const mapLng = Number(s.map_lng) || 106.58103748650889;
+const mapZoom = Number(s.map_zoom) || 14;
 
 const counts = { umkm: 0, potensi: 0 };
 for (const t of titikList) {
@@ -12,7 +18,7 @@ for (const t of titikList) {
 }
 
 const demoPoints = [
-  { jenis: 'potensi', label: 'Kantor Desa Citarik', lat: -7.009933224557312, lng: 106.58103748650889, linked_slug: 'profil', desc: 'Jl. Raya Citarik Km. 06, Kp. Legok Loa RT 001/RW 014, Kec. Palabuhanratu.' },
+  { jenis: 'potensi', label: 'Kantor Desa Citarik', lat: mapLat, lng: mapLng, linked_slug: 'profil', desc: 'Jl. Raya Citarik Km. 06, Kp. Legok Loa, Kec. Palabuhanratu.' },
 ];
 
 const finalPoints = (titikList.length > 0 ? titikList : demoPoints).filter(p => p.jenis !== 'wisata');
@@ -57,15 +63,10 @@ const finalCounts = titikList.length > 0
       <p class="text-xs text-muted mt-3 flex items-center gap-1.5 leading-relaxed">
         <i data-lucide="info" class="w-4 h-4 shrink-0"></i> Peta gratis berbasis OpenStreetMap.
       </p>
-      <div class="mt-4 bg-sand/60 border border-border rounded-md p-3 flex gap-2">
-        <i data-lucide="shield-check" class="w-4 h-4 text-primary shrink-0 mt-0.5"></i>
-        <p class="text-xs text-muted leading-relaxed">
-          <span class="font-heading font-semibold text-ink">Pengelola desa</span> dapat menambah, menyunting, atau menghapus titik peta melalui <span class="font-medium text-primary">Panel Admin › Kelola Peta</span>.
-        </p>
-      </div>
     </aside>
 
-    <div id="peta-map" class="rounded-xl overflow-hidden border border-border shadow-sm" style="height: min(70vh, 640px); z-index: 0;"></div>
+    <div id="peta-map" class="rounded-xl overflow-hidden border border-border shadow-sm" style="height: min(70vh, 640px); z-index: 0;"
+      data-lat={String(mapLat)} data-lng={String(mapLng)} data-zoom={String(mapZoom)}></div>
   </div>
 </div>
 
@@ -74,15 +75,15 @@ const finalCounts = titikList.length > 0
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
-<script define:vars={{ finalJson }}>
-  const CENTER = [-7.009933224557312, 106.58103748650889], ZOOM = 14;
+<script define:vars={{ finalJson, mapLat, mapLng, mapZoom }}>
+  const CENTER = [mapLat, mapLng], ZOOM = mapZoom;
   const map = L.map('peta-map', { scrollWheelZoom: false }).setView(CENTER, ZOOM);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
   map.on('focus', () => map.scrollWheelZoom.enable());
   map.on('blur', () => map.scrollWheelZoom.disable());
 
   const COLORS = { umkm: '#15803D', potensi: '#0E4A6E' };
-  const LINK = { umkm: '/umkm/', potensi: '/potensi' };
+  const LINK = { umkm: '/umkm/', potensi: '/potensi/' };
 
   const points = JSON.parse(finalJson);
   const layers = { umkm: L.layerGroup(), potensi: L.layerGroup() };
@@ -97,21 +98,27 @@ const finalCounts = titikList.length > 0
       iconAnchor: [12, 24],
       popupAnchor: [0, -20],
     });
-    const href = p.jenis === 'potensi' ? '/potensi' : (LINK[p.jenis] ?? '/') + (p.linked_slug ?? '');
-    L.marker([p.lat, p.lng], { icon, title: p.label })
-      .bindPopup(`<h3 style="font-family:Lexend,sans-serif;font-weight:700;color:#0E4A6E;margin:0 0 4px">${p.label}</h3><p style="margin:0 0 6px;color:#5B6B75;font-size:.85rem">${p.desc ?? ''}</p><a href="${href}" style="color:#0E9AA7;font-weight:600;font-size:.85rem">Lihat detail →</a>`)
-      .addTo(layers[p.jenis]);
+    const href = p.jenis === 'potensi'
+      ? (p.linked_slug ? '/potensi/' + p.linked_slug : '/potensi')
+      : (LINK[p.jenis] ?? '/') + (p.linked_slug ?? '');
+    const popup = `<strong>${p.label || 'Titik'}</strong>` +
+      (p.desc ? `<p style="margin:.35rem 0 0;font-size:13px">${p.desc}</p>` : '') +
+      (p.linked_slug ? `<p style="margin:.5rem 0 0"><a href="${href}">Lihat detail →</a></p>` : '');
+    L.marker([p.lat, p.lng], { icon }).bindPopup(popup).addTo(layers[p.jenis]);
   });
 
   Object.values(layers).forEach(l => l.addTo(map));
 
   document.querySelectorAll('.filter-check').forEach(cb => {
     cb.addEventListener('change', () => {
-      const t = cb.dataset.type;
-      cb.checked ? layers[t].addTo(map) : map.removeLayer(layers[t]);
+      const type = cb.getAttribute('data-type');
+      if (!type || !layers[type]) return;
+      if (cb.checked) map.addLayer(layers[type]);
+      else map.removeLayer(layers[type]);
     });
   });
 
-  document.getElementById('resetView')?.addEventListener('click', () => map.setView(CENTER, ZOOM));
-  if (typeof window.refreshIcons === 'function') window.refreshIcons();
+  document.getElementById('resetView')?.addEventListener('click', () => {
+    map.setView(CENTER, ZOOM);
+  });
 </script>
