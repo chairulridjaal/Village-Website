@@ -17,9 +17,21 @@ const META: Record<string, { label: string; publicPath: string; hint: string }> 
   'profil-umum': { label: 'Profil umum', publicPath: '/profil', hint: 'Bagian profil umum desa.' },
   'profil-geografis': { label: 'Kondisi geografis', publicPath: '/profil#geografis', hint: 'Bagian geografis di Profil.' },
   'profil-sejarah': { label: 'Sejarah desa', publicPath: '/profil#sejarah', hint: 'Bagian sejarah di Profil.' },
-  'pemerintahan-visi-misi': { label: 'Visi & misi', publicPath: '/pemerintahan', hint: 'Halaman Pemerintahan.' },
-  'pemerintahan-ruang-lingkup': { label: 'Ruang lingkup', publicPath: '/pemerintahan', hint: 'Halaman Pemerintahan — tabel dusun diisi lewat Statistik Desa.' },
-  'pemerintahan-tugas-fungsi': { label: 'Tugas & fungsi', publicPath: '/pemerintahan', hint: 'Halaman Pemerintahan.' },
+'pemerintahan-visi-misi': {
+    label: 'Visi & misi',
+    publicPath: '/pemerintahan#visi-misi',
+    hint: 'Pakai tombol Sub-judul untuk "Visi" lalu "Misi". Di bawah Misi, buat daftar bernomor untuk butir misi. Kartu biru di situs hanya menampilkan teks Visi (warna putih otomatis).',
+  },
+  'pemerintahan-ruang-lingkup': {
+    label: 'Ruang lingkup',
+    publicPath: '/pemerintahan#ruang-lingkup',
+    hint: 'Paragraf pengantar. Tabel dusun/RW/RT diisi lewat menu Statistik Desa, bukan di sini.',
+  },
+  'pemerintahan-tugas-fungsi': {
+    label: 'Tugas & fungsi',
+    publicPath: '/pemerintahan#tugas-fungsi',
+    hint: 'Teks bebas tugas & fungsi perangkat. Jika diisi, mengganti kartu bawaan di situs.',
+  },
 };
 
 const meta = META[slug] ?? {

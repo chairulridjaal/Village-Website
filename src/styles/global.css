@@ -412,7 +412,7 @@
     color: var(--color-primary);
   }
 
-  /* CMS / rich text */
+  /* CMS / rich text — default on light surfaces */
   .prose {
     color: var(--color-text-muted);
     line-height: 1.7;
@@ -442,6 +442,23 @@
     text-underline-offset: 2px;
   }
   .prose a:hover { color: var(--color-primary); }
+
+  /* CMS HTML on dark cards (e.g. primary background) — force light text */
+  .prose-on-dark,
+  .prose-on-dark p,
+  .prose-on-dark li,
+  .prose-on-dark span,
+  .prose-on-dark strong,
+  .prose-on-dark em {
+    color: #fff !important;
+  }
+  .prose-on-dark h2,
+  .prose-on-dark h3 {
+    color: #fff !important;
+  }
+  .prose-on-dark a {
+    color: #a5f3fc !important;
+  }
 
   .umkm-content h2 {
     font-family: var(--font-heading);

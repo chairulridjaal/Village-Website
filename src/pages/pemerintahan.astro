@@ -57,6 +57,58 @@ const totalKK = Number(stUmum.kk) || sumKK || 0;
 const jumlahDusun = Number(stUmum.dusun) || Math.max(wilayahData.length, 4);
 const jumlahRw = Number(stUmum.rw) || 10;
 const jumlahRt = Number(stUmum.rt) || 50;
+
+const DEFAULT_VISI =
+  'Mewujudkan Desa Citarik yang maju, mandiri, dan sejahtera berbasis potensi lokal yang berkelanjutan.';
+const DEFAULT_MISI = [
+  'Meningkatkan pelayanan publik yang transparan dan akuntabel.',
+  'Mengembangkan potensi ekonomi dan UMKM lokal.',
+  'Menjaga kelestarian lingkungan pesisir dan sumber daya alam.',
+  'Memperkuat partisipasi dan gotong royong masyarakat.',
+];
+
+function stripTags(html: string): string {
+  return html
+    .replace(/<br\s*\/?>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&ldquo;|&rdquo;|&quot;/g, '"')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function parseVisiMisi(html: string | null | undefined): { visi: string; misi: string[] } {
+  if (!html?.trim()) return { visi: DEFAULT_VISI, misi: DEFAULT_MISI };
+
+  const visiBlock = html.match(/<h2[^>]*>\s*Visi\s*<\/h2>([\s\S]*?)(?=<h2\b|$)/i);
+  const misiBlock = html.match(/<h2[^>]*>\s*Misi\s*<\/h2>([\s\S]*?)$/i);
+
+  let visi = DEFAULT_VISI;
+  if (visiBlock?.[1]) {
+    const t = stripTags(visiBlock[1]);
+    if (t) visi = t.replace(/^["“]|["”]$/g, '').trim() || DEFAULT_VISI;
+  } else if (!/<h2/i.test(html)) {
+    // Plain edit without headings: whole body is visi text
+    const t = stripTags(html);
+    if (t) visi = t;
+  }
+
+  let misi = DEFAULT_MISI;
+  if (misiBlock?.[1]) {
+    const lis = [...misiBlock[1].matchAll(/<li[^>]*>([\s\S]*?)<\/li>/gi)].map((m) => stripTags(m[1])).filter(Boolean);
+    if (lis.length) misi = lis;
+    else {
+      const paras = [...misiBlock[1].matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)].map((m) => stripTags(m[1])).filter(Boolean);
+      if (paras.length) misi = paras;
+    }
+  }
+
+  return { visi, misi };
+}
+
+const { visi: visiText, misi: misiItems } = parseVisiMisi(visiMisi?.content_html);
+const tugasHtml = tugasFungsi?.content_html?.trim() || '';
 ---
 
 <Layout
@@ -206,7 +258,7 @@ const jumlahRt = Number(stUmum.rt) || 50;
     </div>
   </section>
 
-  <!-- Visi & Misi -->
+  <!-- Visi & Misi (dari Konten Halaman → Visi & misi; pakai Sub-judul "Visi" / "Misi") -->
   <section id="visi-misi" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary mb-6">Visi & Misi</h2>
     <div class="grid lg:grid-cols-2 gap-6">
@@ -214,19 +266,16 @@ const jumlahRt = Number(stUmum.rt) || 50;
         <span class="inline-flex items-center gap-2 text-white/80 font-heading font-semibold">
           <i data-lucide="target" class="w-5 h-5"></i> Visi
         </span>
-        <p class="text-xl font-heading font-semibold mt-3 leading-snug" set:html={visiMisi?.content_html ?? '"Mewujudkan Desa Citarik yang maju, mandiri, dan sejahtera berbasis potensi lokal yang berkelanjutan."'} />
+        <p class="text-xl font-heading font-semibold mt-3 leading-snug text-white">
+          “{visiText}”
+        </p>
       </div>
       <div class="card-surface p-7">
         <span class="inline-flex items-center gap-2 text-primary font-heading font-semibold">
           <i data-lucide="list-checks" class="w-5 h-5"></i> Misi
         </span>
         <ul class="mt-3 space-y-2.5">
-          {[
-            'Meningkatkan pelayanan publik yang transparan dan akuntabel.',
-            'Mengembangkan potensi ekonomi dan UMKM lokal.',
-            'Menjaga kelestarian lingkungan pesisir dan sumber daya alam.',
-            'Memperkuat partisipasi dan gotong royong masyarakat.',
-          ].map((item, i) => (
+          {misiItems.map((item, i) => (
             <li class="flex gap-3">
               <span class="w-6 h-6 rounded-full bg-sand text-primary grid place-items-center text-sm font-heading font-bold shrink-0">{i + 1}</span>
               <span class="text-muted">{item}</span>
@@ -305,37 +354,35 @@ const jumlahRt = Number(stUmum.rt) || 50;
         </tfoot>
       </table>
     </div>
-    <p class="text-xs text-muted mt-2 leading-relaxed">
-      Sumber RW/RT &amp; jiwa per dusun: <strong>Laporan Tahunan Desa Citarik 2017–2018</strong>
-      {sumJiwa > 0 && <> (jumlah baris {fmt(sumJiwa)} jiwa)</>}.
-      {Number(stUmum.penduduk) > 0 && (
-        <> Total desa terbaru Prodeskel Maret 2025: <strong>{fmt(totalJiwa)} jiwa</strong>{totalKK ? <> · {fmt(totalKK)} KK</> : null}.</>
-      )}
-      {!showKkCol && <> Kolom KK disembunyikan karena belum ada data per dusun — bisa ditambah di Statistik Desa kapan saja.</>}
-    </p>
-  </section>
+    </section>
 
-  <!-- Tugas & Fungsi -->
+  <!-- Tugas & Fungsi (Konten Halaman → Tugas & fungsi) -->
   <section id="tugas-fungsi" style="scroll-margin-top: 120px;">
     <h2 class="text-2xl font-heading font-extrabold text-primary">Tugas & Fungsi</h2>
-    <p class="text-muted mt-2 max-w-2xl">Peran masing-masing perangkat dalam penyelenggaraan pemerintahan desa.</p>
-    <div class="grid sm:grid-cols-2 gap-4 mt-4">
-      {[
-        { icon: 'user-round', title: 'Kepala Desa', desc: 'Memimpin penyelenggaraan pemerintahan, pembangunan, dan pemberdayaan masyarakat desa.' },
-        { icon: 'clipboard-list', title: 'Sekretaris Desa', desc: 'Membantu kepala desa di bidang administrasi dan tata usaha pemerintahan.' },
-        { icon: 'wallet', title: 'Kaur Keuangan', desc: 'Mengelola keuangan dan penatausahaan anggaran desa.' },
-        { icon: 'landmark', title: 'Kasi Pemerintahan', desc: 'Melaksanakan urusan pemerintahan, kependudukan, dan pertanahan.' },
-        { icon: 'heart-handshake', title: 'Kasi Kesejahteraan', desc: 'Melaksanakan pemberdayaan masyarakat dan kesejahteraan sosial.' },
-        { icon: 'clipboard-check', title: 'Kasi Pelayanan', desc: 'Menyelenggarakan pelayanan kepada masyarakat desa.' },
-      ].map(item => (
-        <div class="card-surface p-5">
-          <h3 class="font-heading font-semibold text-ink flex items-center gap-2">
-            <i data-lucide={item.icon} class="w-5 h-5 text-primary"></i> {item.title}
-          </h3>
-          <p class="text-sm text-muted mt-1.5">{item.desc}</p>
+    {tugasHtml ? (
+      <div class="prose max-w-3xl mt-4" set:html={tugasHtml} />
+    ) : (
+      <>
+        <p class="text-muted mt-2 max-w-2xl">Peran masing-masing perangkat dalam penyelenggaraan pemerintahan desa.</p>
+        <div class="grid sm:grid-cols-2 gap-4 mt-4">
+          {[
+            { icon: 'user-round', title: 'Kepala Desa', desc: 'Memimpin penyelenggaraan pemerintahan, pembangunan, dan pemberdayaan masyarakat desa.' },
+            { icon: 'clipboard-list', title: 'Sekretaris Desa', desc: 'Membantu kepala desa di bidang administrasi dan tata usaha pemerintahan.' },
+            { icon: 'wallet', title: 'Kaur Keuangan', desc: 'Mengelola keuangan dan penatausahaan anggaran desa.' },
+            { icon: 'landmark', title: 'Kasi Pemerintahan', desc: 'Melaksanakan urusan pemerintahan, kependudukan, dan pertanahan.' },
+            { icon: 'heart-handshake', title: 'Kasi Kesejahteraan', desc: 'Melaksanakan pemberdayaan masyarakat dan kesejahteraan sosial.' },
+            { icon: 'clipboard-check', title: 'Kasi Pelayanan', desc: 'Menyelenggarakan pelayanan kepada masyarakat desa.' },
+          ].map(item => (
+            <div class="card-surface p-5">
+              <h3 class="font-heading font-semibold text-ink flex items-center gap-2">
+                <i data-lucide={item.icon} class="w-5 h-5 text-primary"></i> {item.title}
+              </h3>
+              <p class="text-sm text-muted mt-1.5">{item.desc}</p>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
+      </>
+    )}
   </section>
 
 </div>
