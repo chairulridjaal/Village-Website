@@ -1,34 +1,61 @@
----
+﻿---
 import type { Media } from '../lib/db/media';
 
 interface Props {
-  ownerType: 'berita' | 'umkm';
+  ownerType: 'berita' | 'umkm' | 'potensi' | 'perangkat';
   ownerId: number;
   mediaList: Media[];
   purgePaths: string[];
   defaultAlt: string;
+  single?: boolean;
+  title?: string;
+  help?: string;
 }
-const { ownerType, ownerId, mediaList, purgePaths, defaultAlt } = Astro.props;
+const {
+  ownerType,
+  ownerId,
+  mediaList,
+  purgePaths,
+  defaultAlt,
+  single = false,
+  title = 'Foto Sampul & Galeri',
+  help = 'Foto pertama otomatis menjadi sampul. Gunakan "Jadikan Sampul" untuk mengganti.',
+} = Astro.props;
 const back = Astro.url.pathname;
 const purge = purgePaths.join(',');
+const mediaErr = Astro.url.searchParams.get('error') === 'media';
+const mediaOk = Astro.url.searchParams.get('media') === '1';
+const inputId = `foto-input-${ownerType}-${ownerId}`;
+const statusId = `foto-status-${ownerType}-${ownerId}`;
 ---
 
 <div class="mt-8 bg-white rounded-xl border border-border p-6" style="box-shadow:var(--shadow-sm);">
-  <h3 class="font-heading font-semibold text-lg mb-1" style="color:var(--color-primary);">Foto Sampul & Galeri</h3>
-  <p class="text-xs text-text-muted mb-4">Foto pertama otomatis menjadi sampul. Gunakan "Jadikan Sampul" untuk mengganti.</p>
+  <h3 class="font-heading font-semibold text-lg mb-1" style="color:var(--color-primary);">{title}</h3>
+  <p class="text-xs text-text-muted mb-4">{help}</p>
+
+  {mediaOk && (
+    <div role="status" class="mb-3 p-2 rounded-lg text-xs font-medium" style="background:#D1FAE5;color:#065F46;">
+      Foto diperbarui.
+    </div>
+  )}
+  {mediaErr && (
+    <div role="alert" class="mb-3 p-2 rounded-lg text-xs font-medium" style="background:#FEE2E2;color:#991B1B;">
+      Gagal menghapus/mengubah foto. Coba lagi.
+    </div>
+  )}
 
   {mediaList.length > 0 && (
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-4">
+    <div class={`grid gap-3 mb-4 ${single ? 'grid-cols-1 max-w-[12rem]' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4'}`}>
       {mediaList.map((m, i) => (
         <div class="rounded-lg border border-border overflow-hidden">
           <div class="aspect-square bg-sand/30 relative">
             <img src={`/api/media/${encodeURIComponent(m.r2_key_thumb)}`} alt={m.alt} class="w-full h-full object-cover" loading="lazy" />
-            {i === 0 && (
+            {!single && i === 0 && (
               <span class="absolute top-1 left-1 px-1.5 py-0.5 rounded text-[10px] font-heading font-semibold text-white" style="background:var(--color-cta);">Sampul</span>
             )}
           </div>
-          <div class="flex gap-1 p-1.5">
-            {i !== 0 && (
+          <div class="flex flex-wrap gap-1 p-1.5">
+            {!single && i !== 0 && (
               <form method="POST" action="/api/admin/media/manage">
                 <input type="hidden" name="_action" value="cover" />
                 <input type="hidden" name="media_id" value={m.id} />
@@ -44,6 +71,8 @@ const purge = purgePaths.join(',');
             <form method="POST" action="/api/admin/media/manage" onsubmit="return confirm('Hapus foto ini?')">
               <input type="hidden" name="_action" value="delete" />
               <input type="hidden" name="media_id" value={m.id} />
+              <input type="hidden" name="owner_type" value={ownerType} />
+              <input type="hidden" name="owner_id" value={ownerId} />
               <input type="hidden" name="back" value={back} />
               <input type="hidden" name="purge" value={purge} />
               <button type="submit" class="px-1.5 py-1 rounded text-[11px] font-heading border cursor-pointer hover:bg-red-50 hover:text-red-600" style="border-color:#FECACA; color:#DC2626;">
@@ -56,32 +85,60 @@ const purge = purgePaths.join(',');
     </div>
   )}
 
-  <label class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg font-heading font-medium text-sm border cursor-pointer hover:bg-sand" style="border-color:var(--color-border); min-height:44px;">
-    + Tambah Foto
-    <input type="file" accept="image/*" multiple class="hidden" id="foto-input"
-      data-owner-type={ownerType} data-owner-id={ownerId} data-purge={purge} data-default-alt={defaultAlt} />
-  </label>
-  <p id="foto-status" class="text-xs text-text-muted mt-2"></p>
+  {(!single || mediaList.length === 0) && (
+    <label class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg font-heading font-medium text-sm border cursor-pointer hover:bg-sand" style="border-color:var(--color-border); min-height:44px;">
+      + {single ? 'Unggah foto' : 'Tambah Foto'}
+      <input
+        type="file"
+        accept="image/*"
+        multiple={!single}
+        class="hidden"
+        id={inputId}
+        data-owner-type={ownerType}
+        data-owner-id={String(ownerId)}
+        data-purge={purge}
+        data-default-alt={defaultAlt}
+        data-single={single ? '1' : '0'}
+        data-status-id={statusId}
+      />
+    </label>
+  )}
+  <p class="text-xs text-text-muted mt-2" id={statusId}></p>
 </div>
 
 <script>
   import { uploadImage } from '../scripts/admin-editor';
 
-  const input = document.getElementById('foto-input') as HTMLInputElement;
-  const status = document.getElementById('foto-status') as HTMLParagraphElement;
+  document.querySelectorAll<HTMLInputElement>('input[type=file][data-owner-type]').forEach((input) => {
+    const el = input as HTMLInputElement & { _fotoBound?: boolean };
+    if (el._fotoBound) return;
+    el._fotoBound = true;
 
-  input?.addEventListener('change', async () => {
-    const files = [...(input.files ?? [])];
-    if (!files.length) return;
-    const { ownerType, ownerId, purge, defaultAlt } = input.dataset;
-    status.textContent = `Mengunggah ${files.length} foto...`;
-    try {
-      for (const file of files) {
-        await uploadImage(file, defaultAlt ?? '', { owner_type: ownerType ?? '', owner_id: ownerId ?? '', purge: purge ?? '' });
+    input.addEventListener('change', async () => {
+      const files = [...(input.files ?? [])];
+      if (!files.length) return;
+      const single = input.dataset.single === '1';
+      const toUpload = single ? files.slice(0, 1) : files;
+      const status = document.getElementById(input.dataset.statusId ?? '') as HTMLParagraphElement | null;
+      if (status) status.textContent = `Mengunggah ${toUpload.length} foto...`;
+      try {
+        for (const file of toUpload) {
+          await uploadImage(file, input.dataset.defaultAlt ?? '', {
+            owner_type: input.dataset.ownerType ?? '',
+            owner_id: input.dataset.ownerId ?? '',
+            purge: input.dataset.purge ?? '',
+          });
+        }
+        const u = new URL(location.href);
+        u.searchParams.set('media', '1');
+        u.searchParams.delete('error');
+        location.href = u.toString();
+      } catch (err) {
+        console.error(err);
+        if (status) status.textContent = 'Upload gagal. Periksa format/ukuran (JPG/PNG, maks ~5 MB) lalu coba lagi.';
+      } finally {
+        input.value = '';
       }
-      location.reload();
-    } catch {
-      status.textContent = 'Upload gagal. Periksa koneksi lalu coba lagi.';
-    }
+    });
   });
 </script>

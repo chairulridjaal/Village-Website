@@ -57,7 +57,15 @@ export function isMaster(user: SessionUser | undefined | null): boolean {
   return Boolean(user?.is_master);
 }
 
-/** Map admin path prefixes to required permission (first match wins). */
+export const MEDIA_OWNER_PERMS: Record<string, PermFlag> = {
+  berita: 'perm_berita',
+  umkm: 'perm_umkm',
+  potensi: 'perm_konten',
+  perangkat: 'perm_konten',
+};
+
+export const MEDIA_OWNER_TYPES = Object.keys(MEDIA_OWNER_PERMS);
+
 export function permForAdminPath(pathname: string): PermFlag | 'master' | null {
   if (pathname.startsWith('/admin/akun') || pathname.startsWith('/api/admin/akun')) return 'master';
   if (pathname.startsWith('/admin/pengaturan') || pathname.startsWith('/api/admin/pengaturan')) return 'perm_pengaturan';
@@ -65,7 +73,8 @@ export function permForAdminPath(pathname: string): PermFlag | 'master' | null {
   if (pathname.startsWith('/admin/umkm') || pathname.startsWith('/api/admin/umkm')) return 'perm_umkm';
   if (pathname.startsWith('/admin/berita') || pathname.startsWith('/api/admin/berita')) return 'perm_berita';
   if (pathname.startsWith('/admin/peta') || pathname.startsWith('/api/admin/peta')) return 'perm_peta';
-  if (pathname.startsWith('/admin/media') || pathname.startsWith('/api/admin/media')) return 'perm_media';
+  if (pathname === '/admin/media' || pathname.startsWith('/admin/media/')) return 'perm_media';
+  if (pathname.startsWith('/api/admin/media')) return null;
   if (
     pathname.startsWith('/admin/konten') ||
     pathname.startsWith('/api/admin/konten') ||
@@ -80,8 +89,19 @@ export function permForAdminPath(pathname: string): PermFlag | 'master' | null {
   ) {
     return 'perm_konten';
   }
-  // dasbor, statistik kunjungan, export, login — any authenticated admin
   return null;
+}
+
+export function canManageMediaOwner(
+  user: SessionUser | undefined | null,
+  ownerType: string | null | undefined
+): boolean {
+  if (!user) return false;
+  if (user.is_master) return true;
+  if (!ownerType) return hasPerm(user, 'perm_media');
+  const need = MEDIA_OWNER_PERMS[ownerType];
+  if (!need) return false;
+  return hasPerm(user, need) || hasPerm(user, 'perm_media');
 }
 
 export const ADMIN_USER_SELECT = `

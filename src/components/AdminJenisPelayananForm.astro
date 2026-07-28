@@ -1,4 +1,4 @@
----
+﻿---
 import type { FormField, JenisPelayanan } from '../lib/db/pelayanan';
 import { DEFAULT_FIELDS, DEFAULT_TEMPLATE } from '../lib/pelayanan/fields-form';
 
@@ -18,11 +18,30 @@ const aktif = jenis ? !!jenis.aktif : true;
 const urutan = jenis?.urutan ?? 0;
 const lampiranWajib = jenis ? !!jenis.lampiran_wajib : false;
 const lampiranInfo = jenis?.lampiran_info ?? '';
+
+const typeLabels: Record<string, string> = {
+  text: 'Teks singkat',
+  textarea: 'Teks panjang',
+  date: 'Tanggal',
+  number: 'Angka',
+  select: 'Pilihan',
+};
 ---
 
-<form method="POST" action={action} class="space-y-6 max-w-3xl" id="jenis-form">
+<form method="POST" action={action} class="space-y-6 max-w-4xl" id="jenis-form">
+  <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-950 leading-relaxed">
+    <p class="font-heading font-semibold mb-1">Cara mudah menambah jenis surat</p>
+    <ol class="list-decimal pl-5 space-y-1 text-xs sm:text-sm">
+      <li>Isi nama surat &amp; syarat untuk warga.</li>
+      <li>Tambah pertanyaan formulir (label saja — sistem buat kodenya).</li>
+      <li>Edit template di bawah; gunakan tombol sisip variabel. Pratinjau langsung di kanan.</li>
+      <li>Simpan → uji di katalog publik → sesuaikan jika perlu.</li>
+    </ol>
+    <p class="text-xs mt-2 text-amber-900/80">Upload Word (.docx) otomatis belum tersedia (sering rusak format). Cara paling andal: salin teks dari Word ke template, lalu sisip <code class="bg-white px-1 rounded">{'{{variabel}}'}</code>.</p>
+  </div>
+
   <div class="bg-white rounded-xl border border-border p-5 space-y-4" style="box-shadow:var(--shadow-sm);">
-    <h3 class="font-heading font-semibold text-primary">Informasi dasar</h3>
+    <h3 class="font-heading font-semibold text-primary">1. Informasi dasar</h3>
     <div>
       <label for="nama" class="block font-heading font-medium text-sm mb-1.5">Nama jenis surat <span class="text-cta">*</span></label>
       <input type="text" id="nama" name="nama" required value={nama}
@@ -31,7 +50,7 @@ const lampiranInfo = jenis?.lampiran_info ?? '';
         placeholder="cth. Surat Keterangan Domisili" />
     </div>
     <div>
-      <label for="deskripsi" class="block font-heading font-medium text-sm mb-1.5">Deskripsi singkat</label>
+      <label for="deskripsi" class="block font-heading font-medium text-sm mb-1.5">Deskripsi singkat (katalog)</label>
       <textarea id="deskripsi" name="deskripsi" rows="2"
         class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
         style="border-color:var(--color-border);">{deskripsi}</textarea>
@@ -40,7 +59,8 @@ const lampiranInfo = jenis?.lampiran_info ?? '';
       <label for="syarat" class="block font-heading font-medium text-sm mb-1.5">Syarat (ditampilkan ke warga)</label>
       <textarea id="syarat" name="syarat" rows="3"
         class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
-        style="border-color:var(--color-border);">{syarat}</textarea>
+        style="border-color:var(--color-border);"
+        placeholder="cth. KTP asli, fotokopi KK">{syarat}</textarea>
     </div>
     <div class="grid grid-cols-2 gap-4">
       <div>
@@ -59,63 +79,56 @@ const lampiranInfo = jenis?.lampiran_info ?? '';
   </div>
 
   <div class="bg-white rounded-xl border border-border p-5 space-y-4" style="box-shadow:var(--shadow-sm);">
-    <h3 class="font-heading font-semibold text-primary">Lampiran unggah</h3>
-    <p class="text-xs text-text-muted leading-relaxed">
-      Jika dicentang, form warga menampilkan unggah file dan <strong>wajib</strong> minimal 1 file.
-      Jika tidak dicentang, field lampiran tidak muncul sama sekali.
-    </p>
+    <h3 class="font-heading font-semibold text-primary">2. Lampiran unggah</h3>
     <label class="inline-flex items-center gap-2 cursor-pointer">
-      <input type="checkbox" name="lampiran_wajib" value="1" checked={lampiranWajib} class="w-4 h-4" id="lampiran-wajib-check" />
-      <span class="font-heading font-medium text-sm">Wajib lampiran (tampilkan di form warga)</span>
+      <input type="checkbox" name="lampiran_wajib" value="1" checked={lampiranWajib} class="w-4 h-4" />
+      <span class="font-heading font-medium text-sm">Wajib lampiran (KTP/KK dll. di form warga)</span>
     </label>
     <div>
-      <label for="lampiran_info" class="block font-heading font-medium text-sm mb-1.5">Petunjuk lampiran (untuk warga)</label>
+      <label for="lampiran_info" class="block font-heading font-medium text-sm mb-1.5">Petunjuk lampiran</label>
       <textarea id="lampiran_info" name="lampiran_info" rows="2"
         class="w-full rounded-lg border px-4 py-3 text-base focus:outline-none"
         style="border-color:var(--color-border);"
-        placeholder="cth. Unggah fotokopi KTP dan KK (PDF/JPG, maks. 3 file).">{lampiranInfo}</textarea>
-      <p class="text-xs text-text-muted mt-1">Ditampilkan di bawah field unggah. Kosong = teks default sistem.</p>
+        placeholder="cth. Unggah fotokopi KTP dan KK (PDF/JPG).">{lampiranInfo}</textarea>
     </div>
   </div>
 
   <div class="bg-white rounded-xl border border-border p-5 space-y-4" style="box-shadow:var(--shadow-sm);">
     <div class="flex items-center justify-between gap-2">
-      <h3 class="font-heading font-semibold text-primary">Field formulir warga</h3>
+      <div>
+        <h3 class="font-heading font-semibold text-primary">3. Pertanyaan formulir warga</h3>
+        <p class="text-xs text-text-muted">Isi label saja. Kode teknis dibuat otomatis.</p>
+      </div>
       <button type="button" id="add-field"
         class="text-sm font-heading font-semibold px-3 py-1.5 rounded-md border cursor-pointer"
         style="border-color:var(--color-accent);color:var(--color-accent);">
-        + Field
+        + Pertanyaan
       </button>
     </div>
-    <p class="text-xs text-text-muted">Key dipakai di template sebagai <code class="bg-sand px-1 rounded">{'{{key}}'}</code>. Kosongkan key untuk diisi otomatis dari label.</p>
     <div id="fields-list" class="space-y-3">
       {fields.map((f) => (
         <div class="field-row grid grid-cols-1 sm:grid-cols-12 gap-2 p-3 rounded-lg border border-border bg-sand/20">
-          <div class="sm:col-span-3">
-            <label class="text-xs text-text-muted">Key</label>
-            <input name="field_key" value={f.key}
-              class="w-full rounded border px-2 py-2 text-sm" style="border-color:var(--color-border);" />
-          </div>
-          <div class="sm:col-span-4">
-            <label class="text-xs text-text-muted">Label</label>
+          <input type="hidden" name="field_key" value={f.key} class="field-key-input" />
+          <div class="sm:col-span-5">
+            <label class="text-xs text-text-muted">Pertanyaan / label</label>
             <input name="field_label" value={f.label} required
-              class="w-full rounded border px-2 py-2 text-sm" style="border-color:var(--color-border);" />
+              class="w-full rounded border px-2 py-2 text-sm field-label-input" style="border-color:var(--color-border);" />
           </div>
-          <div class="sm:col-span-2">
-            <label class="text-xs text-text-muted">Tipe</label>
+          <div class="sm:col-span-3">
+            <label class="text-xs text-text-muted">Jenis isian</label>
             <select name="field_type" class="w-full rounded border px-2 py-2 text-sm" style="border-color:var(--color-border);">
-              {['text', 'textarea', 'date', 'number', 'select'].map(t => (
-                <option value={t} selected={f.type === t}>{t}</option>
+              {Object.entries(typeLabels).map(([t, lbl]) => (
+                <option value={t} selected={f.type === t}>{lbl}</option>
               ))}
             </select>
           </div>
           <div class="sm:col-span-2">
-            <label class="text-xs text-text-muted">Opsi (select, pisah |)</label>
+            <label class="text-xs text-text-muted">Opsi (jika Pilihan)</label>
             <input name="field_options" value={(f.options ?? []).join('|')}
               class="w-full rounded border px-2 py-2 text-sm" style="border-color:var(--color-border);"
               placeholder="A|B|C" />
           </div>
-          <div class="sm:col-span-1 flex items-end gap-2 pb-1">
+          <div class="sm:col-span-2 flex items-end gap-2 pb-1">
             <label class="text-xs flex items-center gap-1">
               <input type="hidden" name="field_required" value={f.required ? '1' : '0'} class="req-hidden" />
               <input type="checkbox" class="req-check" checked={!!f.required} />
@@ -129,18 +142,23 @@ const lampiranInfo = jenis?.lampiran_info ?? '';
   </div>
 
   <div class="bg-white rounded-xl border border-border p-5 space-y-3" style="box-shadow:var(--shadow-sm);">
-    <h3 class="font-heading font-semibold text-primary">Template surat (HTML)</h3>
-    <p class="text-xs text-text-muted leading-relaxed">
-      Variabel: <code class="bg-sand px-1 rounded">{'{{nama}}'}</code>,
-      <code class="bg-sand px-1 rounded">{'{{nik}}'}</code>,
-      <code class="bg-sand px-1 rounded">{'{{nomor_surat}}'}</code>,
-      <code class="bg-sand px-1 rounded">{'{{tanggal}}'}</code>,
-      <code class="bg-sand px-1 rounded">{'{{jenis_surat}}'}</code>,
-      plus key field Anda. Setelah diterima, admin mencetak / menyimpan PDF dari pratinjau.
+    <h3 class="font-heading font-semibold text-primary">4. Isi surat (template)</h3>
+    <p class="text-xs text-text-muted leading-relaxed mb-2">
+      Klik tombol di bawah untuk menyisipkan data dari formulir ke surat. Edit teks seperti di Word sederhana.
     </p>
-    <textarea id="template_html" name="template_html" rows="16" required
-      class="w-full rounded-lg border px-3 py-3 text-sm font-mono focus:outline-none"
-      style="border-color:var(--color-border);">{template}</textarea>
+    <div id="var-chips" class="flex flex-wrap gap-1.5 mb-2"></div>
+    <div class="grid lg:grid-cols-2 gap-4">
+      <div>
+        <label class="text-xs font-heading text-text-muted mb-1 block">Editor template</label>
+        <textarea id="template_html" name="template_html" rows="18" required
+          class="w-full rounded-lg border px-3 py-3 text-sm font-mono focus:outline-none"
+          style="border-color:var(--color-border);">{template}</textarea>
+      </div>
+      <div>
+        <label class="text-xs font-heading text-text-muted mb-1 block">Pratinjau (contoh data)</label>
+        <div id="template-preview" class="border border-border rounded-lg p-4 bg-sand/20 text-sm prose max-w-none min-h-[20rem] overflow-auto" style="max-height:28rem;"></div>
+      </div>
+    </div>
   </div>
 
   <div class="flex justify-end gap-3 sticky bottom-0 bg-white border-t border-border -mx-4 md:-mx-6 px-4 md:px-6 py-3"
@@ -153,36 +171,33 @@ const lampiranInfo = jenis?.lampiran_info ?? '';
     <button type="submit"
       class="px-5 py-2 rounded-lg font-heading font-semibold text-white text-sm cursor-pointer"
       style="background:var(--color-cta);min-height:44px;">
-      Simpan
+      Simpan jenis surat
     </button>
   </div>
 </form>
 
 <template id="field-row-tpl">
   <div class="field-row grid grid-cols-1 sm:grid-cols-12 gap-2 p-3 rounded-lg border border-border bg-sand/20">
+    <input type="hidden" name="field_key" value="" class="field-key-input" />
+    <div class="sm:col-span-5">
+      <label class="text-xs text-text-muted">Pertanyaan / label</label>
+      <input name="field_label" required class="w-full rounded border px-2 py-2 text-sm field-label-input" style="border-color:var(--color-border);" />
+    </div>
     <div class="sm:col-span-3">
-      <label class="text-xs text-text-muted">Key</label>
-      <input name="field_key" class="w-full rounded border px-2 py-2 text-sm" style="border-color:var(--color-border);" />
-    </div>
-    <div class="sm:col-span-4">
-      <label class="text-xs text-text-muted">Label</label>
-      <input name="field_label" required class="w-full rounded border px-2 py-2 text-sm" style="border-color:var(--color-border);" />
-    </div>
-    <div class="sm:col-span-2">
-      <label class="text-xs text-text-muted">Tipe</label>
+      <label class="text-xs text-text-muted">Jenis isian</label>
       <select name="field_type" class="w-full rounded border px-2 py-2 text-sm" style="border-color:var(--color-border);">
-        <option value="text">text</option>
-        <option value="textarea">textarea</option>
-        <option value="date">date</option>
-        <option value="number">number</option>
-        <option value="select">select</option>
+        <option value="text">Teks singkat</option>
+        <option value="textarea">Teks panjang</option>
+        <option value="date">Tanggal</option>
+        <option value="number">Angka</option>
+        <option value="select">Pilihan</option>
       </select>
     </div>
     <div class="sm:col-span-2">
-      <label class="text-xs text-text-muted">Opsi (select, pisah |)</label>
+      <label class="text-xs text-text-muted">Opsi (jika Pilihan)</label>
       <input name="field_options" class="w-full rounded border px-2 py-2 text-sm" style="border-color:var(--color-border);" placeholder="A|B|C" />
     </div>
-    <div class="sm:col-span-1 flex items-end gap-2 pb-1">
+    <div class="sm:col-span-2 flex items-end gap-2 pb-1">
       <label class="text-xs flex items-center gap-1">
         <input type="hidden" name="field_required" value="1" class="req-hidden" />
         <input type="checkbox" class="req-check" checked />
@@ -196,14 +211,39 @@ const lampiranInfo = jenis?.lampiran_info ?? '';
 <script>
   const list = document.getElementById('fields-list');
   const tpl = document.getElementById('field-row-tpl') as HTMLTemplateElement | null;
+  const ta = document.getElementById('template_html') as HTMLTextAreaElement | null;
+  const preview = document.getElementById('template-preview');
+  const chips = document.getElementById('var-chips');
+
+  function slugify(label: string): string {
+    return label
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_|_$/g, '') || 'field';
+  }
 
   function wireRow(row: Element) {
     const check = row.querySelector('.req-check') as HTMLInputElement | null;
     const hidden = row.querySelector('.req-hidden') as HTMLInputElement | null;
+    const label = row.querySelector('.field-label-input') as HTMLInputElement | null;
+    const keyInput = row.querySelector('.field-key-input') as HTMLInputElement | null;
     check?.addEventListener('change', () => {
       if (hidden) hidden.value = check.checked ? '1' : '0';
     });
-    row.querySelector('.remove-field')?.addEventListener('click', () => row.remove());
+    label?.addEventListener('input', () => {
+      if (keyInput && (!keyInput.value || keyInput.dataset.auto !== '0')) {
+        keyInput.value = slugify(label.value);
+        keyInput.dataset.auto = '1';
+        refreshChips();
+      }
+    });
+    row.querySelector('.remove-field')?.addEventListener('click', () => {
+      row.remove();
+      refreshChips();
+      renderPreview();
+    });
   }
 
   list?.querySelectorAll('.field-row').forEach(wireRow);
@@ -214,5 +254,71 @@ const lampiranInfo = jenis?.lampiran_info ?? '';
     const row = node.querySelector('.field-row');
     if (row) wireRow(row);
     list.appendChild(node);
+    refreshChips();
   });
+
+  const builtins = [
+    ['nama', 'Nama'],
+    ['nik', 'NIK'],
+    ['nomor_surat', 'Nomor surat'],
+    ['tanggal', 'Tanggal'],
+    ['jenis_surat', 'Jenis surat'],
+  ];
+
+  function collectFieldKeys(): [string, string][] {
+    const out: [string, string][] = [...builtins];
+    list?.querySelectorAll('.field-row').forEach((row) => {
+      const key = (row.querySelector('.field-key-input') as HTMLInputElement)?.value?.trim();
+      const label = (row.querySelector('.field-label-input') as HTMLInputElement)?.value?.trim();
+      if (key && label && !out.some(([k]) => k === key)) out.push([key, label]);
+    });
+    return out;
+  }
+
+  function refreshChips() {
+    if (!chips || !ta) return;
+    chips.innerHTML = '';
+    for (const [key, label] of collectFieldKeys()) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'px-2 py-1 rounded-full text-[11px] font-heading border cursor-pointer hover:bg-sand';
+      btn.style.borderColor = 'var(--color-border)';
+      btn.textContent = `+ ${label}`;
+      btn.title = `Sisip {{${key}}}`;
+      btn.addEventListener('click', () => {
+        const insert = `{{${key}}}`;
+        const start = ta.selectionStart ?? ta.value.length;
+        const end = ta.selectionEnd ?? start;
+        ta.value = ta.value.slice(0, start) + insert + ta.value.slice(end);
+        ta.focus();
+        ta.selectionStart = ta.selectionEnd = start + insert.length;
+        renderPreview();
+      });
+      chips.appendChild(btn);
+    }
+  }
+
+  function renderPreview() {
+    if (!ta || !preview) return;
+    let html = ta.value;
+    const sample: Record<string, string> = {
+      nama: 'Budi Santoso',
+      nik: '3202010101900001',
+      alamat: 'Kp. Contoh RT 01/02',
+      keperluan: 'Administrasi kependudukan',
+      nomor_surat: '474/001/DS-CTR/2026',
+      tanggal: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+      jenis_surat: (document.getElementById('nama') as HTMLInputElement)?.value || 'Surat Keterangan',
+    };
+    collectFieldKeys().forEach(([key]) => {
+      if (!sample[key]) sample[key] = `[${key}]`;
+    });
+    html = html.replace(/\{\{\s*([\w.]+)\s*\}\}/g, (_, k) => sample[k] ?? `{{${k}}}`);
+    preview.innerHTML = html || '<p class="text-text-muted italic">Pratinjau muncul di sini…</p>';
+  }
+
+  ta?.addEventListener('input', renderPreview);
+  document.getElementById('nama')?.addEventListener('input', renderPreview);
+  refreshChips();
+  renderPreview();
 </script>

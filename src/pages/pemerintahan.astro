@@ -4,16 +4,18 @@ import { getSection } from '../lib/db/page-section';
 import { getPerangkatDesa } from '../lib/db/perangkat-desa';
 import { getPengaturan } from '../lib/db/pengaturan';
 import { getStatistikFull, parseDusunValue } from '../lib/db/statistik';
+import { getCoversForType, mediaUrl } from '../lib/db/media';
 import { getEnv } from '@lib/env';
 
 const env = getEnv();
-const [visiMisi, ruangLingkup, tugasFungsi, perangkat, s, statCats] = await Promise.all([
+const [visiMisi, ruangLingkup, tugasFungsi, perangkat, s, statCats, covers] = await Promise.all([
   env ? getSection('pemerintahan-visi-misi', env.DB) : null,
   env ? getSection('pemerintahan-ruang-lingkup', env.DB) : null,
   env ? getSection('pemerintahan-tugas-fungsi', env.DB) : null,
   env ? getPerangkatDesa(env.DB) : [],
   env ? getPengaturan(env.DB) : {},
   env ? getStatistikFull(env.DB, true).catch(() => []) : Promise.resolve([]),
+  env ? getCoversForType('perangkat', env.DB).catch(() => new Map()) : Promise.resolve(new Map()),
 ]);
 
 const tiers = {
@@ -109,7 +111,11 @@ const jumlahRt = Number(stUmum.rt) || 50;
           <div class="flex flex-col items-center">
             <div class="card-surface p-6 sm:p-8 text-center w-full max-w-sm">
               <div class="w-36 h-36 rounded-full mx-auto ring-4 ring-sand overflow-hidden" style="background: linear-gradient(135deg, #0E4A6E, #0E9AA7);">
-                <div class="w-full h-full flex items-center justify-center font-heading font-bold text-4xl text-white">{tiers.kepala.nama[0]}</div>
+                {covers.get(tiers.kepala.id) ? (
+                  <img src={mediaUrl(covers.get(tiers.kepala.id)!)} alt={tiers.kepala.nama} class="w-full h-full object-cover" />
+                ) : (
+                  <div class="w-full h-full flex items-center justify-center font-heading font-bold text-4xl text-white">{tiers.kepala.nama[0]}</div>
+                )}
               </div>
               <span class="inline-block mt-4 text-xs font-heading font-bold px-3 py-1 rounded-full bg-primary text-white uppercase tracking-wide">Kepala Desa</span>
               <h3 class="font-heading font-bold text-2xl text-ink mt-2">{tiers.kepala.nama}</h3>
@@ -122,7 +128,11 @@ const jumlahRt = Number(stUmum.rt) || 50;
           <div class="flex flex-col items-center">
             <div class="card-surface p-6 text-center w-full max-w-xs">
               <div class="w-28 h-28 rounded-full mx-auto ring-4 ring-sand overflow-hidden" style="background: linear-gradient(135deg, #0A3650, #0E9AA7);">
-                <div class="w-full h-full flex items-center justify-center font-heading font-bold text-3xl text-white">{tiers.sekdes.nama[0]}</div>
+                {covers.get(tiers.sekdes.id) ? (
+                  <img src={mediaUrl(covers.get(tiers.sekdes.id)!)} alt={tiers.sekdes.nama} class="w-full h-full object-cover" />
+                ) : (
+                  <div class="w-full h-full flex items-center justify-center font-heading font-bold text-3xl text-white">{tiers.sekdes.nama[0]}</div>
+                )}
               </div>
               <span class="inline-block mt-3 text-xs font-heading font-bold px-3 py-1 rounded-full bg-accent text-white uppercase tracking-wide">Sekretaris Desa</span>
               <h3 class="font-heading font-bold text-lg text-ink mt-2">{tiers.sekdes.nama}</h3>
@@ -134,7 +144,11 @@ const jumlahRt = Number(stUmum.rt) || 50;
           {tiers.others.map(p => (
             <div class="card-surface p-5 text-center">
               <div class="w-20 h-20 rounded-full mx-auto ring-2 ring-sand overflow-hidden" style="background: linear-gradient(135deg, #0E4A6E, #0E9AA7);">
-                <div class="w-full h-full flex items-center justify-center font-heading font-bold text-2xl text-white">{p.nama[0]}</div>
+                {covers.get(p.id) ? (
+                  <img src={mediaUrl(covers.get(p.id)!)} alt={p.nama} class="w-full h-full object-cover" />
+                ) : (
+                  <div class="w-full h-full flex items-center justify-center font-heading font-bold text-2xl text-white">{p.nama[0]}</div>
+                )}
               </div>
               <span class="inline-block mt-3 text-[11px] font-heading font-semibold px-2.5 py-0.5 rounded-full bg-sand text-primary uppercase">{p.jabatan}</span>
               <h3 class="font-heading font-semibold text-ink mt-1.5">{p.nama}</h3>

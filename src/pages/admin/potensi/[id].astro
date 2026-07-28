@@ -1,6 +1,9 @@
----
+﻿---
 import AdminLayout from '../../../components/AdminLayout.astro';
-import { getPotensiById } from '../../../lib/db/potensi';
+import AdminEditorToolbar from '../../../components/AdminEditorToolbar.astro';
+import AdminFotoManager from '../../../components/AdminFotoManager.astro';
+import { getPotensiById, parseStatsJson } from '../../../lib/db/potensi';
+import { getMediaForEntity } from '../../../lib/db/media';
 import { getEnv } from '@lib/env';
 
 const { id } = Astro.params as { id: string };
@@ -8,6 +11,8 @@ const env = getEnv();
 const p = env ? await getPotensiById(Number(id), env.DB) : null;
 if (!p) return Astro.redirect('/admin/potensi');
 
+const mediaList = env ? await getMediaForEntity('potensi', p.id, env.DB) : [];
+const stats = parseStatsJson(p.stats_json);
 const saved = Astro.url.searchParams.get('saved');
 const inputCls = 'w-full rounded-lg border px-4 py-2.5 text-base focus:outline-none';
 const inputStyle = 'border-color:var(--color-border); min-height:44px;';
@@ -21,23 +26,50 @@ const inputStyle = 'border-color:var(--color-border); min-height:44px;';
     </div>
   )}
 
-  <form method="POST" action={`/api/admin/potensi/${p.id}`} class="max-w-3xl space-y-5">
+  <form id="potensi-form" method="POST" action={`/api/admin/potensi/${p.id}`} class="max-w-3xl space-y-5">
     <div>
       <label class="block font-heading font-medium text-sm mb-1.5" for="nama">Nama *</label>
       <input id="nama" name="nama" required value={p.nama} class={inputCls} style={inputStyle} />
     </div>
     <div>
-      <label class="block font-heading font-medium text-sm mb-1.5" for="ringkasan">Ringkasan</label>
-      <textarea id="ringkasan" name="ringkasan" rows="3" class={inputCls} style={inputStyle}>{p.ringkasan}</textarea>
+      <label class="block font-heading font-medium text-sm mb-1.5" for="ringkasan">Ringkasan singkat (kartu di daftar)</label>
+      <textarea id="ringkasan" name="ringkasan" rows="2" class={inputCls} style={inputStyle}>{p.ringkasan}</textarea>
+      <p class="text-xs text-text-muted mt-1">1–2 kalimat, tanpa HTML.</p>
     </div>
     <div>
-      <label class="block font-heading font-medium text-sm mb-1.5" for="deskripsi_html">Isi halaman</label>
-      <textarea id="deskripsi_html" name="deskripsi_html" rows="12" class={inputCls} style={inputStyle}>{p.deskripsi_html}</textarea>
+      <label class="block font-heading font-medium text-sm mb-1.5">Isi halaman</label>
+      <AdminEditorToolbar withImage />
+      <div id="editor-potensi" contenteditable="true"
+        class="w-full min-h-64 border border-t-0 rounded-b-lg px-4 py-3 text-base focus:outline-none"
+        style="border-color:var(--color-border);"
+        set:html={p.deskripsi_html}></div>
+      <input type="hidden" id="deskripsi_html" name="deskripsi_html" value={p.deskripsi_html} />
+      <p class="text-xs text-text-muted mt-1">Ketik seperti di Word. Klik gambar lalu tombol Hapus gambar / Delete untuk menghapus.</p>
     </div>
-    <div>
-      <label class="block font-heading font-medium text-sm mb-1.5" for="stats_json">Kartu angka (JSON)</label>
-      <textarea id="stats_json" name="stats_json" rows="4" class={inputCls} style={inputStyle}>{p.stats_json}</textarea>
+
+    <div class="bg-white rounded-xl border border-border p-4 space-y-3">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="font-heading font-semibold text-sm text-primary">Kartu angka (opsional)</h3>
+          <p class="text-xs text-text-muted">Contoh: 773 · Keluarga petani</p>
+        </div>
+        <button type="button" id="add-stat" class="text-xs font-heading font-semibold px-3 py-1.5 rounded-md border cursor-pointer" style="border-color:var(--color-accent);color:var(--color-accent);">+ Kartu</button>
+      </div>
+      <div id="stats-list" class="space-y-2">
+        {stats.map((s) => (
+          <div class="stat-row grid grid-cols-3 gap-2">
+            <input name="stat_value" value={s.value} placeholder="Angka / nilai" class={inputCls} style={inputStyle} />
+            <input name="stat_label" value={s.label} placeholder="Label" class={inputCls} style={inputStyle} />
+            <div class="flex gap-1">
+              <input name="stat_icon" value={s.icon || 'info'} placeholder="ikon (opsional)" class={inputCls} style={inputStyle} />
+              <button type="button" class="stat-remove px-2 rounded border text-xs text-red-600 cursor-pointer" style="border-color:#FECACA;">×</button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <input type="hidden" name="stats_json" id="stats_json" value={p.stats_json || '[]'} />
     </div>
+
     <div class="grid grid-cols-2 gap-4">
       <div>
         <label class="block font-heading font-medium text-sm mb-1.5" for="urutan">Urutan</label>
@@ -51,14 +83,79 @@ const inputStyle = 'border-color:var(--color-border); min-height:44px;';
         </select>
       </div>
     </div>
-    <div class="flex gap-3">
+    <div class="flex gap-3 sticky bottom-0 bg-white py-3 border-t border-border">
       <a href="/admin/potensi" class="px-4 py-2 rounded-lg border text-sm font-heading" style="border-color:var(--color-border);">Kembali</a>
       <button type="submit" class="px-5 py-2 rounded-lg font-heading font-semibold text-white text-sm" style="background:var(--color-cta);">Simpan</button>
     </div>
   </form>
+
+  <AdminFotoManager
+    ownerType="potensi"
+    ownerId={p.id}
+    mediaList={mediaList}
+    purgePaths={['/potensi', `/potensi/${p.slug}`]}
+    defaultAlt={p.nama}
+    title="Foto sampul potensi"
+    help="Foto ditampilkan di halaman detail potensi."
+  />
 
   <form method="POST" action={`/api/admin/potensi/${p.id}/delete`} class="mt-8" onsubmit="return confirm('Hapus potensi ini?')">
     <button type="submit" class="text-sm text-red-600 hover:underline">Hapus potensi</button>
   </form>
 
 </AdminLayout>
+
+<style>
+  #editor-potensi h2 { font-size:1.125rem; font-weight:700; margin:1rem 0 .25rem; }
+  #editor-potensi ul { list-style:disc; padding-left:1.5rem; }
+  #editor-potensi ol { list-style:decimal; padding-left:1.5rem; }
+  #editor-potensi img { max-width:100%; height:auto; border-radius:.5rem; margin:.5rem 0; }
+</style>
+
+<script>
+  import { initEditor } from '../../../scripts/admin-editor';
+
+  const form = document.getElementById('potensi-form') as HTMLFormElement;
+  const editor = document.getElementById('editor-potensi') as HTMLDivElement;
+  const hidden = document.getElementById('deskripsi_html') as HTMLInputElement;
+  const statsJson = document.getElementById('stats_json') as HTMLInputElement;
+  const list = document.getElementById('stats-list') as HTMLDivElement;
+
+  initEditor(editor, hidden);
+
+  function packStats() {
+    const rows = [...list.querySelectorAll('.stat-row')];
+    const arr = rows.map((row) => {
+      const inputs = row.querySelectorAll('input');
+      return {
+        value: (inputs[0] as HTMLInputElement).value.trim(),
+        label: (inputs[1] as HTMLInputElement).value.trim(),
+        icon: (inputs[2] as HTMLInputElement)?.value.trim() || 'info',
+      };
+    }).filter((s) => s.value || s.label);
+    statsJson.value = JSON.stringify(arr);
+  }
+
+  form?.addEventListener('submit', () => {
+    hidden.value = editor.innerHTML;
+    packStats();
+  });
+
+  document.getElementById('add-stat')?.addEventListener('click', () => {
+    const div = document.createElement('div');
+    div.className = 'stat-row grid grid-cols-3 gap-2';
+    div.innerHTML = `
+      <input name="stat_value" placeholder="Angka / nilai" class="w-full rounded-lg border px-4 py-2.5 text-base" style="border-color:var(--color-border);min-height:44px;" />
+      <input name="stat_label" placeholder="Label" class="w-full rounded-lg border px-4 py-2.5 text-base" style="border-color:var(--color-border);min-height:44px;" />
+      <div class="flex gap-1">
+        <input name="stat_icon" value="info" placeholder="ikon" class="w-full rounded-lg border px-4 py-2.5 text-base" style="border-color:var(--color-border);min-height:44px;" />
+        <button type="button" class="stat-remove px-2 rounded border text-xs text-red-600 cursor-pointer" style="border-color:#FECACA;">×</button>
+      </div>`;
+    list.appendChild(div);
+  });
+
+  list?.addEventListener('click', (e) => {
+    const t = e.target as HTMLElement;
+    if (t.classList.contains('stat-remove')) t.closest('.stat-row')?.remove();
+  });
+</script>

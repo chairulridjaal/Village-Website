@@ -1,12 +1,20 @@
----
+﻿---
 import AdminLayout from '../../../components/AdminLayout.astro';
+import AdminFotoManager from '../../../components/AdminFotoManager.astro';
 import { getPerangkatDesa } from '../../../lib/db/perangkat-desa';
-
+import { getCoversForType, mediaUrl } from '../../../lib/db/media';
 import { getEnv } from '@lib/env';
+
 const env = getEnv();
 const perangkatList = env ? await getPerangkatDesa(env.DB) : [];
+const covers = env ? await getCoversForType('perangkat', env.DB) : new Map();
 const saved = Astro.url.searchParams.get('saved');
 const deleted = Astro.url.searchParams.get('deleted');
+const editId = Number(Astro.url.searchParams.get('edit') || 0);
+const editPerson = editId ? perangkatList.find((p) => p.id === editId) : null;
+const editMedia = editPerson && env
+  ? await (await import('../../../lib/db/media')).getMediaForEntity('perangkat', editPerson.id, env.DB)
+  : [];
 
 const inputCls = 'w-full rounded-lg border px-3 py-2 text-sm focus:outline-none';
 const inputStyle = 'border-color:var(--color-border); min-height:40px;';
@@ -25,63 +33,83 @@ const inputStyle = 'border-color:var(--color-border); min-height:40px;';
     </div>
   )}
 
+  <p class="text-sm text-text-muted mb-6 max-w-2xl">
+    Tambah nama &amp; jabatan, lalu buka orang tersebut untuk unggah foto. Foto tampil di halaman Pemerintahan.
+  </p>
+
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Add form -->
     <div class="bg-white rounded-xl border border-border p-6" style="box-shadow:var(--shadow-sm);">
-      <h2 class="font-heading font-bold text-xl mb-4" style="color:var(--color-primary);">Tambah Perangkat</h2>
+      <h2 class="font-heading font-bold text-xl mb-4" style="color:var(--color-primary);">
+        {editPerson ? `Edit: ${editPerson.nama}` : 'Tambah Perangkat'}
+      </h2>
       <form method="POST" action="/api/admin/perangkat" class="space-y-4">
+        {editPerson && <input type="hidden" name="id" value={editPerson.id} />}
         <div>
           <label for="nama" class="block font-heading font-medium text-sm mb-1.5">Nama <span>*</span></label>
-          <input type="text" id="nama" name="nama" required class={inputCls} style={inputStyle} />
+          <input type="text" id="nama" name="nama" required value={editPerson?.nama ?? ''} class={inputCls} style={inputStyle} />
         </div>
         <div>
           <label for="jabatan" class="block font-heading font-medium text-sm mb-1.5">Jabatan <span>*</span></label>
-          <input type="text" id="jabatan" name="jabatan" required class={inputCls} style={inputStyle} placeholder="cth. Kepala Desa" />
+          <input type="text" id="jabatan" name="jabatan" required value={editPerson?.jabatan ?? ''} class={inputCls} style={inputStyle} placeholder="cth. Kepala Desa" />
         </div>
         <div>
           <label for="urutan" class="block font-heading font-medium text-sm mb-1.5">Urutan Tampil</label>
-          <input type="number" id="urutan" name="urutan" value={perangkatList.length} class={inputCls} style={inputStyle} />
+          <input type="number" id="urutan" name="urutan" value={editPerson?.urutan ?? perangkatList.length} class={inputCls} style={inputStyle} />
         </div>
         <button type="submit" class="w-full rounded-lg font-heading font-semibold text-white py-2.5 cursor-pointer" style="background:var(--color-cta); min-height:44px;">
-          Tambah Perangkat
+          {editPerson ? 'Simpan perubahan' : 'Tambah Perangkat'}
         </button>
+        {editPerson && (
+          <a href="/admin/perangkat" class="block text-center text-sm text-accent hover:underline">Batal edit</a>
+        )}
       </form>
+
+      {editPerson && (
+        <AdminFotoManager
+          ownerType="perangkat"
+          ownerId={editPerson.id}
+          mediaList={editMedia}
+          purgePaths={['/pemerintahan']}
+          defaultAlt={editPerson.nama}
+          single
+          title="Foto pejabat"
+          help="Satu foto per orang. Disarankan wajah jelas, rasio 1:1."
+        />
+      )}
     </div>
 
-    <!-- List -->
     <div class="space-y-3">
       {perangkatList.length === 0 ? (
         <p class="text-center text-text-muted py-8 bg-white rounded-xl border border-border">Belum ada perangkat desa.</p>
-      ) : perangkatList.map(p => (
-        <div class="bg-white rounded-xl border border-border p-4" style="box-shadow:var(--shadow-sm);">
-          <form method="POST" action="/api/admin/perangkat" class="grid grid-cols-[1fr_1fr_70px] gap-2 items-end">
-            <input type="hidden" name="id" value={p.id} />
-            <div>
-              <label class="block text-xs text-text-muted mb-1">Nama</label>
-              <input type="text" name="nama" value={p.nama} required class={inputCls} style={inputStyle} />
+      ) : perangkatList.map((p) => {
+        const cover = covers.get(p.id);
+        return (
+          <div class="bg-white rounded-xl border border-border p-4 flex gap-3 items-center" style="box-shadow:var(--shadow-sm);">
+            <div class="w-14 h-14 rounded-full overflow-hidden shrink-0 ring-2 ring-sand" style="background:linear-gradient(135deg,#0E4A6E,#0E9AA7);">
+              {cover ? (
+                <img src={mediaUrl(cover)} alt={p.nama} class="w-full h-full object-cover" />
+              ) : (
+                <div class="w-full h-full flex items-center justify-center font-heading font-bold text-white text-lg">{p.nama[0]}</div>
+              )}
             </div>
-            <div>
-              <label class="block text-xs text-text-muted mb-1">Jabatan</label>
-              <input type="text" name="jabatan" value={p.jabatan} required class={inputCls} style={inputStyle} />
+            <div class="flex-1 min-w-0">
+              <p class="font-heading font-semibold text-ink truncate">{p.nama}</p>
+              <p class="text-xs text-text-muted">{p.jabatan} · urutan {p.urutan}</p>
             </div>
-            <div>
-              <label class="block text-xs text-text-muted mb-1">Urutan</label>
-              <input type="number" name="urutan" value={p.urutan} class={inputCls} style={inputStyle} />
+            <div class="flex flex-col gap-1 shrink-0">
+              <a href={`/admin/perangkat?edit=${p.id}`} class="px-3 py-1.5 rounded-md text-xs font-heading font-medium border text-center" style="border-color:var(--color-primary);color:var(--color-primary);">
+                {cover ? 'Edit / foto' : '+ Foto'}
+              </a>
+              <form method="POST" action="/api/admin/perangkat/delete" onsubmit="return confirm('Hapus perangkat ini?')">
+                <input type="hidden" name="id" value={p.id} />
+                <button type="submit" class="w-full px-3 py-1.5 rounded-md text-xs font-heading font-medium border cursor-pointer" style="border-color:#FECACA; color:#DC2626;">
+                  Hapus
+                </button>
+              </form>
             </div>
-            <div class="col-span-3 flex justify-end gap-2 mt-1">
-              <button type="submit" class="px-3 py-1.5 rounded-md text-xs font-heading font-medium border cursor-pointer hover:bg-sand" style="border-color:var(--color-border);">
-                Simpan
-              </button>
-            </div>
-          </form>
-          <form method="POST" action="/api/admin/perangkat/delete" onsubmit="return confirm('Hapus perangkat ini?')" class="mt-1 flex justify-end">
-            <input type="hidden" name="id" value={p.id} />
-            <button type="submit" class="px-3 py-1.5 rounded-md text-xs font-heading font-medium border cursor-pointer hover:bg-red-50 hover:text-red-600" style="border-color:#FECACA; color:#DC2626;">
-              Hapus
-            </button>
-          </form>
-        </div>
-      ))}
+          </div>
+        );
+      })}
     </div>
   </div>
 

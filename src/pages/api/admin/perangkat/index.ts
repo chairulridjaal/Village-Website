@@ -13,7 +13,10 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 
   if (!env || !nama || !jabatan) return redirect('/admin/perangkat?error=1');
 
-  await upsertPerangkat({ id: idRaw ? Number(idRaw) : undefined, nama, jabatan, urutan }, env.DB);
+  const id = idRaw ? Number(idRaw) : undefined;
+  const resultId = await upsertPerangkat({ id, nama, jabatan, urutan }, env.DB);
   await purgeCache(['/pemerintahan']);
+  if (!id && resultId) return redirect(`/admin/perangkat?edit=${resultId}&saved=1`);
+  if (id) return redirect(`/admin/perangkat?edit=${id}&saved=1`);
   return redirect('/admin/perangkat?saved=1');
 };

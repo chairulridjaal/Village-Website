@@ -1,6 +1,4 @@
----
-// Toolbar bersama untuk editor contenteditable admin.
-// Halaman pemakai wajib memanggil initEditor() dari src/scripts/admin-editor.ts.
+﻿---
 interface Props { withImage?: boolean }
 const { withImage = false } = Astro.props;
 
@@ -16,14 +14,14 @@ const blockCmds = [
 ];
 ---
 
-<div class="border rounded-t-lg px-2 py-1.5 flex gap-1 flex-wrap" style="border-color:var(--color-border); background:#F8FAFC;">
+<div data-editor-toolbar class="border rounded-t-lg px-2 py-1.5 flex gap-1 flex-wrap items-center" style="border-color:var(--color-border); background:#F8FAFC;">
   {textCmds.map(([cmd, lbl, title]) => (
     <button type="button" data-cmd={cmd} title={title} aria-label={title}
       class="px-2 py-1 text-xs font-heading font-semibold rounded hover:bg-sand transition-colors cursor-pointer border border-border">
       {lbl}
     </button>
   ))}
-  <span class="w-px bg-border mx-1"></span>
+  <span class="w-px bg-border mx-1 self-stretch"></span>
   {blockCmds.map(([cmd, lbl, title]) => (
     <button type="button" data-cmd={cmd} title={title}
       class="px-2 py-1 text-xs font-heading rounded hover:bg-sand transition-colors cursor-pointer border border-border">
@@ -32,11 +30,19 @@ const blockCmds = [
   ))}
   {withImage && (
     <>
-      <span class="w-px bg-border mx-1"></span>
+      <span class="w-px bg-border mx-1 self-stretch"></span>
       <button type="button" data-cmd="image" title="Sisipkan gambar di posisi kursor"
         class="px-2 py-1 text-xs font-heading rounded hover:bg-sand transition-colors cursor-pointer border border-border">
-        🖼 Gambar
+        + Gambar
+      </button>
+      <button type="button" data-cmd="removeImage" title="Hapus gambar yang dipilih (klik gambar dulu)"
+        class="px-2 py-1 text-xs font-heading rounded hover:bg-red-50 transition-colors cursor-pointer border"
+        style="border-color:#FECACA;color:#DC2626;">
+        Hapus gambar
       </button>
     </>
+  )}
+  {withImage && (
+    <span class="text-[10px] text-text-muted ml-1 hidden sm:inline">Klik gambar → Hapus gambar / tombol Delete</span>
   )}
 </div>
