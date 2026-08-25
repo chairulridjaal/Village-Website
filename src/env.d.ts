@@ -9,6 +9,7 @@ interface Env {
   MEDIA_BUCKET: R2Bucket;
   SESSION_KV: KVNamespace;
   ANALYTICS_TOKEN?: string;
+  ASSETS?: import('@cloudflare/workers-types').Fetcher;
 }
 
 declare module '*.wasm' {
