@@ -8,6 +8,7 @@ const p = env ? await getPengajuanById(Number(id), env.DB) : null;
 if (!p || p.status !== 'diterima') return Astro.redirect('/admin/pelayanan');
 
 const html = buildSuratHtml(p);
+const safeFile = `${p.nomor}-${p.jenis_nama}`.replace(/[^\w.\- ()]+/g, '_').slice(0, 80);
 ---
 
 <!DOCTYPE html>
@@ -15,7 +16,7 @@ const html = buildSuratHtml(p);
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cetak {p.nomor} — {p.jenis_nama}</title>
+  <title>Surat {p.nomor} — {p.jenis_nama}</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -54,18 +55,28 @@ const html = buildSuratHtml(p);
       align-items: center;
       min-height: 40px;
     }
-    .btn-print { background: #F97316; color: #fff; }
-    .btn-back { background: rgba(255,255,255,0.15); color: #fff; }
+    .btn-pdf { background: #F97316; color: #fff; }
+    .btn-print { background: rgba(255,255,255,0.2); color: #fff; }
+    .btn-back { background: rgba(255,255,255,0.12); color: #fff; }
+    .hint {
+      font-size: 12px;
+      opacity: 0.9;
+      max-width: 28rem;
+      line-height: 1.35;
+      font-family: system-ui, sans-serif;
+      margin: 0.25rem 0 0;
+    }
     .sheet {
       max-width: 210mm;
       min-height: 297mm;
       margin: 1.5rem auto;
-      padding: 20mm 18mm;
+      padding: 18mm 16mm;
       background: #fff;
       box-shadow: 0 4px 24px rgba(0,0,0,0.12);
     }
     .sheet p { margin: 0.5rem 0; }
-    .sheet table { border-collapse: collapse; }
+    .sheet table { border-collapse: collapse; width: 100%; }
+    .sheet img { max-width: 100%; height: auto; object-fit: contain; }
     @media print {
       body { background: #fff; }
       .toolbar { display: none !important; }
@@ -74,26 +85,53 @@ const html = buildSuratHtml(p);
         box-shadow: none;
         max-width: none;
         min-height: auto;
-        padding: 12mm 15mm;
+        padding: 0;
       }
-      @page { size: A4; margin: 12mm; }
+      @page { size: A4; margin: 12mm 14mm; }
     }
   </style>
 </head>
 <body>
   <div class="toolbar">
-    <span>{p.nomor} · {p.jenis_nama}</span>
-    <div style="display:flex;gap:0.5rem;">
+    <div>
+      <div>{p.nomor} · {p.jenis_nama}</div>
+      <p class="hint" id="pdf-hint">
+        Klik <strong>Unduh PDF</strong> → di dialog cetak pilih printer
+        <em>“Microsoft Print to PDF”</em> / <em>“Save as PDF”</em> → Simpan.
+      </p>
+    </div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
       <a class="btn-back" href={`/admin/pelayanan/${p.id}`}>Kembali</a>
-      <button type="button" class="btn-print" onclick="window.print()">Cetak / simpan PDF</button>
+      <button type="button" class="btn-print" id="btn-print">Cetak kertas</button>
+      <button type="button" class="btn-pdf" id="btn-pdf" data-filename={`${safeFile}.pdf`}>
+        Unduh PDF
+      </button>
     </div>
   </div>
-  <div class="sheet" set:html={html} />
+  <div class="sheet" id="surat-sheet" set:html={html} />
   <script is:inline>
-    // Optional: auto-open print dialog when ?auto=1
-    if (new URLSearchParams(location.search).get('auto') === '1') {
-      window.addEventListener('load', () => setTimeout(() => window.print(), 300));
-    }
+    (function () {
+      var btnPdf = document.getElementById('btn-pdf');
+      var btnPrint = document.getElementById('btn-print');
+      var hint = document.getElementById('pdf-hint');
+      function openPrint(forPdf) {
+        if (hint && forPdf) {
+          var name = (btnPdf && btnPdf.getAttribute('data-filename')) || 'surat.pdf';
+          hint.innerHTML =
+            'Di dialog cetak: pilih <strong>Save as PDF</strong> / <strong>Microsoft Print to PDF</strong>, lalu Simpan. Nama disarankan: <em>' +
+            name +
+            '</em>';
+        }
+        window.print();
+      }
+      if (btnPdf) btnPdf.addEventListener('click', function () { openPrint(true); });
+      if (btnPrint) btnPrint.addEventListener('click', function () { openPrint(false); });
+      if (new URLSearchParams(location.search).get('auto') === '1') {
+        window.addEventListener('load', function () {
+          setTimeout(function () { openPrint(true); }, 400);
+        });
+      }
+    })();
   </script>
 </body>
 </html>

@@ -5,9 +5,11 @@ import { getEnv } from '@lib/env';
 interface Props {
   transparent?: boolean;
   currentPath?: string;
+  /** When true, nav is not viewport-fixed (parent chrome is fixed instead). */
+  embedded?: boolean;
 }
 
-const { transparent = false, currentPath = '/' } = Astro.props;
+const { transparent = false, currentPath = '/', embedded = false } = Astro.props;
 
 const env = getEnv();
 const headerItems = await listNav('header', env?.DB, true);
@@ -22,7 +24,11 @@ const isActive = (href: string) =>
 <header
   id="site-nav"
   data-transparent={transparent ? 'true' : 'false'}
-  class="fixed top-0 inset-x-0 z-40 transition-[background-color,box-shadow] duration-200"
+  data-embedded={embedded ? 'true' : 'false'}
+  class:list={[
+    'transition-[background-color,box-shadow] duration-200',
+    embedded ? 'relative z-10 w-full' : 'fixed top-0 inset-x-0 z-40',
+  ]}
 >
   <div class="nav-inner container-page flex items-center justify-between" style="height: 80px; transition: height 200ms ease;">
 
@@ -143,7 +149,8 @@ const isActive = (href: string) =>
     backdrop-filter: blur(10px);
     box-shadow: 0 1px 0 rgba(15, 36, 51, 0.06);
   }
-  #site-nav.nav-scrolled .nav-inner {
+  /* Only shrink on transparent hero pages (homepage). Inner pages keep 80px to avoid gap. */
+  #site-nav[data-transparent='true'].nav-scrolled .nav-inner {
     height: 64px !important;
   }
   #site-nav.nav-scrolled .nav-logo-circle {
@@ -217,19 +224,35 @@ const isActive = (href: string) =>
   const nav = document.getElementById('site-nav') as HTMLElement | null;
   const isTransparent = nav?.dataset.transparent === 'true';
 
+  function syncChromeHeight() {
+    const chrome = document.getElementById('site-chrome');
+    const el = chrome || nav;
+    if (!el) return;
+    const h = Math.ceil(el.getBoundingClientRect().height) || 80;
+    document.documentElement.style.setProperty('--site-chrome-h', h + 'px');
+    const main = document.getElementById('main-content');
+    if (main && main.dataset.transparentNav !== '1') {
+      main.style.paddingTop = h + 'px';
+    }
+  }
+
   function updateNavState() {
     if (!nav) return;
     if (isTransparent) {
       nav.classList.toggle('nav-scrolled', window.scrollY > 12);
     } else {
+      // Keep full-height nav so content padding stays flush (no gap under bar)
       nav.classList.add('nav-scrolled');
+      nav.classList.remove('nav-compact');
     }
+    syncChromeHeight();
   }
 
   if (isTransparent) {
     window.addEventListener('scroll', updateNavState, { passive: true });
   }
   updateNavState();
+  window.addEventListener('resize', syncChromeHeight, { passive: true });
 
   const hamburger = document.getElementById('nav-hamburger');
   const drawer = document.getElementById('nav-drawer');

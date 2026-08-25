@@ -23,3 +23,8 @@ crons = []
 
 [dev]
 port = 4321
+
+[[rules]]
+type = "CompiledWasm"
+globs = ["**/*.wasm"]
+fallthrough = true

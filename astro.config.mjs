@@ -16,5 +16,8 @@ export default defineConfig({
         '@lib': fileURLToPath(new URL('./src/lib', import.meta.url)),
       },
     },
+    ssr: {
+      noExternal: ['docxtemplater', 'pizzip', 'docx-to-pdf-wasm'],
+    },
   },
 });

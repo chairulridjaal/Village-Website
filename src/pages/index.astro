@@ -27,32 +27,43 @@ const totalPenduduk = dusunData.reduce((sum, d) => sum + d.l + d.p, 0) || Number
 const dusunCount = Number(stUmum.dusun) || dusunData.length || 4;
 const petaCountByJenis = Object.fromEntries(petaCounts.results.map(r => [r.jenis, r.n]));
 
-const demoBerita = [
-  { slug: 'pelatihan-digital-umkm', judul: 'Pelatihan Digital untuk UMKM Desa', published_at: '2026-07-08', img: '/images/pelatihan_umkm.png', ringkasan: 'Sepuluh pelaku UMKM mengikuti pelatihan foto produk dan WhatsApp Business.' },
-  { slug: 'peluncuran-situs-resmi', judul: 'Peluncuran Situs Resmi Desa Citarik', published_at: '2026-07-01', img: '/images/pelatihan_umkm.png', ringkasan: 'Desa Citarik kini punya kehadiran digital resmi yang dapat diakses siapa saja.' },
-];
-
-const getUmkmImg = (_slug: string) => '/images/kerajinan_bambu.png';
+const umkmCoverFallback: Record<string, string> = {
+  'dapurkin-snack': '/images/abon-dk.jpeg',
+  'adbacin-snack': '/images/adbacin-snack.jpg',
+  'wizard-rafsanjani': '/images/popcorn-wizard.jpg',
+};
 
 const finalUmkm = umkmList.length > 0
   ? umkmList.slice(0, 4).map(u => {
       const cover = umkmCovers.get(u.id);
-      return { slug: u.slug, nama: u.nama, kategori: u.kategori, img: cover ? mediaUrl(cover) : getUmkmImg(u.slug), wa: u.wa_number ?? null, desc: u.deskripsi_html ? excerpt(u.deskripsi_html, 80) : '' };
+      return {
+        slug: u.slug,
+        nama: u.nama,
+        kategori: u.kategori,
+        img: cover ? mediaUrl(cover) : (umkmCoverFallback[u.slug] ?? '/images/adbacin-snack.jpg'),
+        wa: u.wa_number ?? null,
+        desc: u.deskripsi_html ? excerpt(u.deskripsi_html, 80) : '',
+      };
     })
   : [];
 
-const finalBerita = beritaList.length > 0
-  ? beritaList.map(b => {
-      const cover = beritaCovers.get(b.id);
-      return { slug: b.slug, judul: b.judul, published_at: b.published_at ?? '', img: cover ? mediaUrl(cover) : '/images/gotong_royong.png', ringkasan: excerpt(b.content_html, 120) };
-    })
-  : demoBerita;
+const finalBerita = beritaList.map(b => {
+  const cover = beritaCovers.get(b.id);
+  return {
+    slug: b.slug,
+    judul: b.judul,
+    published_at: b.published_at ?? '',
+    img: cover ? mediaUrl(cover) : '/images/tile_berita_baru.jpg',
+    ringkasan: excerpt(b.content_html, 120),
+  };
+});
 ---
 
 <Layout
   title="Desa Citarik - Website Desa"
   description="Situs resmi Pemerintah Desa Citarik, Kecamatan Palabuhanratu, Kabupaten Sukabumi. Profil, potensi, UMKM, dan berita desa."
   transparentNav={true}
+  showAnnouncement={true}
 >
 
 <section
@@ -61,7 +72,7 @@ const finalBerita = beritaList.length > 0
 >
   <div
     class="absolute inset-0 bg-cover bg-center"
-    style="background-image: url('/images/pantai_Citarik.png');"
+    style="background-image: url('/images/pemandangan_citarik.png');"
     role="img"
     aria-label="Pemandangan Desa Citarik"
   ></div>
@@ -97,10 +108,10 @@ const finalBerita = beritaList.length > 0
   <div class="container-page">
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
       {[
-        { href: '/potensi', label: 'Potensi', img: '/images/kebun_sayur.png' },
-        { href: '/umkm', label: 'UMKM', img: '/images/tile_umkm.png' },
-        { href: '/peta', label: 'Peta Desa', img: '/images/tile_peta.png' },
-        { href: '/berita', label: 'Berita', img: '/images/tile_berita.png' },
+        { href: '/berita', label: 'Berita', img: '/images/tile_berita_baru.jpg' },
+        { href: '/umkm', label: 'UMKM', img: '/images/adbacin-snack.jpg' },
+        { href: '/pelayanan', label: 'Pelayanan', img: '/images/kantor_desa_baru.jpg' },
+        { href: '/potensi', label: 'Potensi', img: '/images/tile_potensi_baru.jpg' },
       ].map(tile => (
         <a
           href={tile.href}
@@ -134,35 +145,48 @@ const finalBerita = beritaList.length > 0
   />
 </section>
 
-<section class="py-12 md:py-16" aria-labelledby="potensi-heading">
+<section class="py-14 md:py-18" aria-labelledby="berita-heading">
   <div class="container-page">
     <div class="flex items-end justify-between mb-8 gap-4">
       <div>
-        <span class="section-label">Potensi</span>
-        <h2 id="potensi-heading" class="font-heading font-extrabold text-2xl sm:text-3xl text-primary mt-1">Sektor Unggulan Desa</h2>
+        <span class="section-label">Informasi</span>
+        <h2 id="berita-heading" class="font-heading font-extrabold text-2xl sm:text-3xl text-ink mt-1">Berita & Pengumuman</h2>
       </div>
-      <a href="/potensi" class="hidden sm:inline-flex items-center gap-1.5 text-primary font-heading font-semibold hover:text-accent transition-colors">
-        Semua potensi <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      <a href="/berita" class="text-sm font-heading font-semibold text-accent hover:text-primary flex items-center gap-1 transition-colors shrink-0">
+        Semua Berita <i data-lucide="arrow-right" class="w-4 h-4"></i>
       </a>
     </div>
-    <div class="grid sm:grid-cols-3 gap-5">
-      {[
-        { href: '/potensi/pertanian', title: 'Pertanian', desc: '773 keluarga petani, 2.330 Ha sawah, padi & pisang (Prodeskel 2025).', img: '/images/kebun_sayur.png', icon: 'wheat' },
-        { href: '/potensi/perikanan', title: 'Perikanan', desc: 'Empang/kolam, pancing, produksi mas & nila skala lokal.', img: '/images/ikan_bakar.png', icon: 'fish' },
-        { href: '/potensi/sdm', title: 'SDM', desc: '8.553 pekerja usia 18–56 thn, BPD, LPMD, BUMDes, 10 RW / 50 RT.', img: '/images/nelayan.png', icon: 'users' },
-      ].map(item => (
-        <a href={item.href} class="group block card-surface card-surface-hover overflow-hidden">
-          <div class="aspect-[4/3] overflow-hidden">
-            <img src={item.img} alt={item.title} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-          </div>
-          <div class="p-5">
-            <i data-lucide={item.icon} class="w-5 h-5 text-accent"></i>
-            <h3 class="font-heading font-bold text-lg text-ink mt-2 group-hover:text-primary transition-colors">{item.title}</h3>
-            <p class="text-sm text-muted mt-1.5 leading-relaxed">{item.desc}</p>
-          </div>
-        </a>
-      ))}
-    </div>
+    {finalBerita.length > 0 ? (
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {finalBerita.map(b => (
+          <a href={`/berita/${b.slug}`} class="group block card-surface card-surface-hover overflow-hidden">
+            <div class="aspect-[16/9] overflow-hidden">
+              {b.img ? (
+                <img src={b.img} alt={b.judul} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+              ) : (
+                <div class="w-full h-full" style="background: linear-gradient(135deg, #0E4A6E 0%, #0E9AA7 100%);"></div>
+              )}
+            </div>
+            <div class="p-5">
+              <time class="text-xs font-heading font-semibold text-muted">
+                {b.published_at ? formatTanggal(b.published_at) : ''}
+              </time>
+              <h3 class="font-heading font-semibold text-ink mt-1.5 group-hover:text-primary transition-colors leading-snug">{b.judul}</h3>
+              <p class="text-sm text-muted mt-1.5 line-clamp-2 leading-relaxed">{b.ringkasan}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <div class="rounded-xl border border-border bg-sand/40 px-6 py-12 text-center">
+        <i data-lucide="newspaper" class="w-8 h-8 text-muted mx-auto"></i>
+        <h3 class="font-heading font-semibold text-ink text-lg mt-3">Belum ada berita terbit</h3>
+        <p class="text-muted mt-2 text-sm max-w-md mx-auto leading-relaxed">
+          Kabar resmi desa akan tampil di sini setelah admin menerbitkan berita dari panel.
+        </p>
+        <a href="/berita" class="btn btn-secondary mt-5">Buka halaman berita</a>
+      </div>
+    )}
   </div>
 </section>
 
@@ -214,7 +238,7 @@ const finalBerita = beritaList.length > 0
         </div>
         <h3 class="font-heading font-semibold text-white text-lg">Direktori UMKM sedang diisi</h3>
         <p class="text-white/65 mt-2 max-w-md mx-auto text-sm leading-relaxed">
-          Pendataan pelaku usaha desa dilakukan lewat panel admin. Data binaan dan daftar usaha baru tersedia sebagai referensi di repositori.
+          Pendataan pelaku usaha desa dilakukan lewat panel admin.
         </p>
         <a href="/umkm" class="btn btn-accent mt-6">Buka Direktori UMKM</a>
       </div>
@@ -224,7 +248,7 @@ const finalBerita = beritaList.length > 0
 
 <section class="relative py-16 md:py-24 overflow-hidden" aria-labelledby="peta-heading">
   <div class="absolute inset-0">
-    <img src="/images/pantai_Citarik.png" alt="" class="w-full h-full object-cover" aria-hidden="true" loading="lazy" />
+    <img src="/images/pemandangan_citarik.png" alt="" class="w-full h-full object-cover" aria-hidden="true" loading="lazy" />
     <div class="absolute inset-0" style="background: linear-gradient(to right, rgba(10,54,80,0.94) 0%, rgba(10,54,80,0.78) 55%, rgba(10,54,80,0.55) 100%);"></div>
   </div>
   <div class="relative container-page">
@@ -252,33 +276,31 @@ const finalBerita = beritaList.length > 0
   </div>
 </section>
 
-<section class="py-14 md:py-18" aria-labelledby="berita-heading">
+<section class="py-12 md:py-16" aria-labelledby="potensi-heading">
   <div class="container-page">
     <div class="flex items-end justify-between mb-8 gap-4">
       <div>
-        <span class="section-label">Informasi</span>
-        <h2 id="berita-heading" class="font-heading font-extrabold text-2xl sm:text-3xl text-ink mt-1">Berita & Pengumuman</h2>
+        <span class="section-label">Potensi</span>
+        <h2 id="potensi-heading" class="font-heading font-extrabold text-2xl sm:text-3xl text-primary mt-1">Sektor Unggulan Desa</h2>
       </div>
-      <a href="/berita" class="text-sm font-heading font-semibold text-accent hover:text-primary flex items-center gap-1 transition-colors shrink-0">
-        Semua Berita <i data-lucide="arrow-right" class="w-4 h-4"></i>
+      <a href="/potensi" class="hidden sm:inline-flex items-center gap-1.5 text-primary font-heading font-semibold hover:text-accent transition-colors">
+        Semua potensi <i data-lucide="arrow-right" class="w-4 h-4"></i>
       </a>
     </div>
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-      {finalBerita.map(b => (
-        <a href={`/berita/${b.slug}`} class="group block card-surface card-surface-hover overflow-hidden">
-          <div class="aspect-[16/9] overflow-hidden">
-            {b.img ? (
-              <img src={b.img} alt={b.judul} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-            ) : (
-              <div class="w-full h-full" style="background: linear-gradient(135deg, #0E4A6E 0%, #0E9AA7 100%);"></div>
-            )}
+    <div class="grid sm:grid-cols-3 gap-5">
+      {[
+        { href: '/potensi/pertanian', title: 'Pertanian', desc: '773 keluarga petani, 2.330 Ha sawah, padi & pisang (Prodeskel 2025).', img: '/images/pemandangan_citarik.png', icon: 'wheat' },
+        { href: '/potensi/perikanan', title: 'Perikanan', desc: 'Empang/kolam, pancing, produksi mas & nila skala lokal.', img: '/images/pempek-ikan-tuna.jpg', icon: 'fish' },
+        { href: '/potensi/sdm', title: 'SDM', desc: '8.553 pekerja usia 18–56 thn, BPD, LPMD, BUMDes, 10 RW / 50 RT.', img: '/images/tile_berita_baru.jpg', icon: 'users' },
+      ].map(item => (
+        <a href={item.href} class="group block card-surface card-surface-hover overflow-hidden">
+          <div class="aspect-[4/3] overflow-hidden">
+            <img src={item.img} alt={item.title} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
           </div>
           <div class="p-5">
-            <time class="text-xs font-heading font-semibold text-muted">
-              {b.published_at ? formatTanggal(b.published_at) : ''}
-            </time>
-            <h3 class="font-heading font-semibold text-ink mt-1.5 group-hover:text-primary transition-colors leading-snug">{b.judul}</h3>
-            <p class="text-sm text-muted mt-1.5 line-clamp-2 leading-relaxed">{b.ringkasan}</p>
+            <i data-lucide={item.icon} class="w-5 h-5 text-accent"></i>
+            <h3 class="font-heading font-bold text-lg text-ink mt-2 group-hover:text-primary transition-colors">{item.title}</h3>
+            <p class="text-sm text-muted mt-1.5 leading-relaxed">{item.desc}</p>
           </div>
         </a>
       ))}

@@ -12,7 +12,12 @@ if (!p) return Astro.redirect('/potensi');
 const stats = parseStatsJson(p.stats_json);
 const media = env ? await getMediaForEntity('potensi', p.id, env.DB) : [];
 const cover = media[0];
-const heroSrc = cover ? mediaUrl(cover) : '/images/nelayan.png';
+const FALLBACK: Record<string, string> = {
+  perikanan: '/images/pempek-ikan-tuna.jpg',
+  pertanian: '/images/pemandangan_citarik.png',
+  sdm: '/images/tile_berita_baru.jpg',
+};
+const heroSrc = cover ? mediaUrl(cover) : (FALLBACK[p.slug] ?? '/images/tile_potensi_baru.jpg');
 ---
 
 <Layout

@@ -6,3 +6,5 @@
 
 # Example (uncomment and fill if needed for local dev):
 # ADMIN_SECRET=your-local-dev-secret-here
+
+# DOCX→PDF runs fully local via docx-to-pdf-wasm (no API keys).

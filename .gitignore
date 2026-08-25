@@ -21,4 +21,31 @@ dist/
 .DS_Store
 Thumbs.db
 
+# Local agent / temp tooling
+.omo/
+.opencode/
+
+# Office temp lock files
+~$*
+**/~$*
+
+# Source data / village docs — keep local only, never push to GitHub
+*.xlsx
+*.xls
+*.docx
+*.doc
+*.ppt
+*.pptx
+*.pdf
+!public/templates/**/*.docx
+!public/images/kop-desa-citarik.png
+
+# Large / offline-only notes (if present at repo root)
+DATA UMKM*
+DAFTAR USAHA*
+PROFIL DESA*
+Profil Desa*
+REKAPITULASI*
+SURAT KETERANGAN*
+
 

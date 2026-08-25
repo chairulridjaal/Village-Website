@@ -11,6 +11,11 @@ interface Env {
   ANALYTICS_TOKEN?: string;
 }
 
+declare module '*.wasm' {
+  const wasmModule: WebAssembly.Module;
+  export default wasmModule;
+}
+
 declare module "cloudflare:workers" {
   const env: Env;
   export { env };

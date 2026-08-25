@@ -3,6 +3,7 @@ import AdminLayout from '../../../components/AdminLayout.astro';
 import AdminFotoManager from '../../../components/AdminFotoManager.astro';
 import { getPerangkatDesa } from '../../../lib/db/perangkat-desa';
 import { getCoversForType, mediaUrl } from '../../../lib/db/media';
+import { perangkatAvatarSrc } from '../../../lib/db/perangkat-photo';
 import { getEnv } from '@lib/env';
 
 const env = getEnv();
@@ -83,11 +84,12 @@ const inputStyle = 'border-color:var(--color-border); min-height:40px;';
         <p class="text-center text-text-muted py-8 bg-white rounded-xl border border-border">Belum ada perangkat desa.</p>
       ) : perangkatList.map((p) => {
         const cover = covers.get(p.id);
+        const avatar = perangkatAvatarSrc(p.nama, p.jabatan, cover ? mediaUrl(cover) : null);
         return (
           <div class="bg-white rounded-xl border border-border p-4 flex gap-3 items-center" style="box-shadow:var(--shadow-sm);">
             <div class="w-14 h-14 rounded-full overflow-hidden shrink-0 ring-2 ring-sand" style="background:linear-gradient(135deg,#0E4A6E,#0E9AA7);">
-              {cover ? (
-                <img src={mediaUrl(cover)} alt={p.nama} class="w-full h-full object-cover" />
+              {avatar ? (
+                <img src={avatar} alt={p.nama} class="w-full h-full object-cover" />
               ) : (
                 <div class="w-full h-full flex items-center justify-center font-heading font-bold text-white text-lg">{p.nama[0]}</div>
               )}
@@ -98,7 +100,7 @@ const inputStyle = 'border-color:var(--color-border); min-height:40px;';
             </div>
             <div class="flex flex-col gap-1 shrink-0">
               <a href={`/admin/perangkat?edit=${p.id}`} class="px-3 py-1.5 rounded-md text-xs font-heading font-medium border text-center" style="border-color:var(--color-primary);color:var(--color-primary);">
-                {cover ? 'Edit / foto' : '+ Foto'}
+                {cover ? 'Edit / foto' : avatar ? 'Ganti foto' : '+ Foto'}
               </a>
               <form method="POST" action="/api/admin/perangkat/delete" onsubmit="return confirm('Hapus perangkat ini?')">
                 <input type="hidden" name="id" value={p.id} />

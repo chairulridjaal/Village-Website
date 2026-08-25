@@ -15,10 +15,10 @@ const [allUmkm, covers] = await Promise.all([
 const demoUmkm: Array<{slug:string;nama:string;kategori:string;lokasi:string;img:string;wa_number:string|null;desc:string}> = [];
 
 const getUmkmImg = (slug: string) => {
-  if (slug === 'kerajinan-bambu-Citarik') return '/images/kerajinan_bambu.png';
-  if (slug === 'warung-ikan-bakar-bu-sari') return '/images/ikan_bakar.png';
-  if (slug === 'kebun-sayur-pak-budi') return '/images/kebun_sayur.png';
-  return '/images/kerajinan_bambu.png';
+  if (slug === 'dapurkin-snack') return '/images/abon-dk.jpeg';
+  if (slug === 'adbacin-snack') return '/images/adbacin-snack.jpg';
+  if (slug === 'wizard-rafsanjani') return '/images/popcorn-wizard.jpg';
+  return '/images/adbacin-snack.jpg';
 };
 
 const displayUmkm = allUmkm.length > 0

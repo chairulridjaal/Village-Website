@@ -16,6 +16,13 @@ const cover = mediaList[0];
 const menuItems = (umkm.menu ?? '').split('\n').map(s => s.trim()).filter(Boolean);
 const caraPesanLines = (umkm.cara_pesan ?? '').split('\n').map(s => s.trim()).filter(Boolean);
 const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? SITE_URL).href;
+
+const galleryJson = JSON.stringify(
+  mediaList.map(m => ({
+    src: `/api/media/${encodeURIComponent(m.r2_key_display)}`,
+    alt: m.alt || umkm.nama,
+  }))
+);
 ---
 
 <Layout
@@ -52,14 +59,69 @@ const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? SITE_URL).href;
     <div class="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-10">
 
       <div>
-        {mediaList.length > 1 && (
-          <div class="grid grid-cols-3 gap-2 mb-6">
-            {mediaList.slice(1, 7).map(m => (
-              <div class="aspect-square rounded-lg overflow-hidden border border-border">
-                <img src={`/api/media/${encodeURIComponent(m.r2_key_thumb)}`} alt={m.alt}
-                  class="w-full h-full object-cover" loading="lazy" />
+        {mediaList.length > 0 && (
+          <div class="mb-6" id="umkm-gallery" data-gallery={galleryJson}>
+            <div class="relative rounded-xl overflow-hidden border border-border bg-sand/40 aspect-[16/10] group">
+              <button
+                type="button"
+                id="gallery-main-btn"
+                class="absolute inset-0 w-full h-full cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                aria-label="Perbesar foto"
+              >
+                <img
+                  id="gallery-main-img"
+                  src={`/api/media/${encodeURIComponent(mediaList[0].r2_key_display)}`}
+                  alt={mediaList[0].alt || umkm.nama}
+                  class="w-full h-full object-cover"
+                />
+              </button>
+
+              {mediaList.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    id="gallery-prev"
+                    class="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors z-10"
+                    aria-label="Foto sebelumnya"
+                  >
+                    <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                  </button>
+                  <button
+                    type="button"
+                    id="gallery-next"
+                    class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors z-10"
+                    aria-label="Foto berikutnya"
+                  >
+                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                  </button>
+                  <div class="absolute bottom-3 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-full bg-black/55 text-white text-xs font-heading tabular-nums z-10">
+                    <span id="gallery-counter">1 / {mediaList.length}</span>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {mediaList.length > 1 && (
+              <div class="flex gap-2 mt-3 overflow-x-auto pb-1" role="tablist" aria-label="Thumbnail galeri">
+                {mediaList.map((m, i) => (
+                  <button
+                    type="button"
+                    class="gallery-thumb shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    style={i === 0 ? 'border-color:var(--color-accent)' : 'border-color:transparent'}
+                    data-index={i}
+                    aria-label={`Foto ${i + 1}`}
+                    aria-selected={i === 0 ? 'true' : 'false'}
+                  >
+                    <img
+                      src={`/api/media/${encodeURIComponent(m.r2_key_thumb || m.r2_key_display)}`}
+                      alt=""
+                      class="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </button>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         )}
 
@@ -174,6 +236,25 @@ const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? SITE_URL).href;
     </div>
   </div>
 
+  <div
+    id="lightbox"
+    class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/90 p-4"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Pratinjau foto"
+  >
+    <button type="button" id="lightbox-close" class="absolute top-4 right-4 w-11 h-11 rounded-full bg-white/15 text-white flex items-center justify-center hover:bg-white/25" aria-label="Tutup">
+      <i data-lucide="x" class="w-6 h-6"></i>
+    </button>
+    <button type="button" id="lightbox-prev" class="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/15 text-white flex items-center justify-center hover:bg-white/25" aria-label="Sebelumnya">
+      <i data-lucide="chevron-left" class="w-6 h-6"></i>
+    </button>
+    <img id="lightbox-img" src="" alt="" class="max-h-[88vh] max-w-[92vw] object-contain rounded-lg shadow-2xl" />
+    <button type="button" id="lightbox-next" class="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/15 text-white flex items-center justify-center hover:bg-white/25" aria-label="Berikutnya">
+      <i data-lucide="chevron-right" class="w-6 h-6"></i>
+    </button>
+  </div>
+
 </Layout>
 
 <script define:vars={{ canonicalUrl }}>
@@ -182,4 +263,73 @@ const canonicalUrl = new URL(`/umkm/${slug}`, Astro.site ?? SITE_URL).href;
     const msg = document.getElementById('copy-confirm');
     if (msg) { msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 2000); }
   });
+
+  const root = document.getElementById('umkm-gallery');
+  if (root) {
+    /** @type {{src:string,alt:string}[]} */
+    const items = JSON.parse(root.dataset.gallery || '[]');
+    let index = 0;
+
+    const mainImg = document.getElementById('gallery-main-img');
+    const counter = document.getElementById('gallery-counter');
+    const thumbs = Array.from(document.querySelectorAll('.gallery-thumb'));
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+
+    function show(i) {
+      if (!items.length) return;
+      index = (i + items.length) % items.length;
+      const item = items[index];
+      if (mainImg) {
+        mainImg.src = item.src;
+        mainImg.alt = item.alt;
+      }
+      if (counter) counter.textContent = `${index + 1} / ${items.length}`;
+      thumbs.forEach((t, ti) => {
+        const on = ti === index;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.style.borderColor = on ? 'var(--color-accent)' : 'transparent';
+        t.style.opacity = on ? '1' : '0.72';
+      });
+      if (lightboxImg && lightbox && !lightbox.classList.contains('hidden')) {
+        lightboxImg.src = item.src;
+        lightboxImg.alt = item.alt;
+      }
+    }
+
+    function openLightbox() {
+      if (!lightbox || !lightboxImg || !items.length) return;
+      lightboxImg.src = items[index].src;
+      lightboxImg.alt = items[index].alt;
+      lightbox.classList.remove('hidden');
+      lightbox.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      if (!lightbox) return;
+      lightbox.classList.add('hidden');
+      lightbox.classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('gallery-prev')?.addEventListener('click', (e) => { e.stopPropagation(); show(index - 1); });
+    document.getElementById('gallery-next')?.addEventListener('click', (e) => { e.stopPropagation(); show(index + 1); });
+    document.getElementById('gallery-main-btn')?.addEventListener('click', openLightbox);
+    thumbs.forEach((t) => t.addEventListener('click', () => show(Number(t.dataset.index || 0))));
+
+    document.getElementById('lightbox-close')?.addEventListener('click', closeLightbox);
+    document.getElementById('lightbox-prev')?.addEventListener('click', () => show(index - 1));
+    document.getElementById('lightbox-next')?.addEventListener('click', () => show(index + 1));
+    lightbox?.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+
+    document.addEventListener('keydown', (e) => {
+      if (!items.length) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') show(index - 1);
+      if (e.key === 'ArrowRight') show(index + 1);
+    });
+
+    show(0);
+  }
 </script>

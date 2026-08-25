@@ -4,23 +4,31 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "astro build && wrangler dev",
+    "postinstall": "node scripts/copy-docx-pdf-wasm.mjs",
+    "dev": "node scripts/copy-docx-pdf-wasm.mjs && astro build && wrangler dev",
     "db:setup": "wrangler d1 migrations apply web-desa-citarik-db --local",
-    "build": "astro build",
+    "seed:umkm": "node scripts/seed-umkm-binaan.mjs --local",
+    "seed:umkm:remote": "node scripts/seed-umkm-binaan.mjs --remote",
+    "build": "node scripts/copy-docx-pdf-wasm.mjs && astro build",
     "astro": "astro",
-    "deploy": "astro build && wrangler deploy"
+    "deploy": "node scripts/copy-docx-pdf-wasm.mjs && astro build && wrangler deploy"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.0.0",
     "@astrojs/react": "^6.0.0",
     "@tailwindcss/vite": "^4.0.0",
     "astro": "^7.0.0",
+    "docx-to-pdf-wasm": "^0.1.0",
+    "docxtemplater": "^3.69.3",
+    "jszip": "^3.10.1",
     "leaflet": "^1.9.4",
+    "pizzip": "^3.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwindcss": "^4.0.0"
   },
   "devDependencies": {
+    "@types/jszip": "^3.4.0",
     "wrangler": "^4.0.0"
   }
 }

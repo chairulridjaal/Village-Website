@@ -19,11 +19,15 @@ if (!p) return Astro.redirect('/admin/pelayanan');
 
 const jenis = env ? await getJenisById(p.jenis_id, env.DB) : null;
 const fields = jenis ? parseFields(jenis.fields_json) : [];
+const adminFields = parseFields(p.admin_fields_json || jenis?.admin_fields_json || '[]');
 const data = parseData(p.data_json);
+const adminData = parseData(p.admin_data_json || '{}');
 const lampiran = env ? await listLampiran(p.id, env.DB) : [];
 const saved = Astro.url.searchParams.get('saved');
 
-const suratHtml = p.status === 'diterima' ? buildSuratHtml(p) : '';
+const suratHtml = p.status === 'diterima' && p.template_html ? buildSuratHtml(p) : '';
+const inputCls = 'w-full rounded-lg border px-3 py-2 text-sm focus:outline-none';
+const inputStyle = 'border-color:var(--color-border);min-height:40px;';
 
 const waTerima = waLink(
   p.pemohon_wa,
@@ -88,18 +92,57 @@ const statusStyle: Record<string, string> = {
         )}
       </dl>
 
-      <h3 class="font-heading font-semibold text-primary pt-2">Isi formulir</h3>
-      <dl class="space-y-2 text-sm">
-        {fields.map(f => (
-          <div class="border-b border-border py-2">
-            <dt class="text-text-muted text-xs">{f.label}</dt>
-            <dd class="font-medium mt-0.5 whitespace-pre-wrap">{data[f.key] || '—'}</dd>
+      <h3 class="font-heading font-semibold text-primary pt-2">Isi formulir warga</h3>
+      {p.status !== 'ditolak' && fields.length > 0 ? (
+        <form method="POST" action={`/api/admin/pelayanan/pengajuan/${p.id}`} class="space-y-3">
+          <input type="hidden" name="action" value="edit_warga" />
+          <p class="text-xs text-text-muted">Perbaiki data bila pengaju salah/kurang lengkap, lalu simpan.</p>
+          <div>
+            <label class="block text-xs font-heading mb-1" for="pemohon_wa">WhatsApp</label>
+            <input id="pemohon_wa" name="pemohon_wa" value={p.pemohon_wa} class={inputCls} style={inputStyle} />
           </div>
-        ))}
-        {fields.length === 0 && (
-          <pre class="text-xs bg-sand/50 p-3 rounded-lg overflow-x-auto">{JSON.stringify(data, null, 2)}</pre>
-        )}
-      </dl>
+          {fields.map((f) => (
+            <div>
+              <label class="block text-xs font-heading mb-1" for={`field_${f.key}`}>{f.label}</label>
+              {f.type === 'textarea' ? (
+                <textarea id={`field_${f.key}`} name={`field_${f.key}`} rows="2" class={inputCls} style={inputStyle}>{data[f.key] ?? ''}</textarea>
+              ) : f.type === 'select' && f.options?.length ? (
+                <select id={`field_${f.key}`} name={`field_${f.key}`} class={inputCls} style={inputStyle}>
+                  <option value="">— pilih —</option>
+                  {f.options.map((o) => (
+                    <option value={o} selected={data[f.key] === o}>{o}</option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  id={`field_${f.key}`}
+                  name={`field_${f.key}`}
+                  type={f.type === 'date' ? 'date' : f.type === 'number' ? 'number' : 'text'}
+                  value={data[f.key] ?? ''}
+                  class={inputCls}
+                  style={inputStyle}
+                />
+              )}
+            </div>
+          ))}
+          <button type="submit" class="w-full rounded-lg font-heading font-semibold py-2 border cursor-pointer text-sm"
+            style="border-color:var(--color-primary);color:var(--color-primary);min-height:44px;">
+            Simpan perbaikan data warga
+          </button>
+        </form>
+      ) : (
+        <dl class="space-y-2 text-sm">
+          {fields.map(f => (
+            <div class="border-b border-border py-2">
+              <dt class="text-text-muted text-xs">{f.label}</dt>
+              <dd class="font-medium mt-0.5 whitespace-pre-wrap">{data[f.key] || '—'}</dd>
+            </div>
+          ))}
+          {fields.length === 0 && (
+            <pre class="text-xs bg-sand/50 p-3 rounded-lg overflow-x-auto">{JSON.stringify(data, null, 2)}</pre>
+          )}
+        </dl>
+      )}
 
       {p.status === 'ditolak' && p.alasan_tolak && (
         <div class="p-3 rounded-lg text-sm" style="background:#FEE2E2;color:#991B1B;">
@@ -162,14 +205,87 @@ const statusStyle: Record<string, string> = {
       )}
 
       {p.status === 'diterima' && (
-        <div class="bg-white rounded-xl border border-border p-5 space-y-3" style="box-shadow:var(--shadow-sm);">
+        <div class="bg-white rounded-xl border border-border p-5 space-y-4" style="box-shadow:var(--shadow-sm);">
           <h3 class="font-heading font-semibold text-primary">Surat siap</h3>
-          <p class="text-sm text-text-muted">Cetak atau unduh PDF, lalu hubungi pemohon via WhatsApp bila perlu.</p>
-          <a href={`/admin/pelayanan/${p.id}/cetak`} target="_blank" rel="noopener"
-            class="block w-full text-center rounded-lg font-heading font-semibold text-white py-2.5"
-            style="background:var(--color-primary);min-height:44px;line-height:28px;">
-            Cetak / unduh PDF
-          </a>
+
+          {adminFields.length > 0 && (
+            <form method="POST" action={`/api/admin/pelayanan/pengajuan/${p.id}`} class="space-y-3 border border-border rounded-lg p-3 bg-sand/20">
+              <input type="hidden" name="action" value="admin_data" />
+              <p class="text-xs text-text-muted leading-relaxed">
+                Isian admin dari template (<code>%%…%%</code>). Boleh dikosongkan — nanti diisi tangan di kertas.
+              </p>
+              {adminFields.map((f) => (
+                <div>
+                  <label class="block text-xs font-heading font-medium mb-1" for={`admin_${f.key}`}>
+                    {f.label}
+                    {!f.required && <span class="font-normal text-text-muted"> (opsional)</span>}
+                  </label>
+                  {f.type === 'textarea' ? (
+                    <textarea
+                      id={`admin_${f.key}`}
+                      name={`admin_${f.key}`}
+                      rows="2"
+                      class={inputCls}
+                      style={inputStyle}
+                    >{adminData[f.key] ?? ''}</textarea>
+                  ) : f.type === 'select' && f.options?.length ? (
+                    <select id={`admin_${f.key}`} name={`admin_${f.key}`} class={inputCls} style={inputStyle}>
+                      <option value="">— kosong —</option>
+                      {f.options.map((o) => (
+                        <option value={o} selected={adminData[f.key] === o}>{o}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      id={`admin_${f.key}`}
+                      name={`admin_${f.key}`}
+                      type={f.type === 'date' ? 'date' : f.type === 'number' ? 'number' : 'text'}
+                      value={adminData[f.key] ?? ''}
+                      class={inputCls}
+                      style={inputStyle}
+                      placeholder={
+                        f.key === 'nomor_surat'
+                          ? 'kosongkan = spasi untuk diisi tangan'
+                          : f.type === 'date'
+                            ? ''
+                            : ''
+                      }
+                    />
+                  )}
+                </div>
+              ))}
+              <button type="submit" class="w-full rounded-lg font-heading font-semibold py-2 border cursor-pointer text-sm"
+                style="border-color:var(--color-primary);color:var(--color-primary);min-height:44px;">
+                Simpan isian admin
+              </button>
+            </form>
+          )}
+
+          <p class="text-sm text-text-muted">
+            PDF dibuat dari file Word resmi (konversi CloudConvert / Office). Mirip cetak dari Word.
+          </p>
+          {p.template_docx_path ? (
+            <a
+              href={`/api/admin/pelayanan/pengajuan/${p.id}/pdf`}
+              class="block w-full text-center rounded-lg font-heading font-semibold text-white py-2.5"
+              style="background:var(--color-cta);min-height:44px;line-height:28px;"
+            >
+              Unduh PDF
+            </a>
+          ) : (
+            <p class="text-xs rounded-lg p-3" style="background:#FEF3C7;color:#92400E;">
+              Jenis surat ini belum punya template Word. Unggah .docx di Admin → Jenis surat.
+            </p>
+          )}
+          {p.template_docx_path && (
+            <a
+              href={`/api/admin/pelayanan/pengajuan/${p.id}/docx`}
+              class="block w-full text-center rounded-lg font-heading font-semibold py-2.5 border text-sm"
+              style="border-color:var(--color-border);color:var(--color-primary);min-height:44px;line-height:28px;"
+            >
+              Unduh Word (.docx) — alternatif
+            </a>
+          )}
           <a href={waTerima} target="_blank" rel="noopener noreferrer"
             class="block w-full text-center rounded-lg font-heading font-semibold py-2.5 border"
             style="border-color:#15803D;color:#15803D;min-height:44px;line-height:28px;">
@@ -186,13 +302,6 @@ const statusStyle: Record<string, string> = {
             style="border-color:#15803D;color:#15803D;min-height:44px;line-height:28px;">
             Hubungi WA (ditolak)
           </a>
-        </div>
-      )}
-
-      {p.status === 'diterima' && suratHtml && (
-        <div class="bg-white rounded-xl border border-border p-5" style="box-shadow:var(--shadow-sm);">
-          <h3 class="font-heading font-semibold text-primary mb-3">Pratinjau surat</h3>
-          <div class="prose max-w-none text-sm border border-border rounded-lg p-4 bg-sand/20" set:html={suratHtml} />
         </div>
       )}
     </div>

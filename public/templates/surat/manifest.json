@@ -1,0 +1,344 @@
+[
+  {
+    "slug": "surat-keterangan-domisili",
+    "nama": "Surat Keterangan Domisili",
+    "file": "/templates/surat/surat-keterangan-domisili.docx",
+    "fields": [
+      {
+        "key": "nama",
+        "label": "Nama lengkap",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "jenis_kelamin",
+        "label": "Jenis kelamin",
+        "type": "select",
+        "required": true,
+        "options": [
+          "Laki-laki",
+          "Perempuan"
+        ]
+      },
+      {
+        "key": "nik",
+        "label": "NIK",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "ttl",
+        "label": "Tempat / tanggal lahir",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "agama",
+        "label": "Agama",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "kewarganegaraan",
+        "label": "Kewarganegaraan",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "pekerjaan",
+        "label": "Pekerjaan",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "alamat",
+        "label": "Alamat lengkap",
+        "type": "textarea",
+        "required": true
+      }
+    ],
+    "urutan": 1
+  },
+  {
+    "slug": "surat-keterangan-pengantar-skck",
+    "nama": "Surat Keterangan Pengantar SKCK",
+    "file": "/templates/surat/surat-keterangan-pengantar-skck.docx",
+    "fields": [
+      {
+        "key": "nama",
+        "label": "Nama lengkap",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "jenis_kelamin",
+        "label": "Jenis kelamin",
+        "type": "select",
+        "required": true,
+        "options": [
+          "Laki-laki",
+          "Perempuan"
+        ]
+      },
+      {
+        "key": "nik",
+        "label": "NIK",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "ttl",
+        "label": "Tempat / tanggal lahir",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "kewarganegaraan",
+        "label": "Kewarganegaraan",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "agama",
+        "label": "Agama",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "status_perkawinan",
+        "label": "Status perkawinan",
+        "type": "select",
+        "required": true,
+        "options": [
+          "Belum Kawin",
+          "Kawin",
+          "Cerai Hidup",
+          "Cerai Mati"
+        ]
+      },
+      {
+        "key": "pekerjaan",
+        "label": "Pekerjaan",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "alamat",
+        "label": "Alamat lengkap",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "key": "keperluan",
+        "label": "Keperluan",
+        "type": "text",
+        "required": true
+      }
+    ],
+    "urutan": 2
+  },
+  {
+    "slug": "surat-keterangan-tidak-mampu",
+    "nama": "Surat Keterangan Tidak Mampu",
+    "file": "/templates/surat/surat-keterangan-tidak-mampu.docx",
+    "fields": [
+      {
+        "key": "nama",
+        "label": "Nama lengkap",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "nik",
+        "label": "NIK",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "jenis_kelamin",
+        "label": "Jenis kelamin",
+        "type": "select",
+        "required": true,
+        "options": [
+          "Laki-laki",
+          "Perempuan"
+        ]
+      },
+      {
+        "key": "ttl",
+        "label": "Tempat / tanggal lahir",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "kewarganegaraan",
+        "label": "Kewarganegaraan",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "agama",
+        "label": "Agama",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "pekerjaan",
+        "label": "Pekerjaan",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "alamat",
+        "label": "Alamat lengkap",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "key": "keperluan",
+        "label": "Keperluan / tujuan surat",
+        "type": "text",
+        "required": true
+      }
+    ],
+    "urutan": 3
+  },
+  {
+    "slug": "surat-keterangan-umum",
+    "nama": "Surat Keterangan Umum",
+    "file": "/templates/surat/surat-keterangan-umum.docx",
+    "fields": [
+      {
+        "key": "nama",
+        "label": "Nama lengkap",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "jenis_kelamin",
+        "label": "Jenis kelamin",
+        "type": "select",
+        "required": true,
+        "options": [
+          "Laki-laki",
+          "Perempuan"
+        ]
+      },
+      {
+        "key": "nik",
+        "label": "NIK",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "ttl",
+        "label": "Tempat / tanggal lahir",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "agama",
+        "label": "Agama",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "kewarganegaraan",
+        "label": "Kewarganegaraan",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "pekerjaan",
+        "label": "Pekerjaan",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "alamat",
+        "label": "Alamat lengkap",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "key": "keterangan",
+        "label": "Isi keterangan",
+        "type": "textarea",
+        "required": true
+      }
+    ],
+    "urutan": 4
+  },
+  {
+    "slug": "surat-keterangan-usaha",
+    "nama": "Surat Keterangan Usaha",
+    "file": "/templates/surat/surat-keterangan-usaha.docx",
+    "fields": [
+      {
+        "key": "nama",
+        "label": "Nama lengkap",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "jenis_kelamin",
+        "label": "Jenis kelamin",
+        "type": "select",
+        "required": true,
+        "options": [
+          "Laki-laki",
+          "Perempuan"
+        ]
+      },
+      {
+        "key": "nik",
+        "label": "NIK",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "ttl",
+        "label": "Tempat / tanggal lahir",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "agama",
+        "label": "Agama",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "kewarganegaraan",
+        "label": "Kewarganegaraan",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "pekerjaan",
+        "label": "Pekerjaan",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "alamat",
+        "label": "Alamat lengkap",
+        "type": "textarea",
+        "required": true
+      },
+      {
+        "key": "jenis_usaha",
+        "label": "Jenis / bidang usaha",
+        "type": "text",
+        "required": true
+      },
+      {
+        "key": "keperluan",
+        "label": "Keperluan surat",
+        "type": "text",
+        "required": true
+      }
+    ],
+    "urutan": 5
+  }
+]

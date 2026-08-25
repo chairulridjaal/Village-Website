@@ -17,7 +17,9 @@ export interface JenisPelayanan {
   deskripsi: string;
   syarat: string;
   fields_json: string;
+  admin_fields_json: string;
   template_html: string;
+  template_docx_path: string | null;
   cover_r2_key: string | null;
   aktif: number;
   urutan: number;
@@ -32,7 +34,9 @@ export type JenisPelayananInput = {
   deskripsi: string;
   syarat: string;
   fields_json: string;
+  admin_fields_json?: string;
   template_html: string;
+  template_docx_path?: string | null;
   aktif: number;
   urutan: number;
   lampiran_wajib: number;
@@ -46,6 +50,7 @@ export interface PengajuanPelayanan {
   nomor: string;
   jenis_id: number;
   data_json: string;
+  admin_data_json: string;
   pemohon_nama: string;
   pemohon_nik: string;
   pemohon_wa: string;
@@ -59,6 +64,8 @@ export interface PengajuanWithJenis extends PengajuanPelayanan {
   jenis_nama: string;
   jenis_slug: string;
   template_html: string;
+  template_docx_path: string | null;
+  admin_fields_json: string;
 }
 
 export function parseFields(json: string): FormField[] {
@@ -153,8 +160,8 @@ export async function createJenis(
   const r = await db
     .prepare(
       `INSERT INTO jenis_pelayanan
-       (slug,nama,deskripsi,syarat,fields_json,template_html,aktif,urutan,lampiran_wajib,lampiran_info)
-       VALUES (?,?,?,?,?,?,?,?,?,?) RETURNING id`
+       (slug,nama,deskripsi,syarat,fields_json,admin_fields_json,template_html,template_docx_path,aktif,urutan,lampiran_wajib,lampiran_info)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id`
     )
     .bind(
       slug,
@@ -162,7 +169,9 @@ export async function createJenis(
       data.deskripsi,
       data.syarat,
       data.fields_json,
+      data.admin_fields_json ?? '[]',
       data.template_html,
+      data.template_docx_path ?? null,
       data.aktif,
       data.urutan,
       data.lampiran_wajib,
@@ -179,15 +188,18 @@ export async function updateJenis(
 ): Promise<void> {
   await db
     .prepare(
-      `UPDATE jenis_pelayanan SET nama=?, deskripsi=?, syarat=?, fields_json=?, template_html=?,
-       aktif=?, urutan=?, lampiran_wajib=?, lampiran_info=?, updated_at=datetime('now') WHERE id=?`
+      `UPDATE jenis_pelayanan SET nama=?, deskripsi=?, syarat=?, fields_json=?, admin_fields_json=?,
+       template_html=?, template_docx_path=?, aktif=?, urutan=?, lampiran_wajib=?, lampiran_info=?,
+       updated_at=datetime('now') WHERE id=?`
     )
     .bind(
       data.nama,
       data.deskripsi,
       data.syarat,
       data.fields_json,
+      data.admin_fields_json ?? '[]',
       data.template_html,
+      data.template_docx_path ?? null,
       data.aktif,
       data.urutan,
       data.lampiran_wajib,
@@ -249,7 +261,8 @@ export async function createPengajuan(
 export async function getPengajuanById(id: number, db: D1Database): Promise<PengajuanWithJenis | null> {
   return db
     .prepare(
-      `SELECT p.*, j.nama AS jenis_nama, j.slug AS jenis_slug, j.template_html
+      `SELECT p.*, j.nama AS jenis_nama, j.slug AS jenis_slug, j.template_html, j.template_docx_path,
+              j.admin_fields_json
        FROM pengajuan_pelayanan p
        JOIN jenis_pelayanan j ON j.id = p.jenis_id
        WHERE p.id=?`
@@ -265,7 +278,8 @@ export async function listPengajuan(
   if (status && status !== 'semua') {
     const r = await db
       .prepare(
-        `SELECT p.*, j.nama AS jenis_nama, j.slug AS jenis_slug, j.template_html
+        `SELECT p.*, j.nama AS jenis_nama, j.slug AS jenis_slug, j.template_html, j.template_docx_path,
+                j.admin_fields_json
          FROM pengajuan_pelayanan p
          JOIN jenis_pelayanan j ON j.id = p.jenis_id
          WHERE p.status=?
@@ -277,7 +291,8 @@ export async function listPengajuan(
   }
   const r = await db
     .prepare(
-      `SELECT p.*, j.nama AS jenis_nama, j.slug AS jenis_slug, j.template_html
+      `SELECT p.*, j.nama AS jenis_nama, j.slug AS jenis_slug, j.template_html, j.template_docx_path,
+              j.admin_fields_json
        FROM pengajuan_pelayanan p
        JOIN jenis_pelayanan j ON j.id = p.jenis_id
        ORDER BY
@@ -286,6 +301,42 @@ export async function listPengajuan(
     )
     .all<PengajuanWithJenis>();
   return r.results ?? [];
+}
+
+export async function updatePengajuanAdminData(
+  id: number,
+  admin_data_json: string,
+  db: D1Database
+): Promise<void> {
+  await db
+    .prepare(`UPDATE pengajuan_pelayanan SET admin_data_json=? WHERE id=?`)
+    .bind(admin_data_json, id)
+    .run();
+}
+
+export async function updatePengajuanWargaData(
+  id: number,
+  data: {
+    data_json: string;
+    pemohon_nama: string;
+    pemohon_nik: string;
+    pemohon_wa?: string;
+  },
+  db: D1Database
+): Promise<void> {
+  if (data.pemohon_wa != null) {
+    await db
+      .prepare(
+        `UPDATE pengajuan_pelayanan SET data_json=?, pemohon_nama=?, pemohon_nik=?, pemohon_wa=? WHERE id=?`
+      )
+      .bind(data.data_json, data.pemohon_nama, data.pemohon_nik, data.pemohon_wa, id)
+      .run();
+    return;
+  }
+  await db
+    .prepare(`UPDATE pengajuan_pelayanan SET data_json=?, pemohon_nama=?, pemohon_nik=? WHERE id=?`)
+    .bind(data.data_json, data.pemohon_nama, data.pemohon_nik, id)
+    .run();
 }
 
 export async function countPengajuanByStatus(db: D1Database): Promise<Record<string, number>> {

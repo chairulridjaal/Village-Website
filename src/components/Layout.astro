@@ -4,6 +4,7 @@ import Nav from './Nav.astro';
 import Footer from './Footer.astro';
 import { SITE_URL, SITE_NAME, SITE_DESCRIPTION, GOOGLE_SITE_VERIFICATION } from '@lib/site';
 import { getPengaturan } from '../lib/db/pengaturan';
+import { getActivePengumumanForHomepage } from '../lib/db/pengumuman';
 import { getEnv } from '@lib/env';
 
 interface Props {
@@ -13,6 +14,8 @@ interface Props {
   transparentNav?: boolean;
   /** JSON-LD tambahan per halaman (mis. NewsArticle di detail berita) */
   jsonLd?: Record<string, unknown>;
+  /** Banner pengumuman di atas nav (hanya beranda) */
+  showAnnouncement?: boolean;
 }
 
 const {
@@ -21,11 +24,12 @@ const {
   ogImage,
   transparentNav = false,
   jsonLd,
+  showAnnouncement = false,
 } = Astro.props;
 
 const site = Astro.site ?? new URL(SITE_URL);
 const canonicalUrl = new URL(Astro.url.pathname, site).href;
-const ogImageUrl = new URL(ogImage ?? '/images/pantai_Citarik.png', site).href;
+const ogImageUrl = new URL(ogImage ?? '/images/pemandangan_citarik.png', site).href;
 const currentPath = Astro.url.pathname;
 
 const env = getEnv();
@@ -34,6 +38,18 @@ const kecamatan = s.kecamatan || 'Palabuhanratu';
 const kabupaten = s.kabupaten || 'Sukabumi';
 const email = s.kontak_email || 'desacitarik@gmail.com';
 const street = s.kontak_alamat || 'Kantor Desa Citarik, Kecamatan Palabuhanratu, Kabupaten Sukabumi';
+
+const announcement =
+  showAnnouncement && env
+    ? await getActivePengumumanForHomepage(env.DB).catch(() => null)
+    : null;
+
+const announceStyle: Record<string, string> = {
+  info: 'background:#0E4A6E;color:#fff',
+  success: 'background:#15803D;color:#fff',
+  warning: 'background:#B45309;color:#fff',
+  urgent: 'background:#B91C1C;color:#fff',
+};
 
 // Data organisasi untuk mesin pencari (schema.org)
 const orgJsonLd = {
@@ -134,13 +150,91 @@ const websiteJsonLd = {
       Lewati ke konten utama
     </a>
 
-    <!-- Navigation -->
-    <Nav transparent={transparentNav} currentPath={currentPath} />
+    <div id="site-chrome" class="fixed top-0 inset-x-0 z-50">
+      {announcement && (
+        <div
+          id="site-announcement"
+          class="text-sm"
+          style={announceStyle[announcement.style] || announceStyle.info}
+          role="region"
+          aria-label="Pengumuman desa"
+        >
+          <div class="container-page py-2.5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+            <div class="flex items-start gap-2 flex-1 min-w-0">
+              <i data-lucide="megaphone" class="w-4 h-4 mt-0.5 shrink-0 opacity-90"></i>
+              <p class="leading-snug font-medium">{announcement.teks}</p>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+              {announcement.tautan_url && (
+                <a
+                  href={announcement.tautan_url}
+                  class="font-heading font-semibold underline underline-offset-2 hover:opacity-90 whitespace-nowrap"
+                >
+                  {announcement.tautan_label || 'Selengkapnya'}
+                </a>
+              )}
+              <button
+                type="button"
+                id="announce-dismiss"
+                class="w-8 h-8 rounded-md flex items-center justify-center hover:bg-white/15 cursor-pointer"
+                aria-label="Tutup pengumuman"
+              >
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      <Nav transparent={transparentNav} currentPath={currentPath} embedded={true} />
+    </div>
+
+    <script is:inline>
+      (function () {
+        var chrome = document.getElementById('site-chrome');
+        var bar = document.getElementById('site-announcement');
+        var btn = document.getElementById('announce-dismiss');
+        var main = document.getElementById('main-content');
+        var transparent = main && main.dataset.transparentNav === '1';
+
+        function setChromePad() {
+          if (!chrome) return;
+          var h = Math.ceil(chrome.getBoundingClientRect().height) || 80;
+          document.documentElement.style.setProperty('--site-chrome-h', h + 'px');
+          if (main && !transparent) {
+            main.style.paddingTop = h + 'px';
+          }
+        }
+
+        if (bar && btn) {
+          var key = 'citarik-announce-dismiss-' + (bar.textContent || '').slice(0, 80);
+          try {
+            if (sessionStorage.getItem(key) === '1') {
+              bar.style.display = 'none';
+            }
+          } catch (e) {}
+          btn.addEventListener('click', function () {
+            bar.style.display = 'none';
+            try { sessionStorage.setItem(key, '1'); } catch (e) {}
+            setChromePad();
+          });
+        }
+
+        setChromePad();
+        window.addEventListener('resize', setChromePad, { passive: true });
+        window.addEventListener('scroll', setChromePad, { passive: true });
+        setTimeout(setChromePad, 0);
+        setTimeout(setChromePad, 100);
+      })();
+    </script>
 
     <!-- Main content (single landmark — pages must not nest another <main>) -->
     <main
       id="main-content"
-      class={transparentNav ? '' : 'pt-20'}
+      data-transparent-nav={transparentNav ? '1' : '0'}
+      class={transparentNav ? '' : undefined}
+      style={transparentNav
+        ? 'scroll-padding-top: var(--site-chrome-h, 80px);'
+        : 'padding-top: var(--site-chrome-h, 80px);'}
     >
       <slot />
     </main>

@@ -5,6 +5,7 @@ import { getPerangkatDesa } from '../lib/db/perangkat-desa';
 import { getPengaturan } from '../lib/db/pengaturan';
 import { getStatistikFull, parseDusunValue } from '../lib/db/statistik';
 import { getCoversForType, mediaUrl } from '../lib/db/media';
+import { perangkatAvatarSrc } from '../lib/db/perangkat-photo';
 import { getEnv } from '@lib/env';
 
 const env = getEnv();
@@ -118,7 +119,7 @@ const tugasHtml = tugasFungsi?.content_html?.trim() || '';
 
 <section class="page-hero">
   <div class="page-hero__media">
-    <img src="/images/kantor_desa.png" alt="Kantor Desa Citarik" />
+    <img src="/images/kantor_desa_baru.jpg" alt="Kantor Desa Citarik" />
   </div>
   <div class="page-hero__overlay"></div>
   <div class="page-hero__content">
@@ -163,11 +164,18 @@ const tugasHtml = tugasFungsi?.content_html?.trim() || '';
           <div class="flex flex-col items-center">
             <div class="card-surface p-6 sm:p-8 text-center w-full max-w-sm">
               <div class="w-36 h-36 rounded-full mx-auto ring-4 ring-sand overflow-hidden" style="background: linear-gradient(135deg, #0E4A6E, #0E9AA7);">
-                {covers.get(tiers.kepala.id) ? (
-                  <img src={mediaUrl(covers.get(tiers.kepala.id)!)} alt={tiers.kepala.nama} class="w-full h-full object-cover" />
-                ) : (
-                  <div class="w-full h-full flex items-center justify-center font-heading font-bold text-4xl text-white">{tiers.kepala.nama[0]}</div>
-                )}
+                {(() => {
+                  const src = perangkatAvatarSrc(
+                    tiers.kepala.nama,
+                    tiers.kepala.jabatan,
+                    covers.get(tiers.kepala.id) ? mediaUrl(covers.get(tiers.kepala.id)!) : null
+                  );
+                  return src ? (
+                    <img src={src} alt={tiers.kepala.nama} class="w-full h-full object-cover" />
+                  ) : (
+                    <div class="w-full h-full flex items-center justify-center font-heading font-bold text-4xl text-white">{tiers.kepala.nama[0]}</div>
+                  );
+                })()}
               </div>
               <span class="inline-block mt-4 text-xs font-heading font-bold px-3 py-1 rounded-full bg-primary text-white uppercase tracking-wide">Kepala Desa</span>
               <h3 class="font-heading font-bold text-2xl text-ink mt-2">{tiers.kepala.nama}</h3>
@@ -180,11 +188,18 @@ const tugasHtml = tugasFungsi?.content_html?.trim() || '';
           <div class="flex flex-col items-center">
             <div class="card-surface p-6 text-center w-full max-w-xs">
               <div class="w-28 h-28 rounded-full mx-auto ring-4 ring-sand overflow-hidden" style="background: linear-gradient(135deg, #0A3650, #0E9AA7);">
-                {covers.get(tiers.sekdes.id) ? (
-                  <img src={mediaUrl(covers.get(tiers.sekdes.id)!)} alt={tiers.sekdes.nama} class="w-full h-full object-cover" />
-                ) : (
-                  <div class="w-full h-full flex items-center justify-center font-heading font-bold text-3xl text-white">{tiers.sekdes.nama[0]}</div>
-                )}
+                {(() => {
+                  const src = perangkatAvatarSrc(
+                    tiers.sekdes.nama,
+                    tiers.sekdes.jabatan,
+                    covers.get(tiers.sekdes.id) ? mediaUrl(covers.get(tiers.sekdes.id)!) : null
+                  );
+                  return src ? (
+                    <img src={src} alt={tiers.sekdes.nama} class="w-full h-full object-cover" />
+                  ) : (
+                    <div class="w-full h-full flex items-center justify-center font-heading font-bold text-3xl text-white">{tiers.sekdes.nama[0]}</div>
+                  );
+                })()}
               </div>
               <span class="inline-block mt-3 text-xs font-heading font-bold px-3 py-1 rounded-full bg-accent text-white uppercase tracking-wide">Sekretaris Desa</span>
               <h3 class="font-heading font-bold text-lg text-ink mt-2">{tiers.sekdes.nama}</h3>
@@ -196,11 +211,18 @@ const tugasHtml = tugasFungsi?.content_html?.trim() || '';
           {tiers.others.map(p => (
             <div class="card-surface p-5 text-center">
               <div class="w-20 h-20 rounded-full mx-auto ring-2 ring-sand overflow-hidden" style="background: linear-gradient(135deg, #0E4A6E, #0E9AA7);">
-                {covers.get(p.id) ? (
-                  <img src={mediaUrl(covers.get(p.id)!)} alt={p.nama} class="w-full h-full object-cover" />
-                ) : (
-                  <div class="w-full h-full flex items-center justify-center font-heading font-bold text-2xl text-white">{p.nama[0]}</div>
-                )}
+                {(() => {
+                  const src = perangkatAvatarSrc(
+                    p.nama,
+                    p.jabatan,
+                    covers.get(p.id) ? mediaUrl(covers.get(p.id)!) : null
+                  );
+                  return src ? (
+                    <img src={src} alt={p.nama} class="w-full h-full object-cover" />
+                  ) : (
+                    <div class="w-full h-full flex items-center justify-center font-heading font-bold text-2xl text-white">{p.nama[0]}</div>
+                  );
+                })()}
               </div>
               <span class="inline-block mt-3 text-[11px] font-heading font-semibold px-2.5 py-0.5 rounded-full bg-sand text-primary uppercase">{p.jabatan}</span>
               <h3 class="font-heading font-semibold text-ink mt-1.5">{p.nama}</h3>

@@ -8,22 +8,22 @@ const env = getEnv();
 const list = env ? await getPublishedPotensi(env.DB).catch(() => []) : [];
 const covers = env ? await getCoversForType('potensi', env.DB).catch(() => new Map()) : new Map();
 
-const FALLBACK = {
-  perikanan: '/images/ikan_bakar.png',
-  pertanian: '/images/kebun_sayur.png',
-  sdm: '/images/nelayan.png',
-} as Record<string, string>;
----
-
-<Layout
-  title="Potensi Desa | Desa Citarik"
-  description="Potensi Desa Citarik: pertanian, perikanan, sumber daya manusia, dan peluang kemitraan."
->
-
-<section class="page-hero">
-  <div class="page-hero__media">
-    <img src="/images/nelayan.png" alt="Nelayan dan potensi laut Desa Citarik" />
-  </div>
+	const FALLBACK = {
+	  perikanan: '/images/pempek-ikan-tuna.jpg',
+	  pertanian: '/images/pemandangan_citarik.png',
+	  sdm: '/images/tile_berita_baru.jpg',
+	} as Record<string, string>;
+	---
+	
+	<Layout
+	  title="Potensi Desa | Desa Citarik"
+	  description="Potensi Desa Citarik: pertanian, perikanan, sumber daya manusia, dan peluang kemitraan."
+	>
+	
+	<section class="page-hero">
+	  <div class="page-hero__media">
+	    <img src="/images/tile_potensi_baru.jpg" alt="Potensi Desa Citarik" />
+	  </div>
   <div class="page-hero__overlay"></div>
   <div class="page-hero__content">
     <div class="container-page">
@@ -43,7 +43,7 @@ const FALLBACK = {
     <p class="text-muted text-center py-12">Belum ada potensi yang ditampilkan.</p>
   ) : list.map((p, i) => {
     const cover = covers.get(p.id);
-    const imgSrc = cover ? mediaUrl(cover) : (FALLBACK[p.slug] ?? '/images/nelayan.png');
+    const imgSrc = cover ? mediaUrl(cover) : (FALLBACK[p.slug] ?? '/images/tile_potensi_baru.jpg');
     return (
     <article class="grid md:grid-cols-2 gap-0 items-stretch card-surface overflow-hidden">
       <a href={`/potensi/${p.slug}`} class:list={['block aspect-[16/11] md:aspect-auto overflow-hidden', i % 2 === 1 && 'md:order-2']}>

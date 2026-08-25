@@ -15,6 +15,17 @@ export const POST: APIRoute = async ({ params, request, redirect }) => {
   const fd = await request.formData();
   const data = jenisInputFromFormData(fd);
   if (!data.nama) return redirect(`/admin/pelayanan/jenis/${id}?error=1`);
+  if (!data.template_docx_path && existing.template_docx_path) {
+    data.template_docx_path = existing.template_docx_path;
+  }
+  if (
+    (data.admin_fields_json == null || data.admin_fields_json === '[]') &&
+    existing.admin_fields_json &&
+    existing.admin_fields_json !== '[]' &&
+    !String(fd.get('admin_field_key') ?? '')
+  ) {
+    data.admin_fields_json = existing.admin_fields_json;
+  }
 
   await updateJenis(id, data, env.DB);
   await purgeCache(['/pelayanan', `/pelayanan/${existing.slug}`]);

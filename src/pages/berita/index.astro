@@ -10,26 +10,26 @@ const [beritaList, covers] = await Promise.all([
   env ? getCoversForType('berita', env.DB) : new Map(),
 ]);
 
-const demoBerita = [
-  { slug: 'gotong-royong-bersih-pantai', judul: 'Gotong Royong Bersih Pantai Citarik Menyambut Musim Kunjungan', published_at: '2026-07-12', content_html: '<p>Warga bersama Karang Taruna membersihkan pesisir Pantai Citarik dalam rangka menyambut meningkatnya kunjungan wisatawan ke kawasan Geopark Ciletuh.</p>', featured: true, img: '/images/gotong_royong.png' },
-  { slug: 'pelatihan-digital-umkm', judul: 'Pelatihan Digital untuk UMKM Desa', published_at: '2026-07-08', content_html: '<p>Sepuluh pelaku UMKM mengikuti pelatihan foto produk dan WhatsApp Business yang difasilitasi oleh Tim KKNT IPB.</p>', featured: false, img: '/images/pelatihan_umkm.png' },
-  { slug: 'peluncuran-situs-resmi', judul: 'Peluncuran Situs Resmi Desa Citarik', published_at: '2026-07-01', content_html: '<p>Desa Citarik kini punya kehadiran digital resmi yang dapat diakses siapa saja untuk mengeksplorasi potensi dan layanan desa.</p>', featured: false, img: '/images/pelatihan_umkm.png' },
-  { slug: 'musyawarah-pengembangan-wisata', judul: 'Musyawarah Desa Bahas Pengembangan Wisata', published_at: '2026-06-24', content_html: '<p>Perangkat desa dan warga membahas rencana pengembangan kawasan Pantai Citarik menjadi destinasi ekowisata terpadu.</p>', featured: false, img: '/images/gotong_royong.png' },
-  { slug: 'panen-raya-kopi', judul: 'Panen Raya Kopi Kebun Citarik', published_at: '2026-06-18', content_html: '<p>Hasil panen kopi tahun ini meningkat dibanding musim sebelumnya berkat metode budidaya baru yang diterapkan petani setempat.</p>', featured: false, img: '/images/kebun_sayur.png' },
-  { slug: 'kerja-bakti-jalan-desa', judul: 'Kerja Bakti Perbaikan Jalan Desa', published_at: '2026-06-02', content_html: '<p>Warga bergotong royong memperbaiki ruas jalan menuju dermaga agar lebih nyaman dilalui nelayan dan wisatawan.</p>', featured: false, img: '/images/gotong_royong.png' },
-];
-
 const getBeritaImg = (i: number) => {
-  const imgs = ['/images/gotong_royong.png', '/images/pelatihan_umkm.png', '/images/pelatihan_umkm.png', '/images/gotong_royong.png', '/images/kebun_sayur.png', '/images/gotong_royong.png'];
+  const imgs = [
+    '/images/tile_berita_baru.jpg',
+    '/images/kantor_desa_baru.jpg',
+    '/images/pemandangan_citarik.png',
+  ];
   return imgs[i % imgs.length];
 };
 
-const finalBerita = beritaList.length > 0
-  ? beritaList.map((b, i) => {
-      const cover = covers.get(b.id);
-      return { slug: b.slug, judul: b.judul, published_at: b.published_at ?? '', content_html: b.content_html, featured: i === 0, img: cover ? mediaUrl(cover) : getBeritaImg(i) };
-    })
-  : demoBerita;
+const finalBerita = beritaList.map((b, i) => {
+  const cover = covers.get(b.id);
+  return {
+    slug: b.slug,
+    judul: b.judul,
+    published_at: b.published_at ?? '',
+    content_html: b.content_html,
+    featured: i === 0,
+    img: cover ? mediaUrl(cover) : getBeritaImg(i),
+  };
+});
 
 const featuredBerita = finalBerita[0];
 const restBerita = finalBerita.slice(1);
