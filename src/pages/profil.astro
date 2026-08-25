@@ -309,7 +309,7 @@ const kabupaten = s.kabupaten || 'Sukabumi';
     <div id="profil-map" class="mt-4 rounded-xl overflow-hidden border border-border shadow-sm" style="height: 380px; z-index: 0;"></div>
     <p class="text-sm text-muted mt-2 flex items-center gap-1.5">
       <i data-lucide="info" class="w-4 h-4"></i>
-      Kantor Desa: -7.009933, 106.581037 ·
+      Kantor Desa: {mapLat}, {mapLng} ·
       <a href="/peta" class="text-accent hover:underline font-medium">Buka peta interaktif lengkap →</a>
     </p>
   </section>
@@ -333,11 +333,14 @@ const kabupaten = s.kabupaten || 'Sukabumi';
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-<script is:inline>
+<script define:vars={{ mapLat, mapLng, mapZoom }}>
   document.addEventListener('DOMContentLoaded', function() {
-    var map = L.map('profil-map', { scrollWheelZoom: false }).setView([-7.009933224557312, 106.58103748650889], 15);
+    const lat = mapLat;
+    const lng = mapLng;
+    const zoom = mapZoom;
+    var map = L.map('profil-map', { scrollWheelZoom: false }).setView([lat, lng], zoom);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
-    L.marker([-7.009933224557312, 106.58103748650889]).addTo(map).bindPopup('<b>Kantor Desa Citarik</b><br>Kp. Legok Loa · Kec. Palabuhanratu');
+    L.marker([lat, lng]).addTo(map).bindPopup('<b>Kantor Desa Citarik</b><br>Kp. Legok Loa · Kec. Palabuhanratu');
   });
 </script>
 

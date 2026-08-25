@@ -13,7 +13,7 @@ const { title, breadcrumb, currentPath = Astro.url.pathname } = Astro.props;
 
 const user = Astro.locals.user;
 
-type MenuItem = { href: string; label: string; perm?: PermFlag | 'master' };
+type MenuItem = { href: string; label: string; perm?: PermFlag | 'master'; external?: boolean };
 type MenuGroup = { id: string; title: string; items: MenuItem[] };
 
 const menuGroups: MenuGroup[] = [
@@ -56,6 +56,7 @@ const menuGroups: MenuGroup[] = [
       { href: '/admin/pengaturan', label: 'Pengaturan', perm: 'perm_pengaturan' },
       { href: '/admin/akun', label: 'Akun admin', perm: 'master' },
       { href: '/admin/statistik', label: 'Kunjungan & Backup' },
+      { href: '/modul-panduan', label: 'Panduan PDF', external: true },
     ],
   },
 ];
@@ -125,18 +126,20 @@ const navBlocks: NavBlock[] = visibleGroups.map((g) => {
     <nav aria-label="Menu admin" class="flex flex-col p-3 gap-1 flex-1 overflow-y-auto">
       {navBlocks.map((block) => {
         if (block.kind === 'flat') {
-          const { href, label } = block.item;
-          const active = isActive(href);
+          const { href, label, external } = block.item;
+          const active = !external && isActive(href);
           return (
             <a
               href={href}
+              target={external ? '_blank' : undefined}
+              rel={external ? 'noopener' : undefined}
               class:list={[
                 'flex items-center gap-3 px-3 py-2.5 rounded-md font-heading font-medium text-sm transition-colors duration-150 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent',
                 active ? 'bg-accent text-white' : 'text-white/75 hover:bg-white/10 hover:text-white',
               ]}
               aria-current={active ? 'page' : undefined}
             >
-              {label}
+              {label}{external && <span aria-hidden="true"> ↗</span>}
             </a>
           );
         }
@@ -165,18 +168,20 @@ const navBlocks: NavBlock[] = visibleGroups.map((g) => {
               data-group-panel
               hidden={!open}
             >
-              {block.items.map(({ href, label }) => {
-                const active = isActive(href);
+              {block.items.map(({ href, label, external }) => {
+                const active = !external && isActive(href);
                 return (
                   <a
                     href={href}
+                    target={external ? '_blank' : undefined}
+                    rel={external ? 'noopener' : undefined}
                     class:list={[
                       'flex items-center gap-2 pl-3 pr-3 py-2 rounded-md font-heading font-medium text-sm transition-colors duration-150 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent',
                       active ? 'bg-accent text-white' : 'text-white/75 hover:bg-white/10 hover:text-white',
                     ]}
                     aria-current={active ? 'page' : undefined}
                   >
-                    {label}
+                    {label}{external && <span aria-hidden="true"> ↗</span>}
                   </a>
                 );
               })}

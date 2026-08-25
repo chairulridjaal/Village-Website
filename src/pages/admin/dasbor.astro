@@ -48,11 +48,15 @@ const forbidden = Astro.url.searchParams.get('error') === 'forbidden';
       { label: 'Tambah Jenis Surat', href: '/admin/pelayanan/jenis/new', color: 'var(--color-primary)' },
       { label: 'Tulis Berita Baru', href: '/admin/berita/new', color: 'var(--color-primary)' },
       { label: 'Edit Konten Halaman', href: '/admin/konten',   color: 'var(--color-accent)' },
-    ].map(({ label, href, color }) => (
+      { label: 'Modul Panduan (PDF)', href: '/modul-panduan', color: 'var(--color-accent)', external: true },
+    ].map(({ label, href, color, external }) => (
       <a href={href}
+        target={external ? '_blank' : undefined}
+        rel={external ? 'noopener' : undefined}
+        aria-label={external ? `${label} — buka di tab baru` : undefined}
         class="block rounded-lg px-4 py-3 font-heading font-semibold text-white text-sm text-center transition-opacity hover:opacity-90 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-accent"
-        style={`background:${color}; min-height:44px; line-height:1.4; display:flex; align-items:center; justify-content:center;`}>
-        {label}
+        style={`background:${color}; min-height:44px; line-height:1.4; display:flex; align-items:center; justify-content:center; gap:0.35rem;`}>
+        {label}{external && <span aria-hidden="true">↗</span>}
       </a>
     ))}
   </div>
