@@ -26,9 +26,13 @@ export const POST: APIRoute = async ({ request, redirect, cookies }) => {
   }
 
   const ip = request.headers.get('CF-Connecting-IP');
-  const rlKey = ip ? `ratelimit:login:${ip}` : null;
-  const attempts = rlKey ? parseInt((await env.SESSION_KV.get(rlKey)) ?? '0', 10) : 0;
-  if (rlKey && attempts >= 5) {
+  const rlIpKey = ip ? `ratelimit:login:${ip}` : null;
+  const rlAccKey = `ratelimit:login:acc:${username.toLowerCase()}`;
+  const [ipAttempts, accAttempts] = await Promise.all([
+    rlIpKey ? env.SESSION_KV.get(rlIpKey).then(v => parseInt(v ?? '0', 10)) : Promise.resolve(0),
+    env.SESSION_KV.get(rlAccKey).then(v => parseInt(v ?? '0', 10)),
+  ]);
+  if ((rlIpKey && ipAttempts >= 5) || accAttempts >= 5) {
     return redirect('/admin/login?error=locked');
   }
 
@@ -37,11 +41,14 @@ export const POST: APIRoute = async ({ request, redirect, cookies }) => {
   ).bind(username).first<AdminUserRow>();
 
   if (!row || Number(row.aktif) !== 1 || !(await verifyPassword(password, row.password_hash))) {
-    if (rlKey) await env.SESSION_KV.put(rlKey, String(attempts + 1), { expirationTtl: 900 });
+    const ttl = { expirationTtl: 900 };
+    if (rlIpKey) await env.SESSION_KV.put(rlIpKey, String(ipAttempts + 1), ttl);
+    await env.SESSION_KV.put(rlAccKey, String(accAttempts + 1), ttl);
     return redirect('/admin/login?error=1');
   }
 
-  if (rlKey) await env.SESSION_KV.delete(rlKey);
+  if (rlIpKey) await env.SESSION_KV.delete(rlIpKey);
+  await env.SESSION_KV.delete(rlAccKey);
 
   const sessionUser = sessionFromRow(row);
   const sessionId = generateSessionId();

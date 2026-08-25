@@ -17,6 +17,7 @@ export const GET: APIRoute = async () => {
     { loc: `${base}/berita`, priority: '0.9', changefreq: 'daily' },
     { loc: `${base}/peta`, priority: '0.7', changefreq: 'monthly' },
     { loc: `${base}/kontak`, priority: '0.6', changefreq: 'yearly' },
+    { loc: `${base}/modul-panduan`, priority: '0.5', changefreq: 'yearly' },
   ];
 
   const dynamicUrls: Array<{ loc: string; priority: string; changefreq: string; lastmod?: string }> = [];

@@ -24,7 +24,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     if (!env) return next(); // local dev without runtime, allow through
 
     const sessionId = context.cookies.get(SESSION_COOKIE)?.value;
-    const user = sessionId ? await validateSession(sessionId, env.SESSION_KV) : null;
+    let user = sessionId ? await validateSession(sessionId, env.SESSION_KV) : null;
 
     if (!user) {
       if (isAdminApi) {
@@ -35,6 +35,21 @@ export const onRequest = defineMiddleware(async (context, next) => {
       }
       return context.redirect('/admin/login');
     }
+
+    try {
+      const fresh = await env.DB.prepare('SELECT aktif, is_master FROM admin_user WHERE id=?').bind(user.userId).first<{ aktif: number; is_master: number }>();
+      if (!fresh || Number(fresh.aktif) !== 1) {
+        await env.SESSION_KV.delete(`session:${sessionId}`);
+        if (isAdminApi) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+        return context.redirect('/admin/login');
+      }
+      if (Boolean(fresh.is_master) !== user.is_master) {
+        user = { ...user, is_master: Boolean(fresh.is_master) };
+        await env.SESSION_KV.put(`session:${sessionId}`, JSON.stringify(user), { expirationTtl: 60 * 60 * 8 });
+      } else {
+        await env.SESSION_KV.put(`session:${sessionId}`, JSON.stringify(user), { expirationTtl: 60 * 60 * 8 });
+      }
+    } catch {}
 
     context.locals.user = user;
 
