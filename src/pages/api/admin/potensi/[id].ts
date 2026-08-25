@@ -1,7 +1,7 @@
 import { getEnv } from '@lib/env';
 import type { APIRoute } from 'astro';
 import { hasPerm } from '../../../../lib/auth/permissions';
-import { getPotensiById, updatePotensi } from '../../../../lib/db/potensi';
+import { deletePotensi, getPotensiById, updatePotensi } from '../../../../lib/db/potensi';
 import { sanitizeHtml } from '../../../../lib/html/sanitize';
 import { purgeCache } from '../../../../lib/cache/purge';
 
@@ -15,6 +15,11 @@ export const POST: APIRoute = async ({ params, request, locals, redirect }) => {
   if (!existing) return redirect('/admin/potensi');
 
   const fd = await request.formData();
+  if ((fd.get('_action') as string) === 'delete') {
+    await deletePotensi(id, env.DB);
+    await purgeCache(['/potensi', `/potensi/${existing.slug}`]);
+    return redirect('/admin/potensi?saved=1');
+  }
   const nama = ((fd.get('nama') as string) ?? '').trim();
   if (!nama) return redirect(`/admin/potensi/${id}?error=1`);
 

@@ -113,3 +113,23 @@ export async function resetAdminPassword(id: number, password: string, db: D1Dat
   const hash = await hashPassword(password);
   await db.prepare('UPDATE admin_user SET password_hash=? WHERE id=?').bind(hash, id).run();
 }
+
+export async function countActiveAdmins(db: D1Database): Promise<number> {
+  const r = await db.prepare('SELECT COUNT(*) as c FROM admin_user WHERE aktif=1').first<{ c: number }>();
+  return r?.c ?? 0;
+}
+
+export async function deleteAdmin(id: number, actorId: number, db: D1Database): Promise<void> {
+  if (id === actorId) throw new Error('Tidak bisa menghapus akun sendiri');
+  const row = await getAdminById(id, db);
+  if (!row) throw new Error('Akun tidak ditemukan');
+  if (row.is_master && row.aktif) {
+    const others = await countMasters(db, id);
+    if (others < 1) throw new Error('Tidak bisa menghapus master terakhir');
+  }
+  if (row.aktif) {
+    const active = await countActiveAdmins(db);
+    if (active <= 1) throw new Error('Tidak bisa menghapus admin terakhir');
+  }
+  await db.prepare('DELETE FROM admin_user WHERE id=?').bind(id).run();
+}

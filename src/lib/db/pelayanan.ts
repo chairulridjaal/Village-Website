@@ -247,15 +247,26 @@ export async function createPengajuan(
   },
   db: D1Database
 ): Promise<{ id: number; nomor: string }> {
-  const nomor = await nextNomor(db);
-  const r = await db
-    .prepare(
-      `INSERT INTO pengajuan_pelayanan (nomor,jenis_id,data_json,pemohon_nama,pemohon_nik,pemohon_wa,status)
-       VALUES (?,?,?,?,?,?, 'menunggu') RETURNING id`
-    )
-    .bind(nomor, data.jenis_id, data.data_json, data.pemohon_nama, data.pemohon_nik, data.pemohon_wa)
-    .first<{ id: number }>();
-  return { id: r!.id, nomor };
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const nomor = await nextNomor(db);
+    try {
+      const r = await db
+        .prepare(
+          `INSERT INTO pengajuan_pelayanan (nomor,jenis_id,data_json,pemohon_nama,pemohon_nik,pemohon_wa,status)
+           VALUES (?,?,?,?,?,?, 'menunggu') RETURNING id`
+        )
+        .bind(nomor, data.jenis_id, data.data_json, data.pemohon_nama, data.pemohon_nik, data.pemohon_wa)
+        .first<{ id: number }>();
+      if (!r?.id) throw new Error('Gagal membuat pengajuan');
+      return { id: r.id, nomor };
+    } catch (e) {
+      const msg = String((e as Error)?.message ?? e);
+      const isUnique = msg.includes('UNIQUE') || msg.toLowerCase().includes('unique') || msg.includes('already exists') || msg.includes('constraint');
+      if (isUnique && attempt < 2) continue;
+      throw e;
+    }
+  }
+  throw new Error('Gagal membuat nomor pengajuan, coba lagi');
 }
 
 export async function getPengajuanById(id: number, db: D1Database): Promise<PengajuanWithJenis | null> {

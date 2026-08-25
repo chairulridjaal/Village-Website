@@ -46,7 +46,13 @@ const saved = Astro.url.searchParams.get('saved');
               <td class="px-4 py-3 hidden sm:table-cell capitalize">{p.status}</td>
               <td class="px-4 py-3 hidden md:table-cell">{p.urutan}</td>
               <td class="px-4 py-3 text-center">
-                <a href={`/admin/potensi/${p.id}`} class="inline-block px-3 py-1.5 rounded-md font-heading font-medium text-xs border" style="border-color:var(--color-primary);color:var(--color-primary);">Sunting</a>
+                <div class="inline-flex items-center gap-2">
+                  <a href={`/admin/potensi/${p.id}`} class="inline-block px-3 py-1.5 rounded-md font-heading font-medium text-xs border" style="border-color:var(--color-primary);color:var(--color-primary);">Sunting</a>
+                  <form method="POST" action={`/api/admin/potensi/${p.id}`} onsubmit="return confirm('Hapus potensi &quot;'+this.dataset.nama+'&quot;? Tindakan tidak dapat dibatalkan.')">
+                    <input type="hidden" name="_action" value="delete" />
+                    <button type="submit" data-nama={p.nama} aria-label={`Hapus potensi ${p.nama}`} class="px-3 py-1.5 rounded-md font-heading font-medium text-xs border text-red-600 hover:bg-red-50" style="border-color:#FCA5A5; min-height:32px;">Hapus</button>
+                  </form>
+                </div>
               </td>
             </tr>
           ))}
