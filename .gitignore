@@ -37,6 +37,7 @@ Thumbs.db
 *.ppt
 *.pptx
 *.pdf
+!public/modul-panduan.pdf
 !public/templates/**/*.docx
 !public/images/kop-desa-citarik.png
 
