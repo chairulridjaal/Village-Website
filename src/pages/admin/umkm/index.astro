@@ -6,6 +6,12 @@ import { getEnv } from '@lib/env';
 const env = getEnv();
 const umkmList = env ? await getAllUmkm(env.DB) : [];
 const deleted = Astro.url.searchParams.get('deleted');
+const search = Astro.url.searchParams.get('q') ?? '';
+const filtered = umkmList.filter(u => {
+  if (!search) return true;
+  const q = search.toLowerCase();
+  return u.nama.toLowerCase().includes(q) || u.kategori.toLowerCase().includes(q);
+});
 ---
 
 <AdminLayout title="Kelola UMKM" breadcrumb="UMKM">
@@ -15,6 +21,12 @@ const deleted = Astro.url.searchParams.get('deleted');
       UMKM berhasil dihapus.
     </div>
   )}
+
+   <form method="GET" class="flex flex-wrap gap-3 mb-4">
+    <input type="text" name="q" value={search} placeholder="Cari nama/kategori..." class="rounded-lg border px-4 py-2 text-sm focus:outline-none flex-1 min-w-48" style="border-color:var(--color-border); min-height:44px;" />
+    <button type="submit" class="px-4 py-2 rounded-lg font-heading font-medium text-sm border hover:bg-sand cursor-pointer" style="border-color:var(--color-border); min-height:44px;">Cari</button>
+    {search && <a href="/admin/umkm" class="px-4 py-2 rounded-lg text-sm border hover:bg-sand inline-flex items-center" style="border-color:var(--color-border); min-height:44px;">Reset</a>}
+  </form>
 
   <div class="flex items-center justify-between mb-6">
     <h2 class="font-heading font-bold text-xl" style="color:var(--color-primary);">Direktori UMKM</h2>
@@ -26,8 +38,8 @@ const deleted = Astro.url.searchParams.get('deleted');
   </div>
 
   <div class="bg-white rounded-xl border border-border overflow-hidden" style="box-shadow:var(--shadow-sm);">
-    {umkmList.length === 0 ? (
-      <div class="p-8 text-center text-text-muted">Belum ada UMKM terdaftar.</div>
+    {filtered.length === 0 ? (
+      <div class="p-8 text-center text-text-muted">{umkmList.length === 0 ? 'Belum ada UMKM terdaftar.' : 'Tidak ada UMKM yang sesuai.'}</div>
     ) : (
       <table class="w-full text-sm">
         <thead style="background:#F8FAFC;">
@@ -39,7 +51,7 @@ const deleted = Astro.url.searchParams.get('deleted');
           </tr>
         </thead>
         <tbody>
-          {umkmList.map((u) => (
+          {filtered.map((u) => (
             <tr class="border-b border-border last:border-0 hover:bg-sand/30 transition-colors">
               <td class="px-4 py-3 font-medium">{u.nama}</td>
               <td class="px-4 py-3 hidden md:table-cell">

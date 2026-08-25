@@ -67,16 +67,16 @@ const inputStyle = 'border-color:var(--color-border); min-height:40px;';
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label for="map_lat" class="block font-heading font-medium text-sm mb-1.5">Latitude peta</label>
-            <input type="text" id="map_lat" name="map_lat" value={s.map_lat ?? ''} class={inputCls} style={inputStyle} />
+            <label for="map_lat" class="block font-heading font-medium text-sm mb-1.5">Latitude peta (-90 s/d 90)</label>
+            <input type="number" id="map_lat" name="map_lat" value={s.map_lat ?? ''} placeholder="-7.009" step="any" min="-90" max="90" class={inputCls} style={inputStyle} />
           </div>
           <div>
-            <label for="map_lng" class="block font-heading font-medium text-sm mb-1.5">Longitude peta</label>
-            <input type="text" id="map_lng" name="map_lng" value={s.map_lng ?? ''} class={inputCls} style={inputStyle} />
+            <label for="map_lng" class="block font-heading font-medium text-sm mb-1.5">Longitude peta (-180 s/d 180)</label>
+            <input type="number" id="map_lng" name="map_lng" value={s.map_lng ?? ''} placeholder="106.581" step="any" min="-180" max="180" class={inputCls} style={inputStyle} />
           </div>
           <div>
-            <label for="map_zoom" class="block font-heading font-medium text-sm mb-1.5">Zoom peta</label>
-            <input type="number" id="map_zoom" name="map_zoom" value={s.map_zoom ?? '15'} class={inputCls} style={inputStyle} />
+            <label for="map_zoom" class="block font-heading font-medium text-sm mb-1.5">Zoom peta (1–19)</label>
+            <input type="number" id="map_zoom" name="map_zoom" value={s.map_zoom ?? '15'} min="1" max="19" step="1" class={inputCls} style={inputStyle} />
           </div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

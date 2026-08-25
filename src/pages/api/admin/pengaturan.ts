@@ -30,6 +30,12 @@ export const POST: APIRoute = async ({ request, redirect }) => {
   const form = fd.get('_form') as string;
 
   if (form === 'kontak') {
+    const mapLat = Number(fd.get('map_lat'));
+    const mapLng = Number(fd.get('map_lng'));
+    const mapZoom = Number(fd.get('map_zoom'));
+    if (fd.get('map_lat') && (Number.isNaN(mapLat) || mapLat < -90 || mapLat > 90)) return redirect('/admin/pengaturan?error=Latitude%20harus%20-90%20s%2Fd%2090');
+    if (fd.get('map_lng') && (Number.isNaN(mapLng) || mapLng < -180 || mapLng > 180)) return redirect('/admin/pengaturan?error=Longitude%20harus%20-180%20s%2Fd%20180');
+    if (fd.get('map_zoom') && (Number.isNaN(mapZoom) || mapZoom < 1 || mapZoom > 19)) return redirect('/admin/pengaturan?error=Zoom%20harus%201-19');
     const entries: Record<string, string> = {};
     for (const key of KONTAK_KEYS) entries[key] = ((fd.get(key) as string) ?? '').trim();
     await setPengaturan(entries, env.DB);

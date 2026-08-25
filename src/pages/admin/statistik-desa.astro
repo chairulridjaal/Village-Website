@@ -47,11 +47,11 @@ const inputStyle = 'border-color:var(--color-border); min-height:40px;';
       </div>
       <div>
         <label class="block text-xs mb-1">Jumlah RW</label>
-        <input type="number" name="rw" value={String(stUmum.rw ?? '')} class={inputCls} style={inputStyle} />
+        <input type="number" min="0" name="rw" value={String(stUmum.rw ?? '')} class={inputCls} style={inputStyle} />
       </div>
       <div>
         <label class="block text-xs mb-1">Jumlah RT</label>
-        <input type="number" name="rt" value={String(stUmum.rt ?? '')} class={inputCls} style={inputStyle} />
+        <input type="number" min="0" name="rt" value={String(stUmum.rt ?? '')} class={inputCls} style={inputStyle} />
       </div>
       <div class="sm:col-span-3">
         <button type="submit" class="px-4 py-2 rounded-lg text-sm font-heading font-semibold text-white" style="background:var(--color-cta);">Simpan ringkasan</button>
@@ -97,7 +97,7 @@ const inputStyle = 'border-color:var(--color-border); min-height:40px;';
           </div>
           <div class="w-20">
             <label class="block text-xs mb-1">Urutan</label>
-            <input type="number" name="urutan" value={c.urutan} class={inputCls} style={inputStyle} />
+            <input type="number" min="0" name="urutan" value={c.urutan} class={inputCls} style={inputStyle} />
           </div>
           <label class="flex items-center gap-1 text-sm pb-2">
             <input type="checkbox" name="aktif" value="1" checked={!!c.aktif} /> Aktif
@@ -123,18 +123,18 @@ const inputStyle = 'border-color:var(--color-border); min-height:40px;';
                 <div class="grid sm:grid-cols-4 gap-2">
                   <input name="label" value={row.label} class={inputCls} style={inputStyle} />
                   {c.layout === 'simple' ? (
-                    <input type="number" name="value" value={simple} class={inputCls} style={inputStyle} />
+                    <input type="number" min="0" name="value" value={simple} class={inputCls} style={inputStyle} />
                   ) : (
                     <>
-                      <input type="number" name="jmlRw" value={dusun.jmlRw || ''} placeholder="RW" class={inputCls} style={inputStyle} title="Jumlah RW" />
-                      <input type="number" name="jmlRt" value={dusun.jmlRt || ''} placeholder="RT" class={inputCls} style={inputStyle} title="Jumlah RT" />
-                      <input type="number" name="jiwa" value={dusun.jiwa || ''} placeholder="Jiwa" class={inputCls} style={inputStyle} title="Jumlah jiwa" />
-                      <input type="number" name="l" value={dusun.l || ''} placeholder="L (opsional)" class={inputCls} style={inputStyle} />
-                      <input type="number" name="p" value={dusun.p || ''} placeholder="P (opsional)" class={inputCls} style={inputStyle} />
-                      <input type="number" name="kk" value={dusun.kk || ''} placeholder="KK (opsional)" class={inputCls} style={inputStyle} />
+                      <input type="number" min="0" name="jmlRw" value={dusun.jmlRw || ''} placeholder="RW" class={inputCls} style={inputStyle} title="Jumlah RW" />
+                      <input type="number" min="0" name="jmlRt" value={dusun.jmlRt || ''} placeholder="RT" class={inputCls} style={inputStyle} title="Jumlah RT" />
+                      <input type="number" min="0" name="jiwa" value={dusun.jiwa || ''} placeholder="Jiwa" class={inputCls} style={inputStyle} title="Jumlah jiwa" />
+                      <input type="number" min="0" name="l" value={dusun.l || ''} placeholder="L (opsional)" class={inputCls} style={inputStyle} />
+                      <input type="number" min="0" name="p" value={dusun.p || ''} placeholder="P (opsional)" class={inputCls} style={inputStyle} />
+                      <input type="number" min="0" name="kk" value={dusun.kk || ''} placeholder="KK (opsional)" class={inputCls} style={inputStyle} />
                     </>
                   )}
-                  <input type="number" name="urutan" value={row.urutan} class={inputCls} style={inputStyle} />
+                  <input type="number" min="0" name="urutan" value={row.urutan} class={inputCls} style={inputStyle} />
                 </div>
                 <div class="flex gap-2">
                   <button type="submit" class="px-3 py-1.5 rounded text-xs font-heading border" style="border-color:var(--color-border);">Simpan baris</button>
@@ -155,14 +155,14 @@ const inputStyle = 'border-color:var(--color-border); min-height:40px;';
           {c.layout === 'simple' ? (
             <div>
               <label class="block text-xs mb-1">Nilai</label>
-              <input type="number" name="value" value="0" class={inputCls} style={inputStyle} />
+              <input type="number" min="0" name="value" value="0" class={inputCls} style={inputStyle} />
             </div>
           ) : (
             <>
-              <input type="number" name="jmlRw" placeholder="RW" class={inputCls} style={inputStyle} />
-              <input type="number" name="jmlRt" placeholder="RT" class={inputCls} style={inputStyle} />
-              <input type="number" name="jiwa" placeholder="Jiwa" class={inputCls} style={inputStyle} />
-              <input type="number" name="kk" placeholder="KK" class={inputCls} style={inputStyle} />
+              <input type="number" min="0" name="jmlRw" placeholder="RW" class={inputCls} style={inputStyle} />
+              <input type="number" min="0" name="jmlRt" placeholder="RT" class={inputCls} style={inputStyle} />
+              <input type="number" min="0" name="jiwa" placeholder="Jiwa" class={inputCls} style={inputStyle} />
+              <input type="number" min="0" name="kk" placeholder="KK" class={inputCls} style={inputStyle} />
             </>
           )}
           <button type="submit" class="px-3 py-2 rounded-lg text-xs font-heading font-semibold text-white" style="background:var(--color-accent);">+ Baris</button>

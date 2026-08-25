@@ -6,6 +6,8 @@ import { getEnv } from '@lib/env';
 const env = getEnv();
 const list = env ? await getAllPotensi(env.DB) : [];
 const saved = Astro.url.searchParams.get('saved');
+const search = Astro.url.searchParams.get('q') ?? '';
+const filtered = list.filter(p => !search || p.nama.toLowerCase().includes(search.toLowerCase()));
 ---
 
 <AdminLayout title="Potensi" breadcrumb="Potensi">
@@ -15,6 +17,12 @@ const saved = Astro.url.searchParams.get('saved');
       Potensi disimpan.
     </div>
   )}
+
+  <form method="GET" class="flex flex-wrap gap-3 mb-4">
+    <input type="text" name="q" value={search} placeholder="Cari potensi..." class="rounded-lg border px-4 py-2 text-sm focus:outline-none flex-1 min-w-48" style="border-color:var(--color-border); min-height:44px;" />
+    <button type="submit" class="px-4 py-2 rounded-lg font-heading font-medium text-sm border hover:bg-sand cursor-pointer" style="border-color:var(--color-border); min-height:44px;">Cari</button>
+    {search && <a href="/admin/potensi" class="px-4 py-2 rounded-lg text-sm border hover:bg-sand inline-flex items-center" style="border-color:var(--color-border); min-height:44px;">Reset</a>}
+  </form>
 
   <div class="flex items-center justify-between mb-6">
     <div>
@@ -27,8 +35,8 @@ const saved = Astro.url.searchParams.get('saved');
   </div>
 
   <div class="bg-white rounded-xl border border-border overflow-hidden" style="box-shadow:var(--shadow-sm);">
-    {list.length === 0 ? (
-      <p class="p-8 text-center text-text-muted">Belum ada potensi.</p>
+    {filtered.length === 0 ? (
+      <p class="p-8 text-center text-text-muted">{list.length === 0 ? 'Belum ada potensi.' : 'Tidak ada potensi yang sesuai.'}</p>
     ) : (
       <table class="w-full text-sm">
         <thead style="background:#F8FAFC;">
@@ -40,7 +48,7 @@ const saved = Astro.url.searchParams.get('saved');
           </tr>
         </thead>
         <tbody>
-          {list.map((p) => (
+          {filtered.map((p) => (
             <tr class="border-b border-border last:border-0 hover:bg-sand/30">
               <td class="px-4 py-3 font-medium">{p.nama}<div class="text-xs text-text-muted">/{p.slug}</div></td>
               <td class="px-4 py-3 hidden sm:table-cell capitalize">{p.status}</td>

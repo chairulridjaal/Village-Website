@@ -5,34 +5,50 @@ import { getAllMedia } from '../../../lib/db/media';
 import { getEnv } from '@lib/env';
 const env = getEnv();
 const mediaList = env ? await getAllMedia(env.DB) : [];
+const search = Astro.url.searchParams.get('q') ?? '';
+const filtered = mediaList.filter(m => !search || m.alt.toLowerCase().includes(search.toLowerCase()) || m.r2_key_display.toLowerCase().includes(search.toLowerCase()));
+const deleted = Astro.url.searchParams.get('deleted');
+const error = Astro.url.searchParams.get('error');
 ---
 
 <AdminLayout title="Media" breadcrumb="Media">
 
+  {deleted && <div role="status" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#D1FAE5;color:#065F46;border:1px solid #6EE7B7;">Media dihapus.</div>}
+  {error && <div role="alert" class="mb-4 p-3 rounded-lg text-sm font-medium" style="background:#FEE2E2;color:#991B1B;border:1px solid #FECACA;">{error}</div>}
+
+  <form method="GET" class="flex flex-wrap gap-3 mb-4">
+    <input type="text" name="q" value={search} placeholder="Cari alt/nama file..." class="rounded-lg border px-4 py-2 text-sm focus:outline-none flex-1 min-w-48" style="border-color:var(--color-border); min-height:44px;" />
+    <button type="submit" class="px-4 py-2 rounded-lg font-heading font-medium text-sm border hover:bg-sand cursor-pointer" style="border-color:var(--color-border); min-height:44px;">Cari</button>
+    {search && <a href="/admin/media" class="px-4 py-2 rounded-lg text-sm border hover:bg-sand inline-flex items-center" style="border-color:var(--color-border); min-height:44px;">Reset</a>}
+  </form>
+
   <div class="flex items-center justify-between mb-6">
     <h2 class="font-heading font-bold text-xl" style="color:var(--color-primary);">Perpustakaan Media</h2>
+    <span class="text-sm text-text-muted">{filtered.length} / {mediaList.length} file</span>
   </div>
 
   <div class="bg-white rounded-xl border border-border p-6" style="box-shadow:var(--shadow-sm);">
     <p class="text-text-muted text-sm mb-4">
-      Upload gambar dilakukan langsung dari form UMKM, dan berita. Total file tersimpan: <strong>{mediaList.length}</strong>
+      Upload gambar dilakukan langsung dari form UMKM dan berita. Klik Hapus untuk menghapus dari R2 + database.
     </p>
 
-    {mediaList.length === 0 ? (
-      <p class="text-center text-text-muted py-8">Belum ada media yang diunggah.</p>
+    {filtered.length === 0 ? (
+      <p class="text-center text-text-muted py-8">{mediaList.length === 0 ? 'Belum ada media yang diunggah.' : 'Tidak ada media yang sesuai.'}</p>
     ) : (
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-        {mediaList.map(m => (
-          <div class="aspect-square rounded-lg overflow-hidden border border-border bg-sand/30 relative group">
-            <img
-              src={`/api/media/${encodeURIComponent(m.r2_key_thumb)}`}
-              alt={m.alt}
-              class="w-full h-full object-cover"
-              loading="lazy"
-            />
-            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-1.5">
-              <p class="text-white text-xs leading-tight line-clamp-2">{m.alt}</p>
+        {filtered.map(m => (
+          <div class="rounded-lg overflow-hidden border border-border bg-sand/30 group">
+            <div class="aspect-square relative overflow-hidden">
+              <img src={`/api/media/${encodeURIComponent(m.r2_key_thumb)}`} alt={m.alt} class="w-full h-full object-cover" loading="lazy" />
+              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-1.5">
+                <p class="text-white text-xs leading-tight line-clamp-2">{m.alt}</p>
+              </div>
             </div>
+            <form method="POST" action="/api/admin/media/manage" onsubmit="return confirm('Hapus media ini? File di R2 dan link akan dihapus.')" class="p-1.5 bg-white">
+              <input type="hidden" name="id" value={String(m.id)} />
+              <input type="hidden" name="_action" value="delete" />
+              <button type="submit" aria-label={`Hapus media ${m.alt || m.r2_key_display}`} class="w-full px-2 py-1 rounded text-xs font-heading border text-red-600 hover:bg-red-50" style="border-color:#FECACA; min-height:32px;">Hapus</button>
+            </form>
           </div>
         ))}
       </div>

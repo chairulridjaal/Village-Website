@@ -11,7 +11,8 @@ export const POST: APIRoute = async ({ request, locals, redirect }) => {
   if (!env) return redirect(`${back}${back.includes('?') ? '&' : '?'}error=media`);
 
   const action = fd.get('_action') as string;
-  const mediaId = Number(fd.get('media_id'));
+  const rawId = (fd.get('id') as string) ?? (fd.get('media_id') as string);
+  const mediaId = Number(rawId);
   const ownerType = (fd.get('owner_type') as string | null)?.trim() || null;
   const ownerId = Number(fd.get('owner_id'));
 
