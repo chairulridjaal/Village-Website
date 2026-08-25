@@ -1,6 +1,6 @@
 # Website Desa Citarik
 
-Website resmi Desa Citarik, dibangun sebagai bagian dari program **KKN-T Inovasi IPB University 2026** di Desa Citarik, Kabupaten Sukabumi. Situs ini menampilkan profil desa, potensi (pertanian, perikanan, pariwisata, sumber daya manusia), direktori UMKM, peta interaktif, dan berita desa, lengkap dengan panel admin agar perangkat desa dapat mengelola konten sendiri tanpa bantuan teknis.
+Website resmi Desa Citarik, dibangun sebagai bagian dari program **KKN-T Inovasi IPB University 2026** di Desa Citarik, Kabupaten Sukabumi. Situs ini menampilkan profil desa, potensi (pertanian, perikanan, pariwisata, sumber daya manusia), direktori UMKM, peta interaktif, dan berita desa, lengkap dengan panel admin untuk mengelola konten.
 
 Situs berjalan langsung di [desacitarik.web.id](https://desacitarik.web.id).
 
